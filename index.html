@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>편의점 타이쿤 (Convenience Store Tycoon)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.85; }
+        }
+        .animate-alert-pulse {
+            animation: pulse-ring 1.2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden pb-20">
+
+    <!-- TOP NAVIGATION & UTILITIES HEADER -->
+    <header id="top-nav" class="hidden bg-slate-900 border-b border-slate-800 px-3 py-2 sticky top-0 z-30 shadow-lg justify-between items-center gap-2">
+        <div class="flex items-center gap-1.5 min-w-0">
+            <div class="bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-black px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow shrink-0">
+                <i data-lucide="store" class="w-4 h-4 shrink-0"></i>
+                <span id="nav-store-name" class="text-xs tracking-tight font-extrabold whitespace-nowrap">홍길동 점장의 편의점</span>
+            </div>
+            <div class="hidden sm:flex items-center gap-1.5 text-xs shrink-0">
+                <span id="tag-nickname-badge" class="bg-slate-800 text-cyan-300 px-2 py-1 rounded-lg border border-slate-700 font-semibold flex items-center gap-1 text-[11px] whitespace-nowrap">
+                    <i data-lucide="user" class="w-3 h-3"></i> <span id="tag-nickname">홍길동</span>
+                </span>
+                <span id="tag-mode-badge" class="bg-slate-800 text-purple-300 px-2 py-1 rounded-lg border border-slate-700 font-semibold flex items-center gap-1 text-[11px] whitespace-nowrap">
+                    <i data-lucide="smartphone" class="w-3 h-3"></i> <span id="tag-mode">모바일</span>
+                </span>
+            </div>
+            <span id="speed-tag" class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded border border-amber-800 font-bold text-[10px] whitespace-nowrap hidden shrink-0">
+                ⚡ 1x
+            </span>
+        </div>
+
+        <!-- TOP UTILITY BUTTONS -->
+        <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="openModal('modal-help')" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-black rounded-xl border border-cyan-500/40 transition flex items-center justify-center shadow" title="게임방법">
+                ?
+            </button>
+            <button onclick="openAdminAuthModal()" class="bg-purple-950 hover:bg-purple-900 text-purple-200 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-purple-500/50 transition flex items-center gap-1 shadow whitespace-nowrap">
+                <i data-lucide="shield-check" class="w-4 h-4 text-purple-400"></i> <span class="hidden sm:inline">관리자</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed top-14 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+    <!-- MAIN APP CONTAINER -->
+    <main id="app-container" class="flex-grow flex items-center justify-center p-2 sm:p-4 max-w-6xl mx-auto w-full">
+
+        <!-- 1. START SCREEN -->
+        <div id="screen-start" class="relative w-full max-w-md bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 p-6 sm:p-8 text-center space-y-6 my-auto">
+            <button onclick="openModal('modal-help')" class="absolute top-4 right-4 w-8 h-8 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-sm font-black rounded-full border border-cyan-500/40 transition flex items-center justify-center shadow" title="게임방법">
+                ?
+            </button>
+
+            <div class="space-y-3">
+                <div class="inline-flex p-4 bg-emerald-500/10 rounded-2xl text-emerald-400 border border-emerald-500/20 mb-1">
+                    <i data-lucide="store" class="w-12 h-12"></i>
+                </div>
+                <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 tracking-tight">
+                    편의점 타이쿤
+                </h1>
+                <p class="text-slate-400 text-xs leading-relaxed">
+                    손님 계산, 재고 발주, 매장 청소, 알바 자동화 시스템!<br>최고의 편의점 점장에 도전해 보세요.
+                </p>
+            </div>
+
+            <div class="space-y-4 text-left">
+                <!-- Nickname Input -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <i data-lucide="user-check" class="w-4 h-4 text-emerald-400"></i> 점장 닉네임 설정
+                    </label>
+                    <input type="text" id="input-nickname" placeholder="홍길동" 
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition placeholder-slate-600 text-sm font-medium">
+                    <p id="nickname-error" class="hidden text-rose-400 text-xs font-bold mt-1.5 flex items-center gap-1">
+                        ⚠️ 닉네임을 채워주세요!
+                    </p>
+                </div>
+
+                <!-- Device Mode Selection -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <i data-lucide="monitor-smartphone" class="w-4 h-4 text-cyan-400"></i> 기기 최적화 모드 선택
+                    </label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" id="btn-device-mobile" onclick="selectDeviceMode('mobile')" 
+                            class="device-btn p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-950/40 text-emerald-300 flex flex-col items-center gap-1.5 transition">
+                            <i data-lucide="smartphone" class="w-6 h-6"></i>
+                            <span class="text-xs font-bold">📱 핸드폰 모드</span>
+                            <span class="text-[10px] text-slate-400">터치 최적화 UI</span>
+                        </button>
+                        <button type="button" id="btn-device-pc" onclick="selectDeviceMode('pc')" 
+                            class="device-btn p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950 text-slate-400 flex flex-col items-center gap-1.5 transition">
+                            <i data-lucide="monitor" class="w-6 h-6"></i>
+                            <span class="text-xs font-bold">💻 PC 모드</span>
+                            <span class="text-[10px] text-slate-400">단축키(1~6, Space, C)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black py-4 px-6 rounded-2xl shadow-lg hover:shadow-emerald-500/20 transition transform active:scale-95 text-base flex items-center justify-center gap-2">
+                <i data-lucide="play" class="w-5 h-5 fill-slate-950"></i> 영업 시작하기
+            </button>
+        </div>
+
+        <!-- 2. GAME MAIN WORKSPACE (TABBED PANELS) -->
+        <div id="screen-game" class="hidden w-full flex flex-col gap-4">
+
+            <!-- STAT DASHBOARD BAR (Always visible in game) -->
+            <div class="bg-slate-900 rounded-2xl p-3.5 border border-slate-800 shadow-xl grid grid-cols-2 lg:grid-cols-4 gap-3 items-center">
+                <!-- Money -->
+                <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2.5">
+                    <div class="p-2 bg-amber-500/10 text-amber-400 rounded-lg border border-amber-500/20 shrink-0">
+                        <i data-lucide="coins" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold">보유 자금</div>
+                        <div id="stat-money" class="text-base sm:text-lg font-black text-amber-400 tracking-tight">50,000 원</div>
+                    </div>
+                </div>
+
+                <!-- Satisfaction Gauge (-30 to +100) -->
+                <div id="sat-card" class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400 font-bold flex items-center gap-1 text-[11px]">
+                            <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-400"></i> 만족도
+                        </span>
+                        <span id="stat-sat-val" class="font-black text-emerald-400 text-xs">+1</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5 relative">
+                        <div id="sat-bar" class="bg-emerald-400 h-full transition-all duration-300" style="width: 23.8%;"></div>
+                    </div>
+                    <div class="text-[9px] text-slate-500 flex justify-between mt-1 font-mono">
+                        <span class="text-rose-400 font-bold">-30(해고)</span>
+                        <span>0</span>
+                        <span>+100</span>
+                    </div>
+                </div>
+
+                <!-- Cleanliness Gauge -->
+                <div id="clean-card" class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400 font-bold flex items-center gap-1 text-[11px]">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i> 매장 청결도
+                        </span>
+                        <span id="stat-clean-val" class="font-bold text-cyan-300 text-xs">100%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
+                        <div id="clean-bar" class="bg-cyan-400 h-full transition-all duration-300" style="width: 100%;"></div>
+                    </div>
+                    <div class="text-[9px] text-slate-500 mt-1 flex justify-between">
+                        <span id="clean-warning-text" class="text-slate-500">쾌적함</span>
+                        <span class="text-rose-400 font-bold hidden" id="dirty-alert-badge">⚠️ 더러움(-1/3초)</span>
+                    </div>
+                </div>
+
+                <!-- Staff Summary -->
+                <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2.5">
+                    <div class="p-2 bg-purple-500/10 text-purple-400 rounded-lg border border-purple-500/20 shrink-0">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-[10px] text-slate-400 font-bold">근무 알바</div>
+                        <div id="stat-staff-summary" class="text-xs font-bold text-purple-300 truncate">없음 (점장 직접 관리)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB PANELS CONTENT AREA -->
+            <div id="tab-panels" class="w-full">
+
+                <!-- TAB 1: 🏪 STORE OVERVIEW (현재상황) -->
+                <div id="panel-overview" class="tab-panel space-y-4">
+                    <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800 shadow-xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h3 class="font-extrabold text-base text-white flex items-center gap-2">
+                                <i data-lucide="layout-dashboard" class="w-5 h-5 text-emerald-400"></i> 편의점 실시간 영업 현황
+                            </h3>
+                            <span class="text-xs text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded-lg border border-emerald-800 font-semibold">
+                                영업 중 🟢
+                            </span>
+                        </div>
+
+                        <!-- Status Alert Cards Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div onclick="switchMainTab('pos')" class="bg-slate-950 p-4 rounded-2xl border border-slate-800 hover:border-emerald-500/50 cursor-pointer transition space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-slate-400">POS 대기 손님</span>
+                                    <span id="overview-cust-badge" class="bg-emerald-500/20 text-emerald-300 text-xs px-2 py-0.5 rounded-full font-bold">1명 대기 중</span>
+                                </div>
+                                <div id="overview-cust-text" class="text-sm font-bold text-white truncate">손님 주문을 확인하세요!</div>
+                                <div class="text-[11px] text-emerald-400 flex items-center gap-1">👉 [계산하기] 탭으로 이동</div>
+                            </div>
+
+                            <div onclick="switchMainTab('inventory')" class="bg-slate-950 p-4 rounded-2xl border border-slate-800 hover:border-cyan-500/50 cursor-pointer transition space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-slate-400">매장 청결 상태</span>
+                                    <span id="overview-clean-badge" class="bg-cyan-500/20 text-cyan-300 text-xs px-2 py-0.5 rounded-full font-bold">쾌적함</span>
+                                </div>
+                                <div id="overview-clean-text" class="text-sm font-bold text-white">매장 청결도 100%</div>
+                                <div class="text-[11px] text-cyan-400 flex items-center gap-1">👉 [재고/청소] 탭으로 이동</div>
+                            </div>
+
+                            <div onclick="switchMainTab('staff')" class="bg-slate-950 p-4 rounded-2xl border border-slate-800 hover:border-purple-500/50 cursor-pointer transition space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-slate-400">알바 고용 상황</span>
+                                    <span id="overview-staff-badge" class="bg-purple-500/20 text-purple-300 text-xs px-2 py-0.5 rounded-full font-bold">0명 근무 중</span>
+                                </div>
+                                <div id="overview-staff-text" class="text-sm font-bold text-white">알바를 고용하여 업무를 자동화하세요!</div>
+                                <div class="text-[11px] text-purple-400 flex items-center gap-1">👉 [알바관리] 탭으로 이동</div>
+                            </div>
+                        </div>
+
+                        <!-- Real-time Activity Log -->
+                        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+                            <h4 class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                                <i data-lucide="history" class="w-4 h-4 text-amber-400"></i> 실시간 편의점 영업 일지
+                            </h4>
+                            <div id="overview-log-container" class="space-y-1.5 max-h-40 overflow-y-auto text-xs text-slate-400">
+                                <div class="p-2 bg-slate-900/60 rounded-xl border border-slate-800/80 text-emerald-300">
+                                    [시스템] 매장 영업을 개시하였습니다. 성공적인 경영을 응원합니다!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: 💳 POS CHECKOUT (계산하기) -->
+                <div id="panel-pos" class="tab-panel hidden space-y-4">
+                    <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800 shadow-xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h3 class="font-extrabold text-base text-white flex items-center gap-2">
+                                <i data-lucide="calculator" class="w-5 h-5 text-emerald-400"></i> POS 계산대
+                            </h3>
+                            <span id="pos-shortcut-hint" class="text-xs text-purple-300 bg-purple-950 px-2.5 py-1 rounded-lg border border-purple-800 hidden">
+                                ⌨️ 단축키: 숫자 1~6 바코드스캔 / Space bar: 결제 완료
+                            </span>
+                        </div>
+
+                        <!-- Customer Area -->
+                        <div class="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800 min-h-[140px] flex flex-col justify-between relative">
+                            <div class="flex items-start gap-3">
+                                <div class="p-3 bg-slate-800 rounded-2xl border border-slate-700 text-3xl shrink-0" id="cust-avatar">
+                                    🧑
+                                </div>
+                                <div class="speech-bubble bg-slate-800 p-3 rounded-2xl text-xs sm:text-sm space-y-1 w-full border border-slate-700">
+                                    <div id="cust-name" class="font-bold text-emerald-300">손님 대기 중...</div>
+                                    <div id="cust-order-text" class="text-slate-200">손님이 오기를 기다리고 있습니다.</div>
+                                </div>
+                            </div>
+
+                            <!-- Scanned Items Barcode Summary -->
+                            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-bold">스캔된 바코드 목록:</span>
+                                <span id="pos-scanned-summary" class="font-bold text-amber-300">선택 없음</span>
+                            </div>
+                        </div>
+
+                        <!-- POS Barcode Buttons -->
+                        <div class="space-y-2">
+                            <div class="text-xs font-bold text-slate-400 flex justify-between">
+                                <span>상품 바코드 선택</span>
+                                <span class="text-slate-500">손님이 요구한 상품을 바코드로 찍으세요</span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="pos-products-grid">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                        <!-- POS Actions -->
+                        <div class="grid grid-cols-3 gap-2.5 pt-2">
+                            <button onclick="clearPosSelection()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-3.5 rounded-xl border border-slate-700 transition">
+                                초기화
+                            </button>
+                            <button onclick="submitPosCheckout()" class="col-span-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-1.5 active:scale-95">
+                                <i data-lucide="check-circle" class="w-5 h-5"></i> 결제 승인 완료 (+3)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: 📦 INVENTORY & CLEANING (재고/청소) -->
+                <div id="panel-inventory" class="tab-panel hidden space-y-4">
+                    <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800 shadow-xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h3 class="font-extrabold text-base text-white flex items-center gap-2">
+                                <i data-lucide="boxes" class="w-5 h-5 text-cyan-400"></i> 재고 발주 & 매장 대청소
+                            </h3>
+                            <button onclick="cleanStore()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
+                                🧹 매장 청소하기 [C]
+                            </button>
+                        </div>
+
+                        <!-- Product Stock Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="inventory-list">
+                            <!-- Injected via JS -->
+                        </div>
+
+                        <!-- Restock All Action -->
+                        <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
+                            <span class="text-xs text-slate-400">전 품목 재고가 부족할 때 한번에 발주</span>
+                            <button onclick="restockAllProducts()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow flex items-center gap-1.5">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i> 전체 재고 일괄 보충
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: 👥 STAFF RECRUITMENT (알바관리) -->
+                <div id="panel-staff" class="tab-panel hidden space-y-4">
+                    <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800 shadow-xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h3 class="font-extrabold text-base text-white flex items-center gap-2">
+                                <i data-lucide="user-plus" class="w-5 h-5 text-purple-400"></i> 아르바이트 고용 및 관리
+                            </h3>
+                            <span class="text-xs text-purple-300 bg-purple-950 px-2.5 py-1 rounded-lg border border-purple-800 font-semibold">
+                                업무 자동화
+                            </span>
+                        </div>
+
+                        <!-- Staff Cards Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="staff-hire-list">
+                            <!-- Injected via JS -->
+                        </div>
+
+                        <!-- Staff Activity Console -->
+                        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 text-xs space-y-1">
+                            <div class="font-bold text-slate-400 flex justify-between">
+                                <span>알바 실시간 활동 모니터링</span>
+                                <span id="staff-auto-status" class="text-purple-400 font-semibold">대기 중</span>
+                            </div>
+                            <div id="staff-log-text" class="text-slate-500 truncate">고용된 알바생이 없습니다. 점장이 직접 매장을 관리 중입니다.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: 📢 COMMUNITY & POLLS (공지/투표) -->
+                <div id="panel-community" class="tab-panel hidden space-y-4">
+                    <div class="bg-slate-900 rounded-3xl p-4 sm:p-5 border border-slate-800 shadow-xl space-y-4">
+                        <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-3 gap-2">
+                            <h3 class="font-extrabold text-sm sm:text-base text-white flex items-center gap-1.5">
+                                <i data-lucide="megaphone" class="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 shrink-0"></i>
+                                <span>편의점 커뮤니티 & 실시간 투표</span>
+                            </h3>
+                            <!-- Circled Right-Side Action Buttons: Bug Report & Suggestion -->
+                            <div class="flex items-center gap-1.5 ml-auto">
+                                <button onclick="openModal('modal-bug')" class="bg-rose-950/90 hover:bg-rose-900 text-rose-200 text-[11px] font-bold px-2.5 py-1.5 rounded-xl border border-rose-500/40 transition flex items-center gap-1 shadow whitespace-nowrap">
+                                    <i data-lucide="bug" class="w-3.5 h-3.5 text-rose-400"></i> 버그신고
+                                </button>
+                                <button onclick="openModal('modal-suggest')" class="bg-emerald-950/90 hover:bg-emerald-900 text-emerald-200 text-[11px] font-bold px-2.5 py-1.5 rounded-xl border border-emerald-500/40 transition flex items-center gap-1 shadow whitespace-nowrap">
+                                    <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-emerald-400"></i> 개선사항
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sub-Tabs: Notices & Polls -->
+                        <div class="flex items-center gap-1.5 text-xs bg-slate-950 p-1 rounded-xl border border-slate-800 w-fit">
+                            <button onclick="switchCommunityTab('notices')" id="ctab-notices" class="px-3 py-1.5 rounded-lg font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">📢 공지사항</button>
+                            <button onclick="switchCommunityTab('polls')" id="ctab-polls" class="px-3 py-1.5 rounded-lg font-bold text-slate-400 hover:text-white">🗳️ 진행 중인 투표</button>
+                        </div>
+
+                        <!-- Community Sub Tab 1: Notices -->
+                        <div id="ccontent-notices" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                            <!-- Injected via JS -->
+                        </div>
+
+                        <!-- Community Sub Tab 2: Polls (0 votes initial!) -->
+                        <div id="ccontent-polls" class="hidden space-y-3 max-h-80 overflow-y-auto pr-1">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3. GAME OVER MODAL -->
+        <div id="screen-gameover" class="hidden fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+            <div class="bg-slate-900 border-2 border-rose-600 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center text-white space-y-6 shadow-2xl animate-alert-pulse">
+                <div class="inline-flex p-4 bg-rose-500/20 text-rose-500 rounded-full border border-rose-500/30">
+                    <i data-lucide="store-slash" class="w-12 h-12"></i>
+                </div>
+                <div class="space-y-2">
+                    <h2 class="text-3xl font-black text-rose-500 tracking-tight">당신은 해고당했습니다</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        손님 만족도가 <b class="text-rose-400">-30 이하</b>로 떨어져 본사로부터 점장 직위 해제 및 계약 파기를 통보받았습니다.
+                    </p>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-left space-y-2 text-xs font-medium">
+                    <div class="flex justify-between text-slate-300">
+                        <span>최종 보유 자금:</span>
+                        <span id="go-final-money" class="font-bold text-amber-400">0 원</span>
+                    </div>
+                    <div class="flex justify-between text-slate-300">
+                        <span>서비스한 총 손님 수:</span>
+                        <span id="go-final-cust" class="font-bold text-cyan-400">0 명</span>
+                    </div>
+                    <div class="flex justify-between text-slate-300">
+                        <span>최종 손님 만족도:</span>
+                        <span id="go-final-sat" class="font-bold text-rose-400">-31</span>
+                    </div>
+                </div>
+                <button onclick="restartGame()" class="w-full bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-lg transition transform active:scale-95 text-base flex items-center justify-center gap-2">
+                    <i data-lucide="rotate-cw" class="w-5 h-5"></i> 매장 재개업하기 (다시 시작)
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FIXED BOTTOM NAVIGATION TAB BAR -->
+    <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 z-40 backdrop-blur-md px-2 py-2">
+        <div class="max-w-xl mx-auto grid grid-cols-5 gap-1 text-center">
+            <button onclick="switchMainTab('overview')" id="nav-btn-overview" class="nav-tab-btn flex flex-col items-center py-1.5 rounded-xl text-emerald-400 bg-slate-800/80 font-bold transition">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">현재상황</span>
+            </button>
+            <button onclick="switchMainTab('pos')" id="nav-btn-pos" class="nav-tab-btn relative flex flex-col items-center py-1.5 rounded-xl text-slate-400 hover:text-white font-bold transition">
+                <span id="badge-nav-pos" class="hidden absolute -top-1 right-2 bg-rose-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black animate-bounce">!</span>
+                <i data-lucide="calculator" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">계산하기</span>
+            </button>
+            <button onclick="switchMainTab('inventory')" id="nav-btn-inventory" class="nav-tab-btn relative flex flex-col items-center py-1.5 rounded-xl text-slate-400 hover:text-white font-bold transition">
+                <span id="badge-nav-inventory" class="hidden absolute -top-1 right-2 bg-cyan-400 text-slate-950 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black">!</span>
+                <i data-lucide="boxes" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">재고/청소</span>
+            </button>
+            <button onclick="switchMainTab('staff')" id="nav-btn-staff" class="nav-tab-btn flex flex-col items-center py-1.5 rounded-xl text-slate-400 hover:text-white font-bold transition">
+                <i data-lucide="user-plus" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">알바관리</span>
+            </button>
+            <button onclick="switchMainTab('community')" id="nav-btn-community" class="nav-tab-btn flex flex-col items-center py-1.5 rounded-xl text-slate-400 hover:text-white font-bold transition">
+                <i data-lucide="megaphone" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">공지/투표</span>
+            </button>
+        </div>
+    </nav>
+
+
+    <!-- MODALS SECTION -->
+
+    <!-- MODAL 0: GAME HELP MODAL -->
+    <div id="modal-help" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-cyan-500/40 rounded-3xl w-full max-w-md text-white shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-bold text-cyan-300 flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-700 flex items-center justify-center font-black text-xs">?</span> 게임 설명 & 가이드</h3>
+                <button onclick="closeModal('modal-help')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-4 space-y-3 text-xs overflow-y-auto text-slate-300">
+                <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1">
+                    <div class="font-bold text-emerald-400">1. POS 계산대 업무</div>
+                    <p class="text-[11px] text-slate-400">손님이 요구하는 상품 바코드를 클릭 후 <b>[결제 승인 완료]</b> 클릭! 정확히 계산 시 <b>만족도 +3</b>, 오답/재고 부족 시 <b>만족도 -5</b>.</p>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1">
+                    <div class="font-bold text-cyan-400">2. 매장 청결도 & 패널티</div>
+                    <p class="text-[11px] text-slate-400">청결도가 <b>60% 미만</b>이 되면 3초마다 <b>만족도가 -1씩</b> 지속 감점됩니다. <b>[재고/청소]</b> 탭에서 대청소하세요!</p>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1">
+                    <div class="font-bold text-purple-400">3. 알바 고용 (자동화)</div>
+                    <p class="text-[11px] text-slate-400">알바를 고용하면 손님 계산, 매장 청소, 재고 발주를 <b>자동 대행</b>해 줍니다. 알바 체력이 바닥나면 <b>피로회복제</b>를 챙겨주세요.</p>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1">
+                    <div class="font-bold text-rose-400">4. 해고 기준 (게임 오버)</div>
+                    <p class="text-[11px] text-slate-400">만족도가 <b>-30 이하</b>로 폭락하면 <b>"당신은 해고당했습니다"</b> 팝업과 함께 게임 오버됩니다.</p>
+                </div>
+            </div>
+            <div class="p-3 bg-slate-950 border-t border-slate-800 text-right">
+                <button onclick="closeModal('modal-help')" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold text-slate-200">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: NOTICE MODAL -->
+    <div id="modal-notice" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg text-white shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-bold text-amber-400 flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4"></i> 편의점 공지사항</h3>
+                <button onclick="closeModal('modal-notice')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="modal-notice-container" class="p-4 space-y-3 overflow-y-auto flex-grow text-xs">
+                <!-- Injected via JS -->
+            </div>
+            <div class="p-3 bg-slate-950 border-t border-slate-800 text-right">
+                <button onclick="closeModal('modal-notice')" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: BUG REPORT MODAL -->
+    <div id="modal-bug" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md text-white shadow-2xl overflow-hidden">
+            <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-bold text-rose-400 flex items-center gap-2"><i data-lucide="bug" class="w-4 h-4"></i> 버그 신고하기</h3>
+                <button onclick="closeModal('modal-bug')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="submitBugReport(event)" class="p-4 space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 font-bold mb-1">제목</label>
+                    <input type="text" id="bug-title" required placeholder="버그 현상 제목" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-rose-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-bold mb-1">상세 내용</label>
+                    <textarea id="bug-content" required rows="4" placeholder="발생한 버그 내용을 구체적으로 작성하세요" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-rose-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-bug')" class="bg-slate-800 px-4 py-2 rounded-xl font-bold">취소</button>
+                    <button type="submit" class="bg-rose-600 hover:bg-rose-500 px-4 py-2 rounded-xl font-bold text-white">보내기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: SUGGESTION MODAL -->
+    <div id="modal-suggest" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md text-white shadow-2xl overflow-hidden">
+            <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-bold text-emerald-400 flex items-center gap-2"><i data-lucide="lightbulb" class="w-4 h-4"></i> 개선사항 제안하기</h3>
+                <button onclick="closeModal('modal-suggest')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="submitSuggestion(event)" class="p-4 space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 font-bold mb-1">제안 제목</label>
+                    <input type="text" id="suggest-title" required placeholder="아이디어 제목" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-bold mb-1">상세 내용</label>
+                    <textarea id="suggest-content" required rows="4" placeholder="게임 개선 또는 추가하고 싶은 기능을 적어주세요" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-suggest')" class="bg-slate-800 px-4 py-2 rounded-xl font-bold">취소</button>
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-xl font-bold text-white">보내기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: ADMIN AUTH MODAL -->
+    <div id="modal-admin-auth" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-purple-600/60 rounded-3xl w-full max-w-xs text-white shadow-2xl p-5 space-y-4 text-center">
+            <div class="inline-flex p-3 bg-purple-500/10 text-purple-400 rounded-2xl border border-purple-500/20">
+                <i data-lucide="lock" class="w-8 h-8"></i>
+            </div>
+            <div>
+                <h3 class="font-extrabold text-base text-purple-200">관리자 인증</h3>
+                <p class="text-[11px] text-slate-400 mt-1">비밀번호를 입력하여 접속하세요.</p>
+            </div>
+            <input type="password" id="admin-pass-input" placeholder="비밀번호 입력" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-center text-xs text-white focus:outline-none focus:border-purple-500">
+            <div class="flex gap-2">
+                <button onclick="closeModal('modal-admin-auth')" class="w-1/2 bg-slate-800 py-2 rounded-xl text-xs font-bold">취소</button>
+                <button onclick="verifyAdminPassword()" class="w-1/2 bg-purple-600 hover:bg-purple-500 py-2 rounded-xl text-xs font-bold text-white">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: ALMIGHTY ADMIN PANEL -->
+    <div id="modal-admin-panel" class="hidden fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-slate-900 border-2 border-purple-600 rounded-3xl w-full max-w-4xl text-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 bg-purple-950 border-b border-purple-800/80 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="shield-alert" class="w-6 h-6 text-purple-400"></i>
+                    <div>
+                        <h3 class="font-extrabold text-base text-purple-200">관리자 전용 올마이티 콘솔</h3>
+                        <p class="text-[11px] text-purple-300 font-semibold" id="admin-visitor-badge">👁️ 지금까지 접속한 총 인원수: 0명</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-admin-panel')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+
+            <div class="p-4 space-y-6 overflow-y-auto flex-grow">
+
+                <!-- CHEAT CONTROLLER -->
+                <div class="bg-slate-950 border border-purple-500/30 p-4 rounded-2xl space-y-3">
+                    <h4 class="font-bold text-amber-300 text-xs flex items-center gap-2">
+                        <i data-lucide="wand-2" class="w-4 h-4 text-amber-400"></i> 게임 실시간 조작 & 올마이티 치트
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
+                        <button onclick="cheatMoney(100000)" class="bg-emerald-950 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-200 p-2.5 rounded-xl font-bold">
+                            +10만원 추가
+                        </button>
+                        <button onclick="cheatMoney(1000000)" class="bg-emerald-900 hover:bg-emerald-800 border border-emerald-500 text-emerald-100 p-2.5 rounded-xl font-bold">
+                            +100만원 추가
+                        </button>
+                        <button onclick="cheatSatisfaction(10)" class="bg-rose-950 hover:bg-rose-900 border border-rose-600/50 text-rose-200 p-2.5 rounded-xl font-bold">
+                            만족도 +10
+                        </button>
+                        <button onclick="cheatSatisfactionSet(100)" class="bg-rose-900 hover:bg-rose-800 border border-rose-500 text-rose-100 p-2.5 rounded-xl font-bold">
+                            만족도 100 설정
+                        </button>
+                        <button onclick="cheatClean()" class="bg-cyan-950 hover:bg-cyan-900 border border-cyan-600/50 text-cyan-200 p-2.5 rounded-xl font-bold">
+                            즉시 100% 청소
+                        </button>
+                        <button onclick="cheatRestock()" class="bg-indigo-950 hover:bg-indigo-900 border border-indigo-600/50 text-indigo-200 p-2.5 rounded-xl font-bold">
+                            전 상품 재고 MAX
+                        </button>
+                        <button onclick="cheatHireAll()" class="bg-purple-950 hover:bg-purple-900 border border-purple-600/50 text-purple-200 p-2.5 rounded-xl font-bold">
+                            모든 알바 무료 고용
+                        </button>
+                        <button onclick="cheatGodMode()" class="bg-amber-950 hover:bg-amber-900 border border-amber-600/50 text-amber-200 p-2.5 rounded-xl font-bold">
+                            무적 모드 (ON/OFF)
+                        </button>
+                    </div>
+
+                    <!-- Speed Control -->
+                    <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
+                        <span class="text-slate-400 font-bold">게임 진행 속도:</span>
+                        <div class="flex gap-2">
+                            <button onclick="setGameSpeed(1)" class="bg-slate-800 px-3 py-1 rounded-lg hover:bg-slate-700 font-bold text-white">1x 일반</button>
+                            <button onclick="setGameSpeed(2)" class="bg-slate-800 px-3 py-1 rounded-lg hover:bg-slate-700 font-bold text-amber-400">2x 배속</button>
+                            <button onclick="setGameSpeed(3)" class="bg-slate-800 px-3 py-1 rounded-lg hover:bg-slate-700 font-bold text-rose-400">3x 배속</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTICE MANAGEMENT -->
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-3">
+                    <h4 class="font-bold text-cyan-300 text-xs flex items-center gap-2">
+                        <i data-lucide="megaphone" class="w-4 h-4 text-cyan-400"></i> 공지사항 작성 및 관리
+                    </h4>
+                    <form onsubmit="adminPostNotice(event)" class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="admin-notice-input" required placeholder="모든 유저에게 올릴 공지사항 작성..." class="flex-grow bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+                        <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-4 py-2 rounded-xl text-xs shrink-0">등록하기</button>
+                    </form>
+                    <div id="admin-notice-list" class="space-y-2 max-h-32 overflow-y-auto pt-2 text-xs">
+                        <!-- Injected JS -->
+                    </div>
+                </div>
+
+                <!-- POLL MANAGEMENT (ADMIN) -->
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-3">
+                    <h4 class="font-bold text-cyan-300 text-xs flex items-center gap-2">
+                        <i data-lucide="vote" class="w-4 h-4 text-cyan-400"></i> 새로운 투표 올리기 (0표부터 시작)
+                    </h4>
+                    <form onsubmit="adminCreatePoll(event)" class="space-y-2 text-xs">
+                        <input type="text" id="admin-poll-title" required placeholder="투표 질문 제목 (예: 추가되었으면 하는 상품은?)" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-400">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="admin-poll-opt1" required placeholder="선택지 1" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-400">
+                            <input type="text" id="admin-poll-opt2" required placeholder="선택지 2" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-400">
+                            <input type="text" id="admin-poll-opt3" placeholder="선택지 3 (선택)" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-400">
+                            <input type="text" id="admin-poll-opt4" placeholder="선택지 4 (선택)" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-400">
+                        </div>
+                        <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 rounded-xl text-xs">투표 만들기</button>
+                    </form>
+                    <div id="admin-poll-list" class="space-y-2 max-h-36 overflow-y-auto pt-2 text-xs">
+                        <!-- Injected JS -->
+                    </div>
+                </div>
+
+                <!-- USER REPORTS BOARD (BUGS & SUGGESTIONS) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-2">
+                        <h4 class="font-bold text-rose-300 flex items-center gap-2">
+                            <i data-lucide="bug" class="w-4 h-4 text-rose-400"></i> 접수된 버그 신고
+                        </h4>
+                        <div id="admin-bug-list" class="space-y-2 max-h-48 overflow-y-auto">
+                            <!-- Injected JS -->
+                        </div>
+                    </div>
+                    <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-2">
+                        <h4 class="font-bold text-emerald-300 flex items-center gap-2">
+                            <i data-lucide="lightbulb" class="w-4 h-4 text-emerald-400"></i> 접수된 개선 요청
+                        </h4>
+                        <div id="admin-suggest-list" class="space-y-2 max-h-48 overflow-y-auto">
+                            <!-- Injected JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- GAME SCRIPT LOGIC -->
+    <script>
+        /* ====================================================
+           GAME CONSTANTS & STATE
+        ==================================================== */
+        const ADMIN_PASS = "landers_0724_jaeha";
+
+        let state = {
+            nickname: '홍길동',
+            deviceMode: 'mobile',
+            activeTab: 'overview',
+            money: 50000,
+            satisfaction: 1,
+            cleanliness: 100,
+            gameSpeed: 1,
+            godMode: false,
+            isGameOver: false,
+            customersServed: 0,
+            visitorCount: 1,
+            activeCommunityTab: 'notices'
+        };
+
+        const PRODUCTS = [
+            { id: 1, name: '삼각김밥', icon: '🍙', price: 1500, wholesale: 800, stock: 10, maxStock: 20 },
+            { id: 2, name: '컵라면', icon: '🍜', price: 1800, wholesale: 1000, stock: 10, maxStock: 20 },
+            { id: 3, name: '바나나우유', icon: '🍌', price: 1700, wholesale: 900, stock: 10, maxStock: 20 },
+            { id: 4, name: '캔커피', icon: '☕', price: 1200, wholesale: 600, stock: 10, maxStock: 20 },
+            { id: 5, name: '감자칩', icon: '🥔', price: 2000, wholesale: 1100, stock: 10, maxStock: 20 },
+            { id: 6, name: '생수', icon: '💧', price: 1000, wholesale: 500, stock: 10, maxStock: 20 }
+        ];
+
+        const STAFF_MEMBERS = [
+            { id: 1, name: '초보 캐셔 알바', contractFee: 120000, hourlyWage: 10000, role: 'cashier', stamina: 100, maxStamina: 100, hired: false, icon: '🧑‍🍳' },
+            { id: 2, name: '매장 관리 알바', contractFee: 250000, hourlyWage: 13000, role: 'cleaner', stamina: 100, maxStamina: 100, hired: false, icon: '🧹' },
+            { id: 3, name: '베테랑 매니저', contractFee: 550000, hourlyWage: 20000, role: 'all', stamina: 100, maxStamina: 100, hired: false, icon: '👔' }
+        ];
+
+        let currentCustomer = null;
+        let posSelection = {}; // { itemId: quantity }
+
+        let customerTimer = null;
+        let cleanlinessTimer = null;
+        let staffAutoTimer = null;
+
+        const LS_NOTICE_KEY = 'conv_store_notices_v4';
+        const LS_BUG_KEY = 'conv_store_bugs_v4';
+        const LS_SUGGEST_KEY = 'conv_store_suggests_v4';
+        const LS_POLL_KEY = 'conv_store_polls_v4';
+        const LS_VISITOR_KEY = 'conv_store_visitors_v4';
+
+        /* ====================================================
+           INITIALIZATION & LOCAL STORAGE
+        ==================================================== */
+        window.onload = function() {
+            lucide.createIcons();
+            initLocalStorage();
+            incrementVisitorCount();
+            setupKeyboardShortcuts();
+        };
+
+        function incrementVisitorCount() {
+            let count = parseInt(localStorage.getItem(LS_VISITOR_KEY) || '0') + 1;
+            localStorage.setItem(LS_VISITOR_KEY, count.toString());
+            state.visitorCount = count;
+        }
+
+        function initLocalStorage() {
+            // Strictly NO fake initial polls or bug reports with pre-populated votes!
+            if (!localStorage.getItem(LS_NOTICE_KEY)) {
+                const defaultNotices = [
+                    { id: 1, text: '[공지] 편의점 타이쿤 오픈! 하단 메뉴 탭을 통해 매장을 운영해보세요.', date: '2026-11-13' }
+                ];
+                localStorage.setItem(LS_NOTICE_KEY, JSON.stringify(defaultNotices));
+            }
+            if (!localStorage.getItem(LS_POLL_KEY)) localStorage.setItem(LS_POLL_KEY, JSON.stringify([]));
+            if (!localStorage.getItem(LS_BUG_KEY)) localStorage.setItem(LS_BUG_KEY, JSON.stringify([]));
+            if (!localStorage.getItem(LS_SUGGEST_KEY)) localStorage.setItem(LS_SUGGEST_KEY, JSON.stringify([]));
+
+            renderNoticesUI();
+            renderPollsUI();
+            renderCommunityBoard();
+        }
+
+        /* ====================================================
+           START & NAVIGATION TABS
+        ==================================================== */
+        function selectDeviceMode(mode) {
+            state.deviceMode = mode;
+            const btnMobile = document.getElementById('btn-device-mobile');
+            const btnPc = document.getElementById('btn-device-pc');
+
+            if (mode === 'mobile') {
+                btnMobile.className = 'device-btn p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-950/40 text-emerald-300 flex flex-col items-center gap-1.5 transition';
+                btnPc.className = 'device-btn p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950 text-slate-400 flex flex-col items-center gap-1.5 transition';
+            } else {
+                btnPc.className = 'device-btn p-3.5 rounded-2xl border-2 border-cyan-500 bg-cyan-950/40 text-cyan-300 flex flex-col items-center gap-1.5 transition';
+                btnMobile.className = 'device-btn p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950 text-slate-400 flex flex-col items-center gap-1.5 transition';
+            }
+        }
+
+        function startGame() {
+            const nickInput = document.getElementById('input-nickname');
+            const errEl = document.getElementById('nickname-error');
+            const val = nickInput.value.trim();
+
+            if (!val) {
+                errEl.classList.remove('hidden');
+                nickInput.focus();
+                return;
+            }
+
+            errEl.classList.add('hidden');
+            state.nickname = val;
+
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('top-nav').classList.remove('hidden');
+            document.getElementById('top-nav').classList.add('flex');
+            document.getElementById('bottom-nav').classList.remove('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+
+            document.getElementById('tag-nickname').innerText = state.nickname;
+            document.getElementById('nav-store-name').innerText = `${state.nickname} 점장의 편의점`;
+            document.getElementById('tag-mode').innerText = state.deviceMode === 'pc' ? 'PC 모드' : '모바일 모드';
+
+            if (state.deviceMode === 'pc') {
+                document.getElementById('pos-shortcut-hint').classList.remove('hidden');
+            }
+
+            renderDashboard();
+            renderPosProducts();
+            renderInventory();
+            renderStaffList();
+            spawnCustomer();
+
+            startCustomerSpawner();
+            startCleanlinessLoop();
+            startStaffAutoLoop();
+
+            switchMainTab('overview');
+            showToast(`환영합니다, ${state.nickname} 점장님! 편의점 영업을 시작합니다.`, 'success');
+        }
+
+        function switchMainTab(tabName) {
+            state.activeTab = tabName;
+
+            // Hide all panels
+            const panels = document.querySelectorAll('.tab-panel');
+            panels.forEach(p => p.classList.add('hidden'));
+
+            // Show target panel
+            const targetPanel = document.getElementById(`panel-${tabName}`);
+            if (targetPanel) targetPanel.classList.remove('hidden');
+
+            // Update bottom nav active style
+            const navBtns = document.querySelectorAll('.nav-tab-btn');
+            navBtns.forEach(btn => {
+                btn.className = 'nav-tab-btn relative flex flex-col items-center py-1.5 rounded-xl text-slate-400 hover:text-white font-bold transition';
+            });
+
+            const activeNavBtn = document.getElementById(`nav-btn-${tabName}`);
+            if (activeNavBtn) {
+                activeNavBtn.className = 'nav-tab-btn relative flex flex-col items-center py-1.5 rounded-xl text-emerald-400 bg-slate-800/90 font-bold transition';
+            }
+        }
+
+        function setupKeyboardShortcuts() {
+            window.addEventListener('keydown', (e) => {
+                if (state.isGameOver || state.deviceMode !== 'pc') return;
+                if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+                if (e.key >= '1' && e.key <= '6') {
+                    const idx = parseInt(e.key) - 1;
+                    if (PRODUCTS[idx]) scanPosItem(PRODUCTS[idx].id);
+                } else if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    submitPosCheckout();
+                } else if (e.key.toLowerCase() === 'c') {
+                    cleanStore();
+                }
+            });
+        }
+
+        /* ====================================================
+           CORE GAMEPLAY - CUSTOMER & POS LOGIC
+        ==================================================== */
+        function spawnCustomer() {
+            if (state.isGameOver) return;
+
+            const avatars = ['🧑', '👩', '👨', '👵', '👴', '🧒', '🧔', '👩‍🦰'];
+            const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+            const names = ['단골 손님', '학생 손님', '직장인 손님', '동네 주민', '배달 기사님', '외국인 관광객'];
+            const randomName = names[Math.floor(Math.random() * names.length)];
+
+            // Choose 1 to 3 random items
+            const itemCount = Math.floor(Math.random() * 3) + 1;
+            const requestedItems = [];
+            const shuffled = [...PRODUCTS].sort(() => 0.5 - Math.random());
+
+            for (let i = 0; i < itemCount; i++) {
+                requestedItems.push({ item: shuffled[i], qty: Math.floor(Math.random() * 2) + 1 });
+            }
+
+            currentCustomer = {
+                avatar: randomAvatar,
+                name: randomName,
+                items: requestedItems
+            };
+
+            posSelection = {};
+
+            // Render POS Customer UI
+            document.getElementById('cust-avatar').innerText = currentCustomer.avatar;
+            document.getElementById('cust-name').innerText = currentCustomer.name;
+
+            let orderText = requestedItems.map(ri => `${ri.item.icon} ${ri.item.name} x${ri.qty}`).join(', ');
+            document.getElementById('cust-order-text').innerText = `주문: "${orderText} 주세요!"`;
+            document.getElementById('overview-cust-text').innerText = `"${currentCustomer.name}"님: ${orderText}`;
+            updatePosSummaryUI();
+            updateNavBadges();
+        }
+
+        function scanPosItem(itemId) {
+            if (!currentCustomer) return;
+            posSelection[itemId] = (posSelection[itemId] || 0) + 1;
+            updatePosSummaryUI();
+        }
+
+        function clearPosSelection() {
+            posSelection = {};
+            updatePosSummaryUI();
+        }
+
+        function updatePosSummaryUI() {
+            const summaryEl = document.getElementById('pos-scanned-summary');
+            const keys = Object.keys(posSelection);
+            if (keys.length === 0) {
+                summaryEl.innerText = '선택 없음';
+                return;
+            }
+
+            let text = keys.map(id => {
+                const prod = PRODUCTS.find(p => p.id == id);
+                return `${prod.icon} x${posSelection[id]}`;
+            }).join(' | ');
+
+            summaryEl.innerText = text;
+        }
+
+        function renderPosProducts() {
+            const grid = document.getElementById('pos-products-grid');
+            grid.innerHTML = '';
+
+            PRODUCTS.forEach((p, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-slate-950 hover:bg-slate-800 border border-slate-800 p-3 rounded-xl flex flex-col items-center gap-1 transition active:scale-95 text-xs';
+                btn.onclick = () => scanPosItem(p.id);
+                btn.innerHTML = `
+                    <span class="text-2xl">${p.icon}</span>
+                    <span class="font-bold text-slate-200">${p.name}</span>
+                    <span class="text-[10px] text-amber-400 font-mono">${p.price.toLocaleString()}원</span>
+                    <span class="text-[9px] text-slate-500">[키 ${idx + 1}]</span>
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        function submitPosCheckout() {
+            if (!currentCustomer) return;
+
+            let isExactMatch = true;
+            let totalPrice = 0;
+
+            // Verify requested items
+            currentCustomer.items.forEach(ri => {
+                const scannedQty = posSelection[ri.item.id] || 0;
+                if (scannedQty !== ri.qty) isExactMatch = false;
+                totalPrice += ri.item.price * ri.qty;
+            });
+
+            // Verify no extra unexpected items
+            Object.keys(posSelection).forEach(id => {
+                const match = currentCustomer.items.find(ri => ri.item.id == id);
+                if (!match) isExactMatch = false;
+            });
+
+            // Check stock availability
+            let hasStock = true;
+            currentCustomer.items.forEach(ri => {
+                if (ri.item.stock < ri.qty) hasStock = false;
+            });
+
+            if (!hasStock) {
+                showToast('재고가 부족하여 상품을 판매하지 못했습니다! (만족도 -5)', 'error');
+                logActivity(`[POS 실패] 재고 부족으로 손님 서비스 실패 (만족도 -5)`);
+                adjustSatisfaction(-5);
+                spawnCustomer();
+                return;
+            }
+
+            if (isExactMatch) {
+                // Deduct stock
+                currentCustomer.items.forEach(ri => {
+                    ri.item.stock -= ri.qty;
+                });
+                renderInventory();
+
+                state.money += totalPrice;
+                state.customersServed += 1;
+                adjustSatisfaction(3);
+                logActivity(`[POS 성공] 손님 계산 완료: +${totalPrice.toLocaleString()}원 획득, 만족도 +3`);
+                showToast(`정확한 계산! +${totalPrice.toLocaleString()}원 획득, 만족도 +3`, 'success');
+            } else {
+                adjustSatisfaction(-5);
+                logActivity(`[POS 오답] 잘못된 바코드 스캔으로 손님이 불만 표출 (만족도 -5)`);
+                showToast('계산을 실수하셨습니다! (만족도 -5)', 'error');
+            }
+
+            renderDashboard();
+            spawnCustomer();
+        }
+
+        /* ====================================================
+           INVENTORY RESTOCKING & CLEANING
+        ==================================================== */
+        function renderInventory() {
+            const list = document.getElementById('inventory-list');
+            list.innerHTML = '';
+
+            let hasZeroStock = false;
+
+            PRODUCTS.forEach(p => {
+                if (p.stock === 0) hasZeroStock = true;
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-950 p-3 rounded-2xl border border-slate-800 flex justify-between items-center text-xs';
+
+                const pct = Math.round((p.stock / p.maxStock) * 100);
+                let stockColor = 'text-emerald-400 font-bold';
+                if (pct <= 30) stockColor = 'text-rose-400 font-black animate-pulse';
+                else if (pct <= 60) stockColor = 'text-amber-400 font-bold';
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">${p.icon}</span>
+                        <div>
+                            <div class="font-bold text-slate-200">${p.name}</div>
+                            <div class="text-[10px] text-slate-500">발주비: ${p.wholesale.toLocaleString()}원/개</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="${stockColor}">${p.stock}/${p.maxStock}개</span>
+                        <button onclick="restockSingleProduct(${p.id})" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition">
+                            +10개 발주
+                        </button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            updateNavBadges(hasZeroStock);
+        }
+
+        function restockSingleProduct(id) {
+            const p = PRODUCTS.find(item => item.id === id);
+            if (!p) return;
+
+            const needed = Math.min(10, p.maxStock - p.stock);
+            if (needed <= 0) {
+                showToast('이미 재고가 가득 차 있습니다.', 'info');
+                return;
+            }
+
+            const cost = needed * p.wholesale;
+            if (state.money < cost) {
+                showToast('발주 자금이 부족합니다!', 'error');
+                return;
+            }
+
+            state.money -= cost;
+            p.stock += needed;
+            renderDashboard();
+            renderInventory();
+            logActivity(`[발주] ${p.name} ${needed}개 보충 완료 (-${cost.toLocaleString()}원)`);
+            showToast(`${p.name} ${needed}개 발주 완료 (-${cost.toLocaleString()}원)`, 'success');
+        }
+
+        function restockAllProducts() {
+            let totalCost = 0;
+            PRODUCTS.forEach(p => {
+                const needed = p.maxStock - p.stock;
+                totalCost += needed * p.wholesale;
+            });
+
+            if (totalCost === 0) {
+                showToast('모든 상품 재고가 가득 차 있습니다.', 'info');
+                return;
+            }
+
+            if (state.money < totalCost) {
+                showToast('전체 발주 자금이 부족합니다!', 'error');
+                return;
+            }
+
+            state.money -= totalCost;
+            PRODUCTS.forEach(p => p.stock = p.maxStock);
+
+            renderDashboard();
+            renderInventory();
+            logActivity(`[일괄 발주] 모든 상품 재고 풀 보충 완료 (-${totalCost.toLocaleString()}원)`);
+            showToast(`모든 상품 재고 보충 완료 (-${totalCost.toLocaleString()}원)`, 'success');
+        }
+
+        function cleanStore() {
+            if (state.cleanliness >= 100) {
+                showToast('매장이 이미 완벽히 깨끗합니다!', 'info');
+                return;
+            }
+            state.cleanliness = 100;
+            renderDashboard();
+            logActivity(`[청소] 매장 바닥 대청소 완료 (청결도 100%)`);
+            showToast('매장을 깨끗하게 청소했습니다! (청결도 100%)', 'success');
+        }
+
+        /* ====================================================
+           STAFF RECRUITMENT & AUTOMATION
+        ==================================================== */
+        function renderStaffList() {
+            const list = document.getElementById('staff-hire-list');
+            list.innerHTML = '';
+
+            let hiredNames = [];
+
+            STAFF_MEMBERS.forEach(s => {
+                if (s.hired) hiredNames.push(s.name);
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3 text-xs';
+
+                let actionBtnHTML = '';
+                if (!s.hired) {
+                    actionBtnHTML = `
+                        <button onclick="hireStaff(${s.id})" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-xl shadow transition">
+                            고용하기 (계약금 ${s.contractFee.toLocaleString()}원)
+                        </button>
+                    `;
+                } else {
+                    actionBtnHTML = `
+                        <button onclick="recoverStaffStamina(${s.id})" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-xl shadow transition">
+                            ⚡ 피로회복제 투여 (15,000원)
+                        </button>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">${s.icon}</span>
+                            <div>
+                                <div class="font-bold text-purple-300 text-sm">${s.name}</div>
+                                <div class="text-[10px] text-slate-500">시급: ${s.hourlyWage.toLocaleString()}원</div>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold ${s.hired ? 'text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-lg border border-emerald-800' : 'text-slate-500'}">
+                            ${s.hired ? '근무 중' : '미고용'}
+                        </span>
+                    </div>
+                    ${s.hired ? `
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[10px] text-slate-400">
+                                <span>체력 (피로도)</span>
+                                <span>${s.stamina}/${s.maxStamina}</span>
+                            </div>
+                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                <div class="bg-purple-500 h-full transition-all" style="width: ${(s.stamina / s.maxStamina) * 100}%"></div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${actionBtnHTML}
+                `;
+                list.appendChild(card);
+            });
+
+            document.getElementById('stat-staff-summary').innerText = hiredNames.length > 0 ? hiredNames.join(', ') : '없음 (점장 직접 관리)';
+            document.getElementById('overview-staff-badge').innerText = `${hiredNames.length}명 근무 중`;
+            document.getElementById('overview-staff-text').innerText = hiredNames.length > 0 ? `근무 알바: ${hiredNames.join(', ')}` : '알바를 고용하여 업무를 자동화하세요!';
+        }
+
+        function hireStaff(id) {
+            const s = STAFF_MEMBERS.find(item => item.id === id);
+            if (!s) return;
+
+            if (state.money < s.contractFee) {
+                showToast('고용 계약금이 부족합니다!', 'error');
+                return;
+            }
+
+            state.money -= s.contractFee;
+            s.hired = true;
+            s.stamina = s.maxStamina;
+
+            renderDashboard();
+            renderStaffList();
+            logActivity(`[알바 고용] ${s.name} 채용 완료!`);
+            showToast(`${s.name}을(를) 채용했습니다! 업무 자동화가 시작됩니다.`, 'success');
+        }
+
+        function recoverStaffStamina(id) {
+            const s = STAFF_MEMBERS.find(item => item.id === id);
+            if (!s || !s.hired) return;
+
+            if (s.stamina >= s.maxStamina) {
+                showToast('알바생의 체력이 이미 100%입니다.', 'info');
+                return;
+            }
+
+            const cost = 15000;
+            if (state.money < cost) {
+                showToast('피로회복제 구매 자금이 부족합니다!', 'error');
+                return;
+            }
+
+            state.money -= cost;
+            s.stamina = s.maxStamina;
+            renderDashboard();
+            renderStaffList();
+            showToast(`${s.name} 체력 100% 회복 완료 (-15,000원)`, 'success');
+        }
+
+        /* ====================================================
+           TIMERS & LOOPS
+        ==================================================== */
+        function startCustomerSpawner() {
+            if (customerTimer) clearInterval(customerTimer);
+            customerTimer = setInterval(() => {
+                if (!currentCustomer) spawnCustomer();
+            }, 7000 / state.gameSpeed);
+        }
+
+        function startCleanlinessLoop() {
+            if (cleanlinessTimer) clearInterval(cleanlinessTimer);
+            cleanlinessTimer = setInterval(() => {
+                if (state.isGameOver) return;
+
+                if (state.cleanliness > 0) {
+                    state.cleanliness = Math.max(0, state.cleanliness - 1);
+                }
+
+                const alertBadge = document.getElementById('dirty-alert-badge');
+                if (state.cleanliness < 60) {
+                    alertBadge.classList.remove('hidden');
+                    adjustSatisfaction(-1);
+                } else {
+                    alertBadge.classList.add('hidden');
+                }
+
+                renderDashboard();
+            }, 3000 / state.gameSpeed);
+        }
+
+        function startStaffAutoLoop() {
+            if (staffAutoTimer) clearInterval(staffAutoTimer);
+            staffAutoTimer = setInterval(() => {
+                if (state.isGameOver) return;
+
+                const hiredStaff = STAFF_MEMBERS.filter(s => s.hired && s.stamina > 0);
+                if (hiredStaff.length === 0) {
+                    document.getElementById('staff-auto-status').innerText = '대기 중';
+                    return;
+                }
+
+                document.getElementById('staff-auto-status').innerText = '자동 작업 실행 중 ⚡';
+
+                hiredStaff.forEach(s => {
+                    s.stamina = Math.max(0, s.stamina - 2);
+
+                    if ((s.role === 'cashier' || s.role === 'all') && currentCustomer) {
+                        posSelection = {};
+                        currentCustomer.items.forEach(ri => {
+                            posSelection[ri.item.id] = ri.qty;
+                        });
+                        submitPosCheckout();
+                        document.getElementById('staff-log-text').innerText = `${s.name}이(가) 손님 계산을 대행 처리했습니다.`;
+                    }
+
+                    if (s.role === 'cleaner' || s.role === 'all') {
+                        if (state.cleanliness < 70) {
+                            state.cleanliness = 100;
+                            document.getElementById('staff-log-text').innerText = `${s.name}이(가) 매장 바닥을 청소했습니다.`;
+                        }
+                        PRODUCTS.forEach(p => {
+                            if (p.stock <= 3 && state.money >= p.wholesale * 10) {
+                                p.stock += 10;
+                                state.money -= p.wholesale * 10;
+                                document.getElementById('staff-log-text').innerText = `${s.name}이(가) ${p.name} 10개를 자동 발주했습니다.`;
+                            }
+                        });
+                    }
+                });
+
+                renderDashboard();
+                renderInventory();
+                renderStaffList();
+            }, 2500 / state.gameSpeed);
+        }
+
+        function adjustSatisfaction(val) {
+            if (state.godMode) return;
+
+            state.satisfaction += val;
+
+            if (state.satisfaction <= -30) {
+                triggerGameOver();
+            }
+
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            document.getElementById('stat-money').innerText = `${state.money.toLocaleString()} 원`;
+
+            const satValEl = document.getElementById('stat-sat-val');
+            satValEl.innerText = state.satisfaction >= 0 ? `+${state.satisfaction}` : `${state.satisfaction}`;
+            satValEl.className = state.satisfaction < 0 ? 'font-black text-rose-400 text-xs' : 'font-black text-emerald-400 text-xs';
+
+            const satPct = Math.min(100, Math.max(0, ((state.satisfaction + 30) / 130) * 100));
+            document.getElementById('sat-bar').style.width = `${satPct}%`;
+
+            document.getElementById('stat-clean-val').innerText = `${state.cleanliness}%`;
+            document.getElementById('clean-bar').style.width = `${state.cleanliness}%`;
+
+            const warningText = document.getElementById('clean-warning-text');
+            const overviewCleanBadge = document.getElementById('overview-clean-badge');
+            const overviewCleanText = document.getElementById('overview-clean-text');
+
+            if (state.cleanliness < 60) {
+                warningText.innerText = '더러움';
+                warningText.className = 'text-rose-400 font-bold';
+                overviewCleanBadge.innerText = '청소 필요!';
+                overviewCleanBadge.className = 'bg-rose-500/20 text-rose-300 text-xs px-2 py-0.5 rounded-full font-bold animate-pulse';
+                overviewCleanText.innerText = `매장 청결도 ${state.cleanliness}% (만족도 감소 중!)`;
+            } else {
+                warningText.innerText = '쾌적함';
+                warningText.className = 'text-slate-500';
+                overviewCleanBadge.innerText = '쾌적함';
+                overviewCleanBadge.className = 'bg-cyan-500/20 text-cyan-300 text-xs px-2 py-0.5 rounded-full font-bold';
+                overviewCleanText.innerText = `매장 청결도 ${state.cleanliness}%`;
+            }
+        }
+
+        function updateNavBadges(hasZeroStock = false) {
+            const posBadge = document.getElementById('badge-nav-pos');
+            const invBadge = document.getElementById('badge-nav-inventory');
+
+            if (currentCustomer) posBadge.classList.remove('hidden');
+            else posBadge.classList.add('hidden');
+
+            if (state.cleanliness < 60 || hasZeroStock) invBadge.classList.remove('hidden');
+            else invBadge.classList.add('hidden');
+        }
+
+        function logActivity(text) {
+            const container = document.getElementById('overview-log-container');
+            if (!container) return;
+            const time = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const div = document.createElement('div');
+            div.className = 'p-2 bg-slate-900/60 rounded-xl border border-slate-800/80';
+            div.innerText = `[${time}] ${text}`;
+            container.prepend(div);
+        }
+
+        function triggerGameOver() {
+            state.isGameOver = true;
+            clearInterval(customerTimer);
+            clearInterval(cleanlinessTimer);
+            clearInterval(staffAutoTimer);
+
+            document.getElementById('go-final-money').innerText = `${state.money.toLocaleString()} 원`;
+            document.getElementById('go-final-cust').innerText = `${state.customersServed} 명`;
+            document.getElementById('go-final-sat').innerText = `${state.satisfaction}`;
+
+            document.getElementById('screen-gameover').classList.remove('hidden');
+        }
+
+        function restartGame() {
+            state.money = 50000;
+            state.satisfaction = 1;
+            state.cleanliness = 100;
+            state.isGameOver = false;
+            state.customersServed = 0;
+
+            PRODUCTS.forEach(p => p.stock = 10);
+            STAFF_MEMBERS.forEach(s => { s.hired = false; s.stamina = s.maxStamina; });
+
+            document.getElementById('screen-gameover').classList.add('hidden');
+
+            renderDashboard();
+            renderInventory();
+            renderStaffList();
+
+            startCustomerSpawner();
+            startCleanlinessLoop();
+            startStaffAutoLoop();
+
+            showToast('매장을 재개업했습니다! 화이팅!', 'success');
+        }
+
+        /* ====================================================
+           COMMUNITY & POLLS (ZERO INITIAL SAMPLE DATA)
+        ==================================================== */
+        function switchCommunityTab(tab) {
+            state.activeCommunityTab = tab;
+            const btnN = document.getElementById('ctab-notices');
+            const btnP = document.getElementById('ctab-polls');
+
+            const cntN = document.getElementById('ccontent-notices');
+            const cntP = document.getElementById('ccontent-polls');
+
+            [btnN, btnP].forEach(b => b.className = 'px-3 py-1.5 rounded-lg font-bold text-slate-400 hover:text-white');
+            [cntN, cntP].forEach(c => c.classList.add('hidden'));
+
+            if (tab === 'notices') {
+                btnN.className = 'px-3 py-1.5 rounded-lg font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                cntN.classList.remove('hidden');
+            } else if (tab === 'polls') {
+                btnP.className = 'px-3 py-1.5 rounded-lg font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+                cntP.classList.remove('hidden');
+            }
+            renderCommunityBoard();
+        }
+
+        function renderNoticesUI() {
+            const notices = JSON.parse(localStorage.getItem(LS_NOTICE_KEY) || '[]');
+            const modalContainer = document.getElementById('modal-notice-container');
+            if (modalContainer) {
+                modalContainer.innerHTML = '';
+                notices.forEach(n => {
+                    modalContainer.innerHTML += `
+                        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1">
+                            <div class="flex justify-between font-bold text-amber-300">
+                                <span>📢 ${n.text}</span>
+                                <span class="text-slate-500 text-[10px]">${n.date}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function renderPollsUI() {
+            const polls = JSON.parse(localStorage.getItem(LS_POLL_KEY) || '[]');
+            const container = document.getElementById('ccontent-polls');
+            if (!container) return;
+
+            container.innerHTML = '';
+            if (polls.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 text-xs text-center py-6">등록된 투표가 없습니다. 관리자 패널에서 새로 등록할 수 있습니다.</p>';
+                return;
+            }
+
+            polls.forEach(p => {
+                const hasVoted = p.votedUsers && p.votedUsers.includes(state.nickname);
+                const card = document.createElement('div');
+                card.className = 'bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3 text-xs';
+
+                let optsHTML = '';
+                p.options.forEach((opt, idx) => {
+                    const pct = p.totalVotes > 0 ? Math.round((opt.votes / p.totalVotes) * 100) : 0;
+                    optsHTML += `
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-slate-300">
+                                <button onclick="submitVote(${p.id}, ${idx})" ${hasVoted ? 'disabled' : ''} 
+                                    class="text-left font-bold hover:text-cyan-300 transition ${hasVoted ? 'opacity-90 cursor-default' : 'underline text-cyan-400'}">
+                                    • ${opt.text}
+                                </button>
+                                <span class="text-slate-400 font-mono text-[11px]">${opt.votes}표 (${pct}%)</span>
+                            </div>
+                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                <div class="bg-cyan-500 h-full transition-all duration-300" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-extrabold text-sm text-cyan-300 flex items-center gap-1.5">
+                            <i data-lucide="vote" class="w-4 h-4 text-cyan-400"></i> ${p.title}
+                        </h4>
+                        <span class="text-[10px] ${hasVoted ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-amber-950 text-amber-300 border-amber-800'} border px-2 py-0.5 rounded font-bold">
+                            ${hasVoted ? '참여 완료' : '투표 가능'}
+                        </span>
+                    </div>
+                    <div class="space-y-2 pt-1">${optsHTML}</div>
+                    <div class="text-[10px] text-slate-500 text-right">총 참여자 수: ${p.totalVotes}명</div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function submitVote(pollId, optionIdx) {
+            let polls = JSON.parse(localStorage.getItem(LS_POLL_KEY) || '[]');
+            const p = polls.find(item => item.id === pollId);
+            if (!p) return;
+
+            if (!p.votedUsers) p.votedUsers = [];
+            if (p.votedUsers.includes(state.nickname)) {
+                showToast('이미 이 투표에 참여하셨습니다!', 'error');
+                return;
+            }
+
+            p.options[optionIdx].votes += 1;
+            p.totalVotes += 1;
+            p.votedUsers.push(state.nickname);
+
+            localStorage.setItem(LS_POLL_KEY, JSON.stringify(polls));
+            showToast('투표가 정상 반영되었습니다!', 'success');
+            renderPollsUI();
+        }
+
+        function submitVote(pollId, optionIdx) {
+            const notices = JSON.parse(localStorage.getItem(LS_NOTICE_KEY) || '[]');
+            const noticesContainer = document.getElementById('ccontent-notices');
+            noticesContainer.innerHTML = '';
+            if (notices.length === 0) {
+                noticesContainer.innerHTML = '<p class="text-slate-500 text-xs text-center py-4">등록된 공지사항이 없습니다.</p>';
+            } else {
+                notices.forEach(n => {
+                    const el = document.createElement('div');
+                    el.className = 'bg-slate-950 p-3 rounded-2xl border border-slate-800 flex justify-between items-center text-xs';
+                    el.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="text-amber-400 font-bold">📢 [공지]</span>
+                            <span class="text-slate-200">${n.text}</span>
+                        </div>
+                        <span class="text-slate-500 text-[10px] shrink-0">${n.date}</span>
+                    `;
+                    noticesContainer.appendChild(el);
+                });
+            }
+
+            renderPollsUI();
+        }
+
+        function renderCommunityBoard() {
+            const notices = JSON.parse(localStorage.getItem(LS_NOTICE_KEY) || '[]');
+            const noticesContainer = document.getElementById('ccontent-notices');
+            noticesContainer.innerHTML = '';
+            if (notices.length === 0) {
+                noticesContainer.innerHTML = '<p class="text-slate-500 text-xs text-center py-4">등록된 공지사항이 없습니다.</p>';
+            } else {
+                notices.forEach(n => {
+                    const el = document.createElement('div');
+                    el.className = 'bg-slate-950 p-3 rounded-2xl border border-slate-800 flex justify-between items-center text-xs';
+                    el.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="text-amber-400 font-bold">📢 [공지]</span>
+                            <span class="text-slate-200">${n.text}</span>
+                        </div>
+                        <span class="text-slate-500 text-[10px] shrink-0">${n.date}</span>
+                    `;
+                    noticesContainer.appendChild(el);
+                });
+            }
+
+            renderPollsUI();
+        }
+
+        /* ====================================================
+           ADMIN PANEL LOGIC (landers_0724_jaeha)
+        ==================================================== */
+        function openAdminAuthModal() {
+            document.getElementById('admin-pass-input').value = '';
+            openModal('modal-admin-auth');
+        }
+
+        function verifyAdminPassword() {
+            const pass = document.getElementById('admin-pass-input').value;
+            if (pass === ADMIN_PASS) {
+                closeModal('modal-admin-auth');
+                renderAdminPanelData();
+                openModal('modal-admin-panel');
+                showToast('관리자 인증 성공!', 'success');
+            } else {
+                showToast('비밀번호가 일치하지 않습니다.', 'error');
+            }
+        }
+
+        function renderAdminPanelData() {
+            const visitorBadge = document.getElementById('admin-visitor-badge');
+            const totalVisitors = localStorage.getItem(LS_VISITOR_KEY) || state.visitorCount;
+            visitorBadge.innerText = `👁️ 지금까지 접속한 총 인원수: ${parseInt(totalVisitors).toLocaleString()}명`;
+
+            // Admin Notices List
+            const notices = JSON.parse(localStorage.getItem(LS_NOTICE_KEY) || '[]');
+            const noticeList = document.getElementById('admin-notice-list');
+            noticeList.innerHTML = '';
+            notices.forEach(n => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center bg-slate-900 p-2 rounded-xl border border-slate-800';
+                row.innerHTML = `
+                    <span>${n.text}</span>
+                    <button onclick="adminDeleteNotice(${n.id})" class="text-rose-400 font-bold px-2 py-0.5 bg-rose-950 rounded border border-rose-800 hover:bg-rose-900">삭제</button>
+                `;
+                noticeList.appendChild(row);
+            });
+
+            // Admin Polls List
+            const polls = JSON.parse(localStorage.getItem(LS_POLL_KEY) || '[]');
+            const adminPollList = document.getElementById('admin-poll-list');
+            adminPollList.innerHTML = '';
+            polls.forEach(p => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center bg-slate-900 p-2 rounded-xl border border-slate-800';
+                row.innerHTML = `
+                    <div>
+                        <span class="font-bold text-cyan-300">${p.title}</span>
+                        <span class="text-[10px] text-slate-500 ml-2">(${p.totalVotes}표 참여)</span>
+                    </div>
+                    <button onclick="adminDeletePoll(${p.id})" class="text-rose-400 font-bold px-2 py-0.5 bg-rose-950 rounded border border-rose-800 hover:bg-rose-900 text-xs">삭제</button>
+                `;
+                adminPollList.appendChild(row);
+            });
+
+            // Admin Bug Reports List
+            const bugs = JSON.parse(localStorage.getItem(LS_BUG_KEY) || '[]');
+            const bugList = document.getElementById('admin-bug-list');
+            bugList.innerHTML = '';
+            bugs.forEach(b => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-1';
+                card.innerHTML = `
+                    <div class="flex justify-between font-bold text-rose-300">
+                        <span>[${b.nickname}] ${b.title}</span>
+                        <button onclick="adminDeleteBug(${b.id})" class="text-rose-400 font-bold text-[10px]">삭제</button>
+                    </div>
+                    <p class="text-slate-400 text-[11px]">${b.content}</p>
+                `;
+                bugList.appendChild(card);
+            });
+
+            // Admin Suggestions List
+            const suggests = JSON.parse(localStorage.getItem(LS_SUGGEST_KEY) || '[]');
+            const suggestList = document.getElementById('admin-suggest-list');
+            suggestList.innerHTML = '';
+            suggests.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-1';
+                card.innerHTML = `
+                    <div class="flex justify-between font-bold text-emerald-300">
+                        <span>[${s.nickname}] ${s.title}</span>
+                        <button onclick="adminDeleteSuggest(${s.id})" class="text-rose-400 font-bold text-[10px]">삭제</button>
+                    </div>
+                    <p class="text-slate-400 text-[11px]">${s.content}</p>
+                `;
+                suggestList.appendChild(card);
+            });
+        }
+
+        function adminPostNotice(e) {
+            e.preventDefault();
+            const input = document.getElementById('admin-notice-input');
+            const val = input.value.trim();
+            if (!val) return;
+
+            const notices = JSON.parse(localStorage.getItem(LS_NOTICE_KEY) || '[]');
+            notices.unshift({ id: Date.now(), text: val, date: new Date().toISOString().split('T')[0] });
+            localStorage.setItem(LS_NOTICE_KEY, JSON.stringify(notices));
+
+            input.value = '';
+            renderNoticesUI();
+            renderCommunityBoard();
+            renderAdminPanelData();
+            showToast('공지사항이 새롭게 등록되었습니다.', 'success');
+        }
+
+        function adminDeleteNotice(id) {
+            let notices = JSON.parse(localStorage.getItem(LS_NOTICE_KEY) || '[]');
+            notices = notices.filter(n => n.id !== id);
+            localStorage.setItem(LS_NOTICE_KEY, JSON.stringify(notices));
+            renderNoticesUI();
+            renderCommunityBoard();
+            renderAdminPanelData();
+        }
+
+        function adminCreatePoll(e) {
+            e.preventDefault();
+            const title = document.getElementById('admin-poll-title').value.trim();
+            const opt1 = document.getElementById('admin-poll-opt1').value.trim();
+            const opt2 = document.getElementById('admin-poll-opt2').value.trim();
+            const opt3 = document.getElementById('admin-poll-opt3').value.trim();
+            const opt4 = document.getElementById('admin-poll-opt4').value.trim();
+
+            if (!title || !opt1 || !opt2) {
+                showToast('투표 제목과 최소 2개의 선택지를 작성해주세요.', 'error');
+                return;
+            }
+
+            const options = [
+                { text: opt1, votes: 0 },
+                { text: opt2, votes: 0 }
+            ];
+            if (opt3) options.push({ text: opt3, votes: 0 });
+            if (opt4) options.push({ text: opt4, votes: 0 });
+
+            const polls = JSON.parse(localStorage.getItem(LS_POLL_KEY) || '[]');
+            polls.unshift({
+                id: Date.now(),
+                title,
+                options,
+                totalVotes: 0,
+                votedUsers: []
+            });
+
+            localStorage.setItem(LS_POLL_KEY, JSON.stringify(polls));
+            document.getElementById('admin-poll-title').value = '';
+            document.getElementById('admin-poll-opt1').value = '';
+            document.getElementById('admin-poll-opt2').value = '';
+            document.getElementById('admin-poll-opt3').value = '';
+            document.getElementById('admin-poll-opt4').value = '';
+
+            renderPollsUI();
+            renderCommunityBoard();
+            renderAdminPanelData();
+            showToast('0표부터 시작하는 새 투표가 올라갔습니다!', 'success');
+        }
+
+        function adminDeletePoll(id) {
+            let polls = JSON.parse(localStorage.getItem(LS_POLL_KEY) || '[]');
+            polls = polls.filter(p => p.id !== id);
+            localStorage.setItem(LS_POLL_KEY, JSON.stringify(polls));
+            renderPollsUI();
+            renderCommunityBoard();
+            renderAdminPanelData();
+        }
+
+        function submitBugReport(e) {
+            e.preventDefault();
+            const title = document.getElementById('bug-title').value;
+            const content = document.getElementById('bug-content').value;
+
+            const bugs = JSON.parse(localStorage.getItem(LS_BUG_KEY) || '[]');
+            bugs.push({ id: Date.now(), title, content, nickname: state.nickname });
+            localStorage.setItem(LS_BUG_KEY, JSON.stringify(bugs));
+
+            document.getElementById('bug-title').value = '';
+            document.getElementById('bug-content').value = '';
+            closeModal('modal-bug');
+            renderCommunityBoard();
+            showToast('버그 신고가 전송되었습니다.', 'success');
+        }
+
+        function submitSuggestion(e) {
+            e.preventDefault();
+            const title = document.getElementById('suggest-title').value;
+            const content = document.getElementById('suggest-content').value;
+
+            const suggests = JSON.parse(localStorage.getItem(LS_SUGGEST_KEY) || '[]');
+            suggests.push({ id: Date.now(), title, content, nickname: state.nickname });
+            localStorage.setItem(LS_SUGGEST_KEY, JSON.stringify(suggests));
+
+            document.getElementById('suggest-title').value = '';
+            document.getElementById('suggest-content').value = '';
+            closeModal('modal-suggest');
+            renderCommunityBoard();
+            showToast('개선 아이디어가 전송되었습니다!', 'success');
+        }
+
+        function adminDeleteBug(id) {
+            let bugs = JSON.parse(localStorage.getItem(LS_BUG_KEY) || '[]');
+            bugs = bugs.filter(b => b.id !== id);
+            localStorage.setItem(LS_BUG_KEY, JSON.stringify(bugs));
+            renderCommunityBoard();
+            renderAdminPanelData();
+        }
+
+        function adminDeleteSuggest(id) {
+            let suggests = JSON.parse(localStorage.getItem(LS_SUGGEST_KEY) || '[]');
+            suggests = suggests.filter(s => s.id !== id);
+            localStorage.setItem(LS_SUGGEST_KEY, JSON.stringify(suggests));
+            renderCommunityBoard();
+            renderAdminPanelData();
+        }
+
+        /* ====================================================
+           ADMIN CHEATS
+        ==================================================== */
+        function cheatMoney(amount) {
+            state.money += amount;
+            renderDashboard();
+            showToast(`[치트] 보유 자금 +${amount.toLocaleString()}원 추가`, 'success');
+        }
+
+        function cheatSatisfaction(val) {
+            state.satisfaction += val;
+            renderDashboard();
+            showToast(`[치트] 만족도 +${val} 증가`, 'success');
+        }
+
+        function cheatSatisfactionSet(val) {
+            state.satisfaction = val;
+            renderDashboard();
+            showToast(`[치트] 만족도가 ${val}로 설정되었습니다.`, 'success');
+        }
+
+        function cheatClean() {
+            state.cleanliness = 100;
+            renderDashboard();
+            showToast(`[치트] 청결도 100% 회복!`, 'success');
+        }
+
+        function cheatRestock() {
+            PRODUCTS.forEach(p => p.stock = p.maxStock);
+            renderInventory();
+            showToast(`[치트] 전 상품 재고 MAX 보충!`, 'success');
+        }
+
+        function cheatHireAll() {
+            STAFF_MEMBERS.forEach(s => { s.hired = true; s.stamina = s.maxStamina; });
+            renderStaffList();
+            renderDashboard();
+            showToast(`[치트] 모든 알바 무상 고용!`, 'success');
+        }
+
+        function cheatGodMode() {
+            state.godMode = !state.godMode;
+            showToast(`[치트] 무적 (해고 방지) 모드: ${state.godMode ? 'ON' : 'OFF'}`, 'info');
+        }
+
+        function setGameSpeed(speed) {
+            state.gameSpeed = speed;
+            const tag = document.getElementById('speed-tag');
+            if (speed > 1) {
+                tag.innerText = `⚡ ${speed}x 배속`;
+                tag.classList.remove('hidden');
+            } else {
+                tag.classList.add('hidden');
+            }
+
+            startCustomerSpawner();
+            startCleanlinessLoop();
+            startStaffAutoLoop();
+            showToast(`게임 진행 속도가 ${speed}배속으로 설정되었습니다.`, 'info');
+        }
+
+        /* ====================================================
+           MODAL & TOAST HELPERS
+        ==================================================== */
+        function openModal(id) {
+            if (id === 'modal-notice') renderNoticesUI();
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            let bgClass = 'bg-slate-900 border-slate-700 text-slate-100';
+            let iconName = 'info';
+
+            if (type === 'success') {
+                bgClass = 'bg-emerald-950/90 border-emerald-600 text-emerald-100';
+                iconName = 'check-circle';
+            } else if (type === 'error') {
+                bgClass = 'bg-rose-950/90 border-rose-600 text-rose-100';
+                iconName = 'alert-triangle';
+            }
+
+            toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-2xl text-xs font-semibold ${bgClass} pointer-events-auto transition duration-300`;
+            toast.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 shrink-0"></i> <span>${message}</span>`;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
