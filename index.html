@@ -111,9 +111,6 @@
         </div>
         <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">편의점 타이쿤</h1>
         <p class="text-xs text-slate-400 mt-0.5">리얼 POS 계산 · 다점포 확장 · 실시간 랭킹</p>
-        <div class="mt-2 inline-block px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-[10px] font-extrabold text-amber-300">
-          🎁 출시 기념 쿠폰: open_261119 (50,000원 지급!)
-        </div>
       </div>
 
       <!-- LEGACY / CLOUD RECOVERY BANNER -->
@@ -437,8 +434,8 @@
       <!-- Coupon Quick Banner -->
       <div class="bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/50 rounded-2xl p-3.5 flex items-center justify-between gap-2">
         <div>
-          <div class="text-xs font-black text-amber-300">🎁 출시 기념 쿠폰 이벤트 진행중!</div>
-          <div class="text-[11px] text-slate-300 mt-0.5">코드 <strong class="text-white">open_261119</strong> 입력 시 50,000원 즉시 지급!</div>
+          <div class="text-xs font-black text-amber-300">🎁 비밀 쿠폰 교환소</div>
+          <div class="text-[11px] text-slate-300 mt-0.5">이벤트나 공지로 받은 비밀 코드를 입력하고 보상을 받으세요!</div>
         </div>
         <button onclick="openCouponModal()"
           class="shrink-0 px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs whitespace-nowrap active:scale-95">
@@ -508,7 +505,7 @@
         <button onclick="closeCouponModal()" class="px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-bold text-slate-300">✕</button>
       </div>
       <p class="text-xs text-slate-300">
-        출시 기념 코드: <span class="font-black text-amber-300 select-all">open_261119</span> (50,000원 + 만족도 100%)
+        이벤트 또는 공지로 전달받은 비밀 쿠폰 코드를 입력하세요.
       </p>
       <input id="couponCodeInput" type="text" placeholder="쿠폰 코드를 입력하세요"
         class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm font-bold text-white focus:outline-none focus:border-amber-400" />
@@ -633,7 +630,7 @@
 
         <!-- COUPON GENERATOR -->
         <div class="bg-slate-800/60 border border-emerald-500/40 rounded-2xl p-3 space-y-2">
-          <h4 class="text-xs font-black text-emerald-300">🎁 새 쿠폰 코드 발행 (기본: open_261119)</h4>
+          <h4 class="text-xs font-black text-emerald-300">🎁 새 쿠폰 코드 발행</h4>
           <div class="grid grid-cols-2 gap-1.5">
             <input id="adminNewCouponCode" type="text" placeholder="쿠폰 코드 (예: event_100)"
               class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
@@ -1056,7 +1053,7 @@
             updatedAt: Date.now(),
             state: gameState
           });
-          showToast(`신규 매장 오픈 완료! 쿠폰 버튼에서 open_261119를 입력해 보세요 🎉`, 'success');
+          showToast(`신규 매장 오픈 완료! 오늘도 대박 매출을 올려보세요 🎉`, 'success');
         }
 
         currentUser = { nickname: nick, pin: pin };
