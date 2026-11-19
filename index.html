@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>편의점 타이쿤 - 24시 클라우드 에디션</title>
+  <title>편의점 타이쿤 - 그랜드 오픈 에디션</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Pretendard / Noto Sans KR -->
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Noto Sans KR -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <!-- Firebase v10 Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -22,13 +24,12 @@
       margin: 0;
       padding: 0;
       width: 100%;
-      height: 100%;
+      min-height: 100%;
       overflow-x: hidden;
-      background-color: #0f172a;
+      background-color: #080c14;
       color: #f8fafc;
       user-select: none;
     }
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -41,55 +42,99 @@
       border-radius: 9999px;
     }
     @keyframes popIn {
-      0% { transform: scale(0.85); opacity: 0; }
-      70% { transform: scale(1.03); opacity: 1; }
+      0% { transform: scale(0.92); opacity: 0; }
+      70% { transform: scale(1.02); opacity: 1; }
       100% { transform: scale(1); opacity: 1; }
     }
     @keyframes floatUp {
       0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-34px) scale(1.08); opacity: 0; }
+      100% { transform: translateY(-38px) scale(1.1); opacity: 0; }
     }
-    @keyframes pulseBorder {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.45); }
-      50% { box-shadow: 0 0 0 6px rgba(250, 204, 21, 0); }
+    @keyframes laserSweep {
+      0% { top: 12%; opacity: 0.4; }
+      50% { top: 84%; opacity: 1; }
+      100% { top: 12%; opacity: 0.4; }
+    }
+    @keyframes feverGlow {
+      0%, 100% { box-shadow: 0 0 12px rgba(251, 191, 36, 0.35); }
+      50% { box-shadow: 0 0 24px rgba(251, 191, 36, 0.75); }
     }
     .animate-pop {
-      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .fever-pulse {
+      animation: feverGlow 1.5s infinite ease-in-out;
     }
     .floating-text {
       position: fixed;
       pointer-events: none;
-      font-weight: 800;
+      font-weight: 900;
       z-index: 9999;
       animation: floatUp 0.9s ease-out forwards;
-      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.75);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
     }
-    .fever-glow {
-      animation: pulseBorder 1.5s infinite;
+    .scanner-laser {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      height: 2px;
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444, 0 0 14px #f87171;
+      animation: laserSweep 1.6s infinite ease-in-out;
+      pointer-events: none;
     }
-    /* Safe padding for bottom nav on mobile */
     .pb-nav-safe {
-      padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px));
     }
   </style>
 </head>
-<body class="flex flex-col min-h-screen bg-slate-950 text-slate-100">
+<body class="flex flex-col min-h-screen bg-[#080c14] text-slate-100">
 
-  <!-- ==================== 1. LOGIN / ACCOUNT MODAL ==================== -->
-  <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-4">
-    <div class="w-full max-w-sm bg-slate-900 border border-slate-700/80 rounded-3xl p-6 shadow-2xl animate-pop">
-      <div class="text-center mb-5">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-3xl shadow-lg mb-3">
+  <!-- ==================== 0. FULL-SCREEN BAN LOCK MODAL ==================== -->
+  <div id="banLockModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/98 backdrop-blur-lg p-4">
+    <div class="w-full max-w-sm bg-rose-950/90 border-2 border-rose-500 rounded-3xl p-6 text-center shadow-2xl space-y-3 animate-pop">
+      <div class="text-5xl">🚫</div>
+      <h2 class="text-xl font-black text-white">이용이 정지된 계정입니다</h2>
+      <p id="banReasonDisplay" class="text-xs text-rose-200 bg-rose-900/60 border border-rose-700/70 rounded-xl p-3 leading-relaxed">
+        운영 정책 위반으로 인해 관리자에 의해 접근이 제한되었습니다.
+      </p>
+      <p class="text-[11px] text-rose-300/80">이의 제기는 관리자에게 직접 문의해주세요.</p>
+    </div>
+  </div>
+
+  <!-- ==================== 1. LOGIN & DATA RECOVERY MODAL ==================== -->
+  <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-3.5 overflow-y-auto">
+    <div class="w-full max-w-sm bg-slate-900 border border-slate-700/80 rounded-3xl p-5 shadow-2xl animate-pop my-auto">
+      <div class="text-center mb-4">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-3xl shadow-lg mb-2">
           🏪
         </div>
-        <h1 class="text-2xl font-black tracking-tight text-white">편의점 타이쿤</h1>
-        <p class="text-xs text-slate-400 mt-1">닉네임 + 4자리 PIN으로 클라우드 자동 저장</p>
+        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">편의점 타이쿤</h1>
+        <p class="text-xs text-slate-400 mt-0.5">리얼 POS 계산 · 다점포 확장 · 실시간 랭킹</p>
+        <div class="mt-2 inline-block px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-[10px] font-extrabold text-amber-300">
+          🎁 출시 기념 쿠폰: open_261119 (50,000원 지급!)
+        </div>
       </div>
 
-      <div class="space-y-3.5">
+      <!-- LEGACY / CLOUD RECOVERY BANNER -->
+      <div id="recoveryBanner" class="hidden mb-3.5 p-3 rounded-2xl bg-amber-500/15 border border-amber-400/60 space-y-2">
+        <div class="flex items-start gap-2">
+          <span class="text-lg shrink-0">🔄</span>
+          <div class="min-w-0">
+            <div class="text-xs font-black text-amber-300">기존 매장 기록이 발견되었습니다!</div>
+            <p id="recoverySummaryText" class="text-[11px] text-amber-100/90 mt-0.5 leading-snug"></p>
+          </div>
+        </div>
+        <button type="button" onclick="applyDetectedRecovery()"
+          class="w-full py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs active:scale-[0.98] transition">
+          ✨ 발견된 기록 불러와서 자동 복구하기
+        </button>
+      </div>
+
+      <div class="space-y-3">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">사장님 닉네임 (2~10자)</label>
-          <input id="loginNickname" type="text" maxlength="10" placeholder="예: 재하사장님"
+          <input id="loginNickname" type="text" maxlength="10" placeholder="닉네임 입력"
             class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-400 transition" />
         </div>
         <div>
@@ -98,224 +143,354 @@
             class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-center text-lg tracking-[0.5em] font-bold focus:outline-none focus:border-emerald-400 transition" />
         </div>
 
-        <div id="loginError" class="hidden text-xs font-semibold text-rose-400 bg-rose-950/60 border border-rose-800/70 rounded-xl px-3 py-2 text-center">
-        </div>
+        <div id="loginError" class="hidden text-xs font-semibold text-rose-400 bg-rose-950/70 border border-rose-800/70 rounded-xl px-3 py-2 text-center"></div>
 
         <button id="loginSubmitBtn" onclick="handleAccountLogin()"
           class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 active:scale-[0.98] text-slate-950 font-black text-sm shadow-lg shadow-emerald-500/20 transition">
-          매장 오픈하기 🚀
+          매장 오픈 & 데이터 연결 🚀
         </button>
       </div>
 
       <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-        <span>🌐 실시간 서버 연동됨</span>
-        <span id="loginVisitorCount">총 방문자 불러오는 중...</span>
+        <span>🌐 Firebase 실시간 서버</span>
+        <span id="loginVisitorCount">방문자 집계중...</span>
       </div>
     </div>
   </div>
 
-  <!-- ==================== 2. TOAST NOTIFICATION CONTAINER ==================== -->
-  <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 w-[92%] max-w-sm pointer-events-none"></div>
+  <!-- ==================== 2. TOAST CONTAINER ==================== -->
+  <div id="toastContainer" class="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-1.5 w-[92%] max-w-sm pointer-events-none"></div>
 
-  <!-- ==================== 3. TOP HEADER (NO OVERLAP MOBILE RESPONSIVE) ==================== -->
+  <!-- ==================== 3. TOP HEADER (MOBILE ZERO-OVERLAP) ==================== -->
   <header class="sticky top-0 z-30 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-2.5 py-2">
     <div class="max-w-3xl mx-auto flex flex-col gap-1.5">
-      <!-- Row 1: Store Name/Day + Action Buttons -->
-      <div class="flex items-center justify-between gap-1.5 min-w-0">
+      <!-- Row 1: Branch Badge + Nickname & Compact Action Buttons -->
+      <div class="flex items-center justify-between gap-1 min-w-0">
         <div class="flex items-center gap-1.5 min-w-0">
-          <span class="text-base shrink-0">🏪</span>
-          <span id="headerNickname" class="font-extrabold text-xs sm:text-sm text-white truncate max-w-[95px] sm:max-w-[150px]">로딩중</span>
-          <span id="headerDayBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-[10px] sm:text-xs font-bold text-emerald-400 whitespace-nowrap">
-            DAY 1
+          <span id="headerBranchBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[10px] font-black text-amber-300 whitespace-nowrap">
+            1호점
           </span>
-          <span id="feverBadge" class="hidden shrink-0 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-400 text-[10px] font-black text-amber-300 whitespace-nowrap animate-pulse">
-            🔥 피버 x2
+          <span id="headerNickname" class="font-black text-xs sm:text-sm text-white truncate max-w-[82px] sm:max-w-[150px]">로딩중</span>
+          <span id="headerDayBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-[10px] font-extrabold text-emerald-400 whitespace-nowrap">
+            D-1
           </span>
         </div>
 
-        <!-- Compact Right Controls (Never overlap) -->
         <div class="flex items-center gap-1 shrink-0">
-          <button onclick="toggleSound()" id="soundToggleBtn" title="효과음 켜기/끄기"
-            class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-bold text-slate-200 whitespace-nowrap active:scale-95 transition">
-            🔊
+          <button onclick="toggleSound()" id="soundToggleBtn" aria-label="효과음 토글"
+            class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 active:scale-95 transition">
+            <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
           </button>
-          <button onclick="manualCloudSave()" title="클라우드 즉시 저장"
-            class="px-2 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-[11px] font-bold text-emerald-300 whitespace-nowrap active:scale-95 transition">
+          <button onclick="openCouponModal()"
+            class="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-[11px] font-extrabold text-amber-300 whitespace-nowrap active:scale-95 transition">
+            🎁 쿠폰
+          </button>
+          <button onclick="manualCloudSave()"
+            class="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-[11px] font-extrabold text-emerald-300 whitespace-nowrap active:scale-95 transition">
             ☁️ 저장
           </button>
-          <button onclick="openAdminModal()" title="관리자 메뉴"
-            class="px-2 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-[11px] font-bold text-indigo-300 whitespace-nowrap active:scale-95 transition">
-            🔐 관리자
+          <button onclick="openAdminModal()"
+            class="px-2 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-[11px] font-extrabold text-indigo-300 whitespace-nowrap active:scale-95 transition">
+            🛡️
           </button>
         </div>
       </div>
 
-      <!-- Row 2: Key Stats Grid (3 equal columns, zero wrap/overlap) -->
+      <!-- Row 2: 3 Equal Stat Cards -->
       <div class="grid grid-cols-3 gap-1.5">
         <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-2 py-1 flex items-center justify-between min-w-0">
           <span class="text-[10px] text-slate-400 shrink-0">💰 자금</span>
           <span id="statMoney" class="text-[11px] sm:text-xs font-black text-amber-400 truncate ml-1">0원</span>
         </div>
         <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-2 py-1 flex items-center justify-between min-w-0">
-          <span class="text-[10px] text-slate-400 shrink-0">⭐ 평판</span>
-          <span id="statRep" class="text-[11px] sm:text-xs font-black text-sky-400 truncate ml-1">50%</span>
+          <span class="text-[10px] text-slate-400 shrink-0">😊 만족</span>
+          <span id="statSatisfaction" class="text-[11px] sm:text-xs font-black text-sky-400 truncate ml-1">85%</span>
         </div>
         <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-2 py-1 flex items-center justify-between min-w-0">
-          <span class="text-[10px] text-slate-400 shrink-0">✨ 청결</span>
-          <span id="statClean" class="text-[11px] sm:text-xs font-black text-emerald-400 truncate ml-1">100%</span>
+          <span class="text-[10px] text-slate-400 shrink-0">🔥 배율</span>
+          <span id="statMultiplier" class="text-[11px] sm:text-xs font-black text-rose-400 truncate ml-1">x1.0</span>
         </div>
       </div>
 
-      <!-- Live Global Notice Ticker -->
-      <div id="globalNoticeBanner" class="hidden bg-amber-500/15 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 text-[11px] text-amber-200">
-        <span class="shrink-0 font-black text-amber-400">📢 공지</span>
+      <!-- Global Server Fever Event Banner -->
+      <div id="globalFeverBanner" class="hidden bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-amber-500/25 border border-amber-400 rounded-lg px-2.5 py-1 flex items-center justify-between text-[11px] text-amber-200 fever-pulse">
+        <span class="font-black text-amber-300">🔥 전체 서버 피버 타임! (모든 매출 2배!)</span>
+        <span id="globalFeverTimer" class="font-black text-white bg-amber-600/60 px-1.5 py-0.2 rounded">05:00</span>
+      </div>
+
+      <!-- Global Live Notice Ticker -->
+      <div id="globalNoticeBanner" class="hidden bg-indigo-500/15 border border-indigo-400/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 text-[11px] text-indigo-200">
+        <span class="shrink-0 font-black text-indigo-300">📢 공지</span>
         <span id="globalNoticeText" class="truncate font-medium"></span>
       </div>
     </div>
   </header>
 
-  <!-- ==================== 4. MAIN CONTENT AREA ==================== -->
+  <!-- ==================== 4. MAIN CONTENT ==================== -->
   <main class="flex-1 w-full max-w-3xl mx-auto px-3 pt-3 pb-nav-safe">
 
-    <!-- TAB 1: 매장 운영 (STORE) -->
+    <!-- TAB 1: 매장 / 리얼 POS 계산대 (STORE & POS) -->
     <section id="tab-store" class="space-y-3">
-      <!-- Shift Progress & Store Level Banner -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 shadow-md">
-        <div class="flex items-center justify-between text-xs mb-1.5">
+      <!-- Store Status & Passive Income Bar -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between gap-2">
+        <div class="min-w-0 flex-1">
           <div class="flex items-center gap-1.5">
-            <span class="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-bold text-[11px]" id="storeGradeLabel">Lv.1 동네 구멍가게</span>
-            <span class="text-slate-400 text-[11px]" id="staffSummaryText">알바 0명 근무중</span>
+            <span id="storeGradeBadge" class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[11px] font-black whitespace-nowrap">1호점 · 동네 편의점</span>
+            <span id="passiveIncomeLabel" class="text-[11px] text-slate-400 truncate">알바 자동매출: 0원/초</span>
           </div>
-          <span class="text-[11px] font-bold text-slate-300" id="dayTimerText">영업중 00:30</span>
+          <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+            <div id="dayProgressBar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-300" style="width: 0%"></div>
+          </div>
         </div>
-        <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-          <div id="dayProgressBar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-300" style="width: 0%"></div>
-        </div>
-      </div>
-
-      <!-- Customer Counter & Trash Interactive Zone -->
-      <div class="bg-gradient-to-b from-slate-900 to-slate-900/80 border border-slate-800 rounded-2xl p-3.5 shadow-lg relative overflow-hidden">
-        <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-xs sm:text-sm font-black text-white flex items-center gap-1.5">
-            <span>🧾 계산대 & 매장 홀</span>
-            <span id="queueCountBadge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold">대기 0명</span>
-          </h2>
-          <button onclick="cleanStoreAction(event)" id="cleanBtn"
-            class="px-2.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-xs font-bold whitespace-nowrap active:scale-95 transition flex items-center gap-1">
-            <span>🧹 청소하기</span>
-            <span id="trashCountTag" class="px-1.5 py-0.2 rounded bg-sky-950 text-[10px]">0개</span>
-          </button>
-        </div>
-
-        <!-- Customer Queue Cards -->
-        <div id="customerQueueArea" class="min-h-[112px] bg-slate-950/70 border border-slate-800/90 rounded-xl p-2.5 flex items-center gap-2.5 overflow-x-auto">
-          <!-- Populated dynamically -->
-        </div>
-
-        <!-- Quick Big Checkout Button for Mobile Convenience -->
-        <button onclick="serveFrontCustomer(event)" id="checkoutMainBtn"
-          class="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 active:scale-[0.98] text-slate-950 font-black text-sm shadow-lg shadow-amber-500/15 transition flex items-center justify-center gap-2">
-          <span>💳 손님 계산하기 (터치!)</span>
+        <button onclick="cleanStoreFloor(event)"
+          class="shrink-0 px-2.5 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[11px] font-extrabold whitespace-nowrap active:scale-95 transition">
+          🧹 청소 (<span id="cleanlinessText">100%</span>)
         </button>
       </div>
 
-      <!-- Product Shelves (4 Core Categories) -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-md">
-        <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-xs sm:text-sm font-black text-white">📦 진열대 재고 관리 (터치하여 발주)</h2>
-          <button onclick="restockAllProducts(event)"
-            class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold whitespace-nowrap active:scale-95 transition">
-            ⚡ 전체 채우기
+      <!-- INTERACTIVE POS CHECKOUT REGISTER -->
+      <div class="bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-700/80 rounded-3xl p-3.5 shadow-xl relative overflow-hidden">
+        <!-- POS Header -->
+        <div class="flex items-center justify-between mb-2.5 gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 text-[10px] font-black shrink-0">POS 1번기</span>
+            <h2 id="posCustomerTitle" class="text-xs sm:text-sm font-black text-white truncate">손님 입장 대기중...</h2>
+          </div>
+          <span id="posStepBadge" class="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-black shrink-0">
+            STEP 1 · 바코드 스캔
+          </span>
+        </div>
+
+        <!-- POS Digital LCD Screen -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 mb-3 relative overflow-hidden">
+          <div id="scannerLaserLine" class="scanner-laser"></div>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+            <span>스캔 진행도: <strong id="scanProgressText" class="text-emerald-400">0 / 0개</strong></span>
+            <span>연속 콤보: <strong id="posComboText" class="text-amber-400">0콤보</strong></span>
+          </div>
+
+          <div class="flex items-baseline justify-between pt-1 border-t border-slate-800/80">
+            <span class="text-xs font-bold text-slate-300">스캔 합계 금액</span>
+            <span id="posScannedTotal" class="text-xl sm:text-2xl font-black text-emerald-400 tracking-tight">0원</span>
+          </div>
+        </div>
+
+        <!-- SPECIAL INCIDENT: AGE CHECK / TROUBLEMAKER -->
+        <div id="posSpecialIncidentArea" class="hidden space-y-2.5 animate-pop">
+          <div class="p-3.5 rounded-2xl bg-rose-950/60 border border-rose-500/60 space-y-1.5">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🚨</span>
+              <span id="incidentTitle" class="text-xs sm:text-sm font-black text-rose-300">돌발 상황! 신분증 미소지 미성년자</span>
+            </div>
+            <p id="incidentDesc" class="text-xs text-slate-200 leading-relaxed">
+              교복을 입은 손님이 주류·담배를 계산대에 올렸지만 신분증이 없다고 합니다! 어떻게 처리할까요?
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="resolveSpecialIncident(true, event)"
+              class="py-3 px-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs active:scale-95 transition shadow-lg">
+              🚫 판매 거부하기 (포상금!)
+            </button>
+            <button onclick="resolveSpecialIncident(false, event)"
+              class="py-3 px-2 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-rose-500/40 text-rose-300 font-bold text-xs active:scale-95 transition">
+               그냥 판매하기 (벌금 위험)
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 1 AREA: BARCODE ITEM BUTTONS -->
+        <div id="posStep1Area" class="space-y-2">
+          <p class="text-[11px] text-slate-400 font-medium">👇 손님이 올린 상품을 하나씩 터치해 바코드를 찍으세요!</p>
+          <div id="posBasketGrid" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
+        <!-- STEP 2A AREA: CARD / SAMSUNG PAY -->
+        <div id="posStep2CardArea" class="hidden space-y-2.5 animate-pop">
+          <div class="p-3 rounded-2xl bg-sky-950/50 border border-sky-500/40 flex items-center justify-between">
+            <div>
+              <div class="text-xs font-black text-sky-300">💳 카드 / 삼성페이 결제 손님</div>
+              <div class="text-[11px] text-slate-300 mt-0.5">단말기 승인 버튼을 눌러 결제를 완료하세요!</div>
+            </div>
+            <span class="text-2xl">📱</span>
+          </div>
+          <button onclick="completeCardPayment(event)"
+            class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-300 hover:to-indigo-400 active:scale-[0.98] text-slate-950 font-black text-sm shadow-lg shadow-sky-500/20 transition">
+            💳 카드/페이 단말기 승인하기 (<span id="cardPayAmountText">0원</span>)
           </button>
         </div>
 
-        <div id="productGrid" class="grid grid-cols-2 gap-2.5">
-          <!-- Populated dynamically -->
+        <!-- STEP 2B AREA: CASH REGISTER CHANGE MINI-GAME -->
+        <div id="posStep2CashArea" class="hidden space-y-2.5 animate-pop">
+          <div class="p-3 rounded-2xl bg-amber-950/40 border border-amber-500/40 space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-300">💵 손님이 낸 현금</span>
+              <span id="cashGivenText" class="font-black text-white">10,000원</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-300">🧾 물건 합계 금액</span>
+              <span id="cashTotalText" class="font-bold text-slate-200">0원</span>
+            </div>
+            <div class="pt-1.5 border-t border-amber-500/30 flex items-center justify-between">
+              <span class="text-xs font-black text-amber-300">🪙 내가 준비한 거스름돈</span>
+              <span id="cashPreparedText" class="text-base font-black text-emerald-400">0원</span>
+            </div>
+          </div>
+
+          <!-- Tactile Coin & Bill Drawer Buttons -->
+          <div class="grid grid-cols-5 gap-1.5">
+            <button onclick="addChangeCash(5000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-amber-300 active:scale-95">+5,000</button>
+            <button onclick="addChangeCash(1000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-sky-300 active:scale-95">+1,000</button>
+            <button onclick="addChangeCash(500)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-emerald-300 active:scale-95">+500</button>
+            <button onclick="addChangeCash(100)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-slate-200 active:scale-95">+100</button>
+            <button onclick="resetChangeCash()" class="py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-[11px] font-black text-rose-300 active:scale-95">초기화</button>
+          </div>
+
+          <button onclick="completeCashPayment(event)"
+            class="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 active:scale-[0.98] text-slate-950 font-black text-sm shadow-lg shadow-emerald-500/20 transition">
+            🤝 거스름돈 건네고 정산 완료!
+          </button>
         </div>
+      </div>
+
+      <!-- Waiting Line Preview -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3">
+        <div class="flex items-center justify-between text-xs mb-2">
+          <span class="font-black text-slate-200">🚶 다음 대기 손님 줄</span>
+          <span id="waitingLineCount" class="text-[11px] text-slate-400">3명 대기중</span>
+        </div>
+        <div id="waitingLineBar" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
       </div>
     </section>
 
-    <!-- TAB 2: 알바 및 매장 업그레이드 (UPGRADE) -->
+    <!-- TAB 2: 알바 및 다점포 확장(프레스티지) (UPGRADES & FRANCHISE) -->
     <section id="tab-upgrade" class="hidden space-y-3">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
-        <h2 class="text-sm font-black text-white mb-1">👩‍💼 아르바이트 고용 & 시설 업그레이드</h2>
-        <p class="text-xs text-slate-400 mb-3">알바생을 고용하면 자동으로 계산과 청소를 도와줍니다!</p>
-        <div id="upgradeList" class="space-y-2.5">
-          <!-- Populated dynamically -->
+      <!-- Franchise Branch Expansion Card (Prestige) -->
+      <div class="bg-gradient-to-br from-amber-950/60 via-slate-900 to-slate-900 border border-amber-500/50 rounded-2xl p-3.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-black">다점포 가맹 확장</span>
+            <h2 id="nextBranchTitle" class="text-sm font-black text-white mt-1">🏢 2호점 오픈하기 (영구 매출 +50%)</h2>
+          </div>
+          <span id="currentBranchMultText" class="text-xs font-black text-amber-300 bg-amber-500/15 px-2.5 py-1 rounded-xl border border-amber-400/40">
+            현재 1호점 (x1.0)
+          </span>
         </div>
+        <p class="text-[11px] text-slate-300 leading-relaxed">
+          목표 자금을 달성하면 새로운 점포를 추가 오픈합니다! 현재 보유 자금과 일반 시설이 초기화되는 대신, <strong class="text-amber-300">모든 수익 영구 +50% 배율</strong>과 <strong class="text-amber-300">랭킹 점포 등급</strong>이 영구 상승합니다.
+        </p>
+        <button id="expandBranchBtn" onclick="expandNewBranch()"
+          class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs active:scale-[0.98] transition shadow-lg">
+          필요 자금: 500,000원 달성 시 오픈 가능
+        </button>
+      </div>
+
+      <!-- Staff & Store Upgrades -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
+        <h2 class="text-sm font-black text-white mb-1">👥 아르바이트 고용 & POS 시설 업그레이드</h2>
+        <p class="text-xs text-slate-400 mb-3">알바생을 고용하면 계산대를 보지 않을 때도 초당 자동 수익이 쌓입니다!</p>
+        <div id="upgradeListContainer" class="space-y-2.5"></div>
       </div>
     </section>
 
-    <!-- TAB 3: 실시간 글로벌 랭킹 (RANKING) -->
+    <!-- TAB 3: 실시간 글로벌 랭킹 & 한줄 방명록 (RANKING & SHOUTBOX) -->
     <section id="tab-ranking" class="hidden space-y-3">
+      <!-- Real-time Shoutbox (한줄 방명록) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-black text-white">💬 실시간 사장님 한줄 방명록</h2>
+          <span class="text-[10px] text-emerald-400 font-bold">● LIVE</span>
+        </div>
+        <div id="shoutboxList" class="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-xs">
+          <p class="text-slate-400 text-[11px]">방명록을 불러오는 중...</p>
+        </div>
+        <div class="flex gap-1.5 pt-1">
+          <input id="shoutboxInput" type="text" maxlength="50" placeholder="친구들에게 한마디 남기기 (최대 50자)"
+            class="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-400" />
+          <button onclick="postShoutboxMessage()"
+            class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs whitespace-nowrap active:scale-95 transition">
+            등록
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Leaderboard -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
         <div class="flex items-center justify-between mb-3">
           <div>
-            <h2 class="text-sm font-black text-white flex items-center gap-1.5">🏆 실시간 부자 사장님 랭킹</h2>
-            <p class="text-[11px] text-slate-400">Firebase 서버 실시간 자산 순위</p>
+            <h2 class="text-sm font-black text-white">🏆 실시간 편의점 재벌 랭킹</h2>
+            <p class="text-[11px] text-slate-400">다점포 수 및 보유 자산 기준 실시간 순위</p>
           </div>
           <button onclick="fetchLeaderboard()"
-            class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 whitespace-nowrap active:scale-95">
+            class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 whitespace-nowrap active:scale-95">
             🔄 새로고침
           </button>
         </div>
-
         <div id="leaderboardList" class="space-y-2">
-          <div class="text-center text-xs text-slate-400 py-8">랭킹 데이터를 불러오는 중...</div>
+          <div class="text-center text-xs text-slate-400 py-8">순위를 불러오는 중...</div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 4: 커뮤니티 / 투표 / 건의 (COMMUNITY) -->
+    <!-- TAB 4: 공지 / 투표 / 버그신고 (COMMUNITY) -->
     <section id="tab-community" class="hidden space-y-3">
-      <!-- Active Poll Card -->
+      <!-- Coupon Quick Banner -->
+      <div class="bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/50 rounded-2xl p-3.5 flex items-center justify-between gap-2">
+        <div>
+          <div class="text-xs font-black text-amber-300">🎁 출시 기념 쿠폰 이벤트 진행중!</div>
+          <div class="text-[11px] text-slate-300 mt-0.5">코드 <strong class="text-white">open_261119</strong> 입력 시 50,000원 즉시 지급!</div>
+        </div>
+        <button onclick="openCouponModal()"
+          class="shrink-0 px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs whitespace-nowrap active:scale-95">
+          쿠폰 입력
+        </button>
+      </div>
+
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
-        <h2 class="text-sm font-black text-white mb-2 flex items-center gap-1.5">🗳️ 실시간 유저 투표</h2>
+        <h2 class="text-sm font-black text-white mb-2">🗳️ 실시간 유저 투표</h2>
         <div id="pollContainer">
           <p class="text-xs text-slate-400">현재 진행 중인 투표가 없습니다.</p>
         </div>
       </div>
 
-      <!-- Recent Notices -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
-        <h2 class="text-sm font-black text-white mb-2 flex items-center gap-1.5">📢 전체 공지사항</h2>
+        <h2 class="text-sm font-black text-white mb-2">📢 전체 공지사항 기록</h2>
         <div id="noticeHistoryList" class="space-y-2 text-xs text-slate-300">
           <p class="text-slate-400">등록된 공지가 없습니다.</p>
         </div>
       </div>
 
-      <!-- Bug Report / Suggestion Box -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
-        <h2 class="text-sm font-black text-white mb-1 flex items-center gap-1.5">💌 개발자(관리자)에게 건의 & 버그 제보</h2>
-        <p class="text-[11px] text-slate-400 mb-2.5">보낸 내용은 관리자만 비공개로 확인할 수 있습니다.</p>
-        <textarea id="feedbackInput" rows="3" maxlength="300" placeholder="버그 제보나 추가되었으면 하는 기능을 적어주세요!"
+        <h2 class="text-sm font-black text-white mb-1">🐞 버그신고 & 개선사항 보내기</h2>
+        <p class="text-[11px] text-slate-400 mb-2">보낸 내용은 오직 관리자만 수신함에서 확인할 수 있습니다.</p>
+        <textarea id="feedbackInput" rows="3" maxlength="300" placeholder="버그 제보나 건의사항을 자유롭게 적어주세요!"
           class="w-full p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-400 resize-none"></textarea>
         <button onclick="submitFeedback()"
           class="mt-2 w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs active:scale-[0.98] transition">
-          관리자에게 전송하기 📨
+          관리자에게 비공개 전송하기 📨
         </button>
       </div>
     </section>
 
   </main>
 
-  <!-- ==================== 5. BOTTOM NAVIGATION BAR (ZERO OVERLAP MOBILE) ==================== -->
+  <!-- ==================== 5. BOTTOM 4-TAB NAVIGATION ==================== -->
   <nav class="fixed bottom-0 inset-x-0 z-30 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-1.5 py-1.5">
     <div class="max-w-3xl mx-auto grid grid-cols-4 gap-1">
       <button onclick="switchTab('store')" id="nav-store"
         class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition">
         <span class="text-base leading-none mb-0.5">🏪</span>
-        <span class="text-[11px] font-extrabold whitespace-nowrap">매장운영</span>
+        <span class="text-[11px] font-extrabold whitespace-nowrap">매장/계산대</span>
       </button>
       <button onclick="switchTab('upgrade')" id="nav-upgrade"
         class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition">
-        <span class="text-base leading-none mb-0.5">⚡</span>
-        <span class="text-[11px] font-extrabold whitespace-nowrap">알바/업글</span>
+        <span class="text-base leading-none mb-0.5">🏢</span>
+        <span class="text-[11px] font-extrabold whitespace-nowrap">알바/점포확장</span>
       </button>
       <button onclick="switchTab('ranking')" id="nav-ranking"
         class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition">
         <span class="text-base leading-none mb-0.5">🏆</span>
-        <span class="text-[11px] font-extrabold whitespace-nowrap">랭킹</span>
+        <span class="text-[11px] font-extrabold whitespace-nowrap">랭킹/방명록</span>
       </button>
       <button onclick="switchTab('community')" id="nav-community"
         class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition">
@@ -325,56 +500,108 @@
     </div>
   </nav>
 
-  <!-- ==================== 6. ADMIN MODAL (PASSWORD: landers_0724_jaeha) ==================== -->
+  <!-- ==================== 6. COUPON REDEEM MODAL ==================== -->
+  <div id="couponModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-3.5">
+    <div class="w-full max-w-sm bg-slate-900 border border-amber-500/50 rounded-3xl p-5 shadow-2xl space-y-3 animate-pop">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-black text-white">🎁 쿠폰 코드 입력</h3>
+        <button onclick="closeCouponModal()" class="px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-bold text-slate-300">✕</button>
+      </div>
+      <p class="text-xs text-slate-300">
+        출시 기념 코드: <span class="font-black text-amber-300 select-all">open_261119</span> (50,000원 + 만족도 100%)
+      </p>
+      <input id="couponCodeInput" type="text" placeholder="쿠폰 코드를 입력하세요"
+        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm font-bold text-white focus:outline-none focus:border-amber-400" />
+      <button onclick="redeemCouponCode()"
+        class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-sm active:scale-95 transition">
+        보상 수령하기 🎉
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== 7. ADMIN MODAL (landers_0724_jaeha) ==================== -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-3">
-    <div class="w-full max-w-lg max-h-[88vh] flex flex-col bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-pop">
-      <!-- Modal Header -->
+    <div class="w-full max-w-lg max-h-[90vh] flex flex-col bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-pop">
       <div class="px-4 py-3 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2">
           <span class="text-lg">🛡️</span>
-          <h3 class="text-sm font-black text-white">총괄 관리자 제어판</h3>
+          <h3 class="text-sm font-black text-white">총괄 관리자 패널</h3>
         </div>
         <button onclick="closeAdminModal()" class="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-bold text-slate-200">
           닫기 ✕
         </button>
       </div>
 
-      <!-- Password Gate -->
+      <!-- Password Verification -->
       <div id="adminAuthGate" class="p-5 space-y-3">
         <p class="text-xs text-slate-300">관리자 전용 비밀번호를 입력하세요.</p>
-        <input id="adminPassInput" type="password" placeholder="관리자 비밀번호 입력"
+        <input id="adminPassInput" type="password" placeholder="비밀번호 입력"
           class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-indigo-400" />
         <div id="adminAuthError" class="hidden text-xs text-rose-400 font-bold">비밀번호가 일치하지 않습니다.</div>
         <button onclick="verifyAdminPass()"
           class="w-full py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-black text-xs transition">
-          관리자 인증하기
+          관리자 로그인
         </button>
       </div>
 
-      <!-- Authenticated Admin Dashboard -->
+      <!-- Admin Dashboard Content -->
       <div id="adminDashboard" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
-        <!-- Global Stats -->
         <div class="grid grid-cols-2 gap-2">
           <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-2.5">
-            <div class="text-[10px] text-slate-400">누적 총 방문수</div>
+            <div class="text-[10px] text-slate-400">총 누적 접속수</div>
             <div id="adminTotalVisits" class="text-base font-black text-emerald-400">0회</div>
           </div>
           <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-2.5">
-            <div class="text-[10px] text-slate-400">가입된 총 사장님 수</div>
+            <div class="text-[10px] text-slate-400">등록된 사장님 수</div>
             <div id="adminTotalUsers" class="text-base font-black text-sky-400">0명</div>
           </div>
         </div>
 
-        <!-- NEW: USER MONEY GRANT / EDIT PANEL -->
-        <div class="bg-slate-800/60 border border-amber-500/40 rounded-2xl p-3 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <h4 class="text-xs font-black text-amber-300 flex items-center gap-1">💸 유저 자금 지급 및 수정</h4>
-            <button onclick="loadAdminUserList()" class="px-2 py-0.5 rounded bg-slate-700 text-[10px] font-bold text-slate-200">🔄 목록 갱신</button>
+        <!-- GLOBAL FEVER EVENT TRIGGER -->
+        <div class="bg-gradient-to-r from-amber-950/60 to-orange-950/60 border border-amber-500/50 rounded-2xl p-3 space-y-2">
+          <h4 class="text-xs font-black text-amber-300">🔥 전체 서버 피버 이벤트 (매출 2배)</h4>
+          <div class="flex gap-2">
+            <button onclick="triggerServerFever(5)"
+              class="flex-1 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs active:scale-95">
+              ⚡ 5분간 전체 매출 2배 발동!
+            </button>
+            <button onclick="stopServerFever()"
+              class="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-300 font-bold text-xs">
+              종료
+            </button>
           </div>
+        </div>
 
+        <!-- USER BAN & UNBAN CONTROL -->
+        <div class="bg-slate-800/60 border border-rose-500/40 rounded-2xl p-3 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-black text-rose-300">🚫 유저 차단(밴) 및 해제 관리</h4>
+            <button onclick="loadAdminUserList()" class="px-2 py-0.5 rounded bg-slate-700 text-[10px] font-bold text-slate-200">🔄 갱신</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input id="adminBanTargetInput" type="text" placeholder="차단/해제할 닉네임"
+              class="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminBanReasonInput" type="text" placeholder="차단 사유 (선택)"
+              class="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="adminSetUserBan(true)"
+              class="py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs active:scale-95">
+              🚫 즉시 차단 (강제 퇴장)
+            </button>
+            <button onclick="adminSetUserBan(false)"
+              class="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs active:scale-95">
+              ✅ 차단 해제
+            </button>
+          </div>
+          <div id="adminUserStatusList" class="max-h-32 overflow-y-auto space-y-1 pt-1 text-[11px]"></div>
+        </div>
+
+        <!-- USER MONEY GRANT & EDIT -->
+        <div class="bg-slate-800/60 border border-amber-500/40 rounded-2xl p-3 space-y-2.5">
+          <h4 class="text-xs font-black text-amber-300">💸 유저 자금 지급 및 수정</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
-              <label class="block text-[10px] text-slate-400 mb-1">대상 유저 선택 또는 닉네임</label>
               <select id="adminUserSelect" onchange="syncSelectedUserToInput()"
                 class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white mb-1.5">
                 <option value="">-- 가입 유저 선택 --</option>
@@ -382,54 +609,66 @@
               <input id="adminTargetNickname" type="text" placeholder="직접 닉네임 입력"
                 class="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
             </div>
-
             <div>
-              <label class="block text-[10px] text-slate-400 mb-1">지급/변경 금액 (원)</label>
               <input id="adminMoneyAmount" type="number" value="100000" step="10000"
                 class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-amber-300 mb-1.5" />
               <div class="flex gap-1">
                 <button onclick="setAdminAmountPreset(100000)" class="flex-1 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-[10px] font-bold">+10만</button>
                 <button onclick="setAdminAmountPreset(1000000)" class="flex-1 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-[10px] font-bold">+100만</button>
-                <button onclick="setAdminAmountPreset(10000000)" class="flex-1 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-[10px] font-bold">+1000만</button>
+                <button onclick="setAdminAmountPreset(10000000)" class="flex-1 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-[10px] font-bold">+1,000만</button>
               </div>
             </div>
           </div>
-
-          <div class="grid grid-cols-2 gap-2 pt-1">
+          <div class="grid grid-cols-2 gap-2">
             <button onclick="adminModifyUserMoney('add')"
-              class="py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs active:scale-95 transition">
+              class="py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs active:scale-95">
               ➕ 금액 추가 지급
             </button>
             <button onclick="adminModifyUserMoney('set')"
-              class="py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs active:scale-95 transition">
+              class="py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs active:scale-95">
               ✏️ 해당 금액으로 설정
             </button>
           </div>
+        </div>
+
+        <!-- COUPON GENERATOR -->
+        <div class="bg-slate-800/60 border border-emerald-500/40 rounded-2xl p-3 space-y-2">
+          <h4 class="text-xs font-black text-emerald-300">🎁 새 쿠폰 코드 발행 (기본: open_261119)</h4>
+          <div class="grid grid-cols-2 gap-1.5">
+            <input id="adminNewCouponCode" type="text" placeholder="쿠폰 코드 (예: event_100)"
+              class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminNewCouponReward" type="number" placeholder="보상 금액 (원)" value="100000"
+              class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-amber-300 font-bold" />
+          </div>
+          <button onclick="createAdminCoupon()"
+            class="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs">
+            새 쿠폰 코드 등록하기
+          </button>
         </div>
 
         <!-- Global Notice Control -->
         <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-3 space-y-2">
           <h4 class="text-xs font-black text-white">📢 전체 공지사항 등록</h4>
           <div class="flex gap-1.5">
-            <input id="adminNoticeInput" type="text" placeholder="모든 접속자에게 띄울 공지 내용"
+            <input id="adminNoticeInput" type="text" placeholder="모든 접속자 상단에 띄울 공지 내용"
               class="flex-1 px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
             <button onclick="postGlobalNotice()"
               class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xs whitespace-nowrap">
               등록
             </button>
           </div>
-          <button onclick="clearGlobalNotice()" class="text-[11px] text-rose-400 hover:underline">현재 상단 공지 내리기</button>
+          <button onclick="clearGlobalNotice()" class="text-[11px] text-rose-400 hover:underline">상단 공지 배너 내리기</button>
         </div>
 
-        <!-- Poll Creation Control -->
+        <!-- Poll Creation -->
         <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-3 space-y-2">
-          <h4 class="text-xs font-black text-white">🗳️ 새 실시간 투표 만들기 (0표 시작)</h4>
-          <input id="adminPollQuestion" type="text" placeholder="투표 질문 (예: 다음 업데이트 희망 기능은?)"
+          <h4 class="text-xs font-black text-white">🗳️ 실시간 투표 시작 (0표 시작)</h4>
+          <input id="adminPollQuestion" type="text" placeholder="투표 질문 입력"
             class="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
           <div class="grid grid-cols-2 gap-1.5">
-            <input id="adminPollOpt1" type="text" placeholder="항목 1 (예: 야간 알바 추가)"
+            <input id="adminPollOpt1" type="text" placeholder="선택지 1"
               class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
-            <input id="adminPollOpt2" type="text" placeholder="항목 2 (예: 2호점 오픈)"
+            <input id="adminPollOpt2" type="text" placeholder="선택지 2"
               class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
           </div>
           <div class="flex gap-2">
@@ -444,10 +683,10 @@
           </div>
         </div>
 
-        <!-- Private Feedback / Bug Reports Viewer -->
+        <!-- Bug / Suggestion Inbox -->
         <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-3 space-y-2">
           <div class="flex items-center justify-between">
-            <h4 class="text-xs font-black text-white">💌 유저 비공개 건의 & 버그 제보함</h4>
+            <h4 class="text-xs font-black text-white">🐞 버그신고 & 개선사항 수신함</h4>
             <button onclick="loadAdminFeedbacks()" class="text-[10px] text-slate-400 underline">새로고침</button>
           </div>
           <div id="adminFeedbackList" class="space-y-1.5 max-h-40 overflow-y-auto text-xs">
@@ -458,10 +697,10 @@
     </div>
   </div>
 
-  <!-- ==================== 7. GAME & FIREBASE LOGIC ==================== -->
+  <!-- ==================== 8. JAVASCRIPT LOGIC ==================== -->
   <script>
     // ---------------------------------------------------------
-    // A. Firebase Initialization
+    // 1. Firebase Initialization
     // ---------------------------------------------------------
     const firebaseConfig = {
       databaseURL: "https://game-7b7db-default-rtdb.firebaseio.com/"
@@ -470,285 +709,413 @@
     const db = firebase.database();
 
     // ---------------------------------------------------------
-    // B. Web Audio API Sound Synthesizer (Zero external assets)
+    // 2. Web Audio API POS Beep & Cash Register Sound
     // ---------------------------------------------------------
     let soundEnabled = true;
     let audioCtx = null;
 
-    function playTone(freq, type = 'sine', duration = 0.12, gainVal = 0.08) {
+    function playTone(freq, type = 'sine', duration = 0.1, vol = 0.08) {
       if (!soundEnabled) return;
       try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = type;
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
         osc.stop(audioCtx.currentTime + duration);
-      } catch (e) {
-        // Ignore audio block errors on strict mobile browsers
-      }
+      } catch (e) {}
     }
 
-    function playCashSound() {
-      playTone(880, 'triangle', 0.09, 0.09);
-      setTimeout(() => playTone(1318.5, 'triangle', 0.16, 0.09), 65);
+    function playBarcodeBeep() {
+      playTone(1760, 'square', 0.075, 0.05);
     }
 
-    function playSweepSound() {
-      playTone(320, 'sine', 0.1, 0.06);
-      setTimeout(() => playTone(480, 'sine', 0.12, 0.06), 60);
+    function playRegisterComplete() {
+      playTone(987.77, 'triangle', 0.08, 0.09);
+      setTimeout(() => playTone(1318.51, 'triangle', 0.16, 0.09), 65);
     }
 
-    function playGiftSound() {
-      [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
-        setTimeout(() => playTone(f, 'triangle', 0.18, 0.1), idx * 75);
+    function playCoinTap() {
+      playTone(1150, 'sine', 0.05, 0.05);
+    }
+
+    function playGiftFanfare() {
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        setTimeout(() => playTone(f, 'triangle', 0.18, 0.1), i * 70);
       });
     }
 
     function toggleSound() {
       soundEnabled = !soundEnabled;
-      document.getElementById('soundToggleBtn').textContent = soundEnabled ? '🔊' : '🔇';
-      showToast(soundEnabled ? '효과음이 켜졌습니다.' : '효과음이 꺼졌습니다.');
+      const btn = document.getElementById('soundToggleBtn');
+      btn.innerHTML = soundEnabled
+        ? '<i data-lucide="volume-2" class="w-3.5 h-3.5"></i>'
+        : '<i data-lucide="volume-x" class="w-3.5 h-3.5 text-rose-400"></i>';
+      lucide.createIcons();
+      showToast(soundEnabled ? '🔊 효과음이 켜졌습니다.' : '🔇 효과음이 꺼졌습니다.');
     }
 
     // ---------------------------------------------------------
-    // C. Game State & Constants
+    // 3. Game State & Constants
     // ---------------------------------------------------------
     const ADMIN_SECRET = "landers_0724_jaeha";
     const DAY_DURATION_SEC = 30;
+    const LAUNCH_COUPON_CODE = "open_261119";
+    const LAUNCH_COUPON_REWARD = 50000;
 
-    const PRODUCTS = [
-      { id: 'kimbap', name: '삼각김밥', emoji: '🍙', cost: 600, price: 1500, maxStock: 20 },
-      { id: 'ramen', name: '컵라면', emoji: '🍜', cost: 800, price: 2000, maxStock: 20 },
-      { id: 'coffee', name: '캔커피/음료', emoji: '🥤', cost: 700, price: 1800, maxStock: 25 },
-      { id: 'snack', name: '허니과자/빵', emoji: '🥐', cost: 1100, price: 2800, maxStock: 15 }
+    const STORE_ITEMS = [
+      { id: 'kimbap', name: '참치마요 삼각김밥', emoji: '🍙', price: 1200 },
+      { id: 'ramen', name: '매운 컵라면', emoji: '🍜', price: 1500 },
+      { id: 'milk', name: '단지 바나나우유', emoji: '🍌', price: 1700 },
+      { id: 'bento', name: '혜자 편의점 도시락', emoji: '🍱', price: 4900 },
+      { id: 'coffee', name: '아이스 아메리카노', emoji: '🧊', price: 2000 },
+      { id: 'snack', name: '허니버터 과자', emoji: '🥨', price: 1800 }
     ];
 
-    const CUSTOMER_TYPES = [
-      { emoji: '🧑‍🎓', title: '학생 손님', tipMult: 1.0 },
-      { emoji: '👩‍💼', title: '직장인', tipMult: 1.25 },
-      { emoji: '🧔', title: '단골 아저씨', tipMult: 1.15 },
-      { emoji: '👵', title: '동네 할머니', tipMult: 1.1 },
-      { emoji: '🕵️', title: '본사 암행평가단', tipMult: 2.0 }
+    const CUSTOMER_PROFILES = [
+      { emoji: '🧑‍🎓', name: '야자 끝난 고등학생' },
+      { emoji: '👩‍💼', name: '점심시간 직장인' },
+      { emoji: '🧔', name: '야간 택배 기사님' },
+      { emoji: '👵', name: '이웃집 할머니' },
+      { emoji: '🕵️', name: '본사 우수매장 심사관' }
     ];
 
-    let currentUser = null; // { nickname, pin }
+    const UPGRADE_DEFS = [
+      {
+        key: 'partTimer',
+        title: '👩‍💼 야간/주간 알바생 고용',
+        desc: '초당 자동 매출 +800원을 벌어옵니다.',
+        baseCost: 8000,
+        mult: 1.65,
+        maxLv: 20,
+        passivePerLv: 800
+      },
+      {
+        key: 'posScanner',
+        title: '🔫 듀얼 초고속 바코드 스캐너',
+        desc: '모든 계산 정산 수익이 레벨당 +15% 증가합니다.',
+        baseCost: 12000,
+        mult: 1.75,
+        maxLv: 15,
+        passivePerLv: 0
+      },
+      {
+        key: 'coffeeMachine',
+        title: '☕ 원두커피 & 치킨 조리기',
+        desc: '초당 자동 매출 +2,500원을 추가로 벌어옵니다.',
+        baseCost: 25000,
+        mult: 1.8,
+        maxLv: 15,
+        passivePerLv: 2500
+      },
+      {
+        key: 'storeExpansion',
+        title: '🏬 프리미엄 매장 확장',
+        desc: '초당 자동 매출 +7,000원 & 매장 등급이 상승합니다.',
+        baseCost: 60000,
+        mult: 1.9,
+        maxLv: 10,
+        passivePerLv: 7000
+      }
+    ];
+
+    let currentUser = null;
     let isRemoteMoneySyncing = false;
-    let userMoneyRef = null;
-    let adminUsersCache = {};
+    let detectedRecoveryData = null;
+    let serverFeverUntil = 0;
 
     let gameState = {
       money: 15000,
       day: 1,
-      reputation: 50,
+      branchCount: 1, // 1호점, 2호점, 3호점... (Prestige)
+      satisfaction: 85,
       cleanliness: 100,
-      trashCount: 0,
+      combo: 0,
       totalServed: 0,
-      stocks: {
-        kimbap: 15,
-        ramen: 15,
-        coffee: 18,
-        snack: 12
-      },
+      usedCoupons: {},
       upgrades: {
-        cashierStaff: 0,   // Auto checkout every few seconds
-        cleanerStaff: 0,   // Auto clean trash
-        shelfCapacity: 0,  // Increases maxStock
-        interiorLevel: 1   // Increases customer price multiplier & spawn rate
+        partTimer: 0,
+        posScanner: 0,
+        coffeeMachine: 0,
+        storeExpansion: 0
       }
     };
 
-    let customerQueue = [];
+    let currentCustomer = null;
+    let waitingQueue = [];
+    let preparedChange = 0;
     let dayTimer = 0;
-    let feverSeconds = 0;
-    let lastTickTimestamp = Date.now();
-    let autoCashierTimer = 0;
-    let autoCleanerTimer = 0;
-    let customerSpawnTimer = 0;
+    let lastTick = Date.now();
 
     // ---------------------------------------------------------
-    // D. Helper UI Functions
+    // 4. Legacy Data & Account Auto-Recovery Scanner
     // ---------------------------------------------------------
-    function formatKRW(num) {
-      return Math.floor(num).toLocaleString('ko-KR') + '원';
-    }
+    async function scanForRecoverableData() {
+      let bestMoney = 0;
+      let bestNickname = '';
+      let bestDay = 1;
+      let bestBranch = 1;
+      let bestSatisfaction = 85;
+      let bestUpgrades = null;
 
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const el = document.createElement('div');
-      const bgMap = {
-        info: 'bg-slate-800/95 border-slate-600 text-white',
-        success: 'bg-emerald-950/95 border-emerald-500 text-emerald-200',
-        warning: 'bg-amber-950/95 border-amber-500 text-amber-200',
-        error: 'bg-rose-950/95 border-rose-500 text-rose-200'
-      };
-      el.className = `px-3.5 py-2 rounded-2xl border shadow-xl text-xs font-bold text-center animate-pop ${bgMap[type] || bgMap.info}`;
-      el.textContent = message;
-      container.appendChild(el);
-      setTimeout(() => {
-        el.style.opacity = '0';
-        el.style.transition = 'opacity 0.25s';
-        setTimeout(() => el.remove(), 260);
-      }, 2600);
-    }
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
 
-    function spawnFloatingText(x, y, text, color = '#fbbf24') {
-      const el = document.createElement('div');
-      el.className = 'floating-text text-xs sm:text-sm';
-      el.style.left = `${Math.min(window.innerWidth - 90, Math.max(16, x - 30))}px`;
-      el.style.top = `${Math.max(50, y - 20)}px`;
-      el.style.color = color;
-      el.textContent = text;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 900);
-    }
+          if (key.toLowerCase().includes('nick') || key === 'cvs_user') {
+            if (raw.length >= 2 && raw.length <= 12 && !raw.startsWith('{')) {
+              bestNickname = raw.trim();
+            }
+          }
 
-    function switchTab(tabName) {
-      ['store', 'upgrade', 'ranking', 'community'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
-        const btn = document.getElementById(`nav-${t}`);
-        btn.className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition';
-      });
-      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-      const activeBtn = document.getElementById(`nav-${tabName}`);
-      activeBtn.className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition';
-
-      if (tabName === 'ranking') fetchLeaderboard();
-      if (tabName === 'upgrade') renderUpgrades();
-      if (tabName === 'community') loadCommunityData();
-    }
-
-    // ---------------------------------------------------------
-    // E. Visitor Counter & Account Authentication (Nickname + 4-Digit PIN)
-    // ---------------------------------------------------------
-    function initVisitorCounter() {
-      const visitRef = db.ref('meta/totalVisits');
-      visitRef.transaction(current => (current || 0) + 1, (err, committed, snapshot) => {
-        if (!err && snapshot) {
-          const val = snapshot.val() || 1;
-          const el = document.getElementById('loginVisitorCount');
-          if (el) el.textContent = `누적 방문 ${val.toLocaleString()}회`;
+          if (raw.startsWith('{')) {
+            try {
+              const parsed = JSON.parse(raw);
+              const candidateMoney = Number(parsed.money ?? parsed.cash ?? parsed.state?.money ?? 0);
+              const candidateNick = parsed.nickname || parsed.userName || parsed.state?.nickname || '';
+              if (candidateMoney > bestMoney) {
+                bestMoney = candidateMoney;
+                bestDay = Number(parsed.day ?? parsed.state?.day ?? 1);
+                bestBranch = Number(parsed.branchCount ?? parsed.state?.branchCount ?? 1);
+                bestSatisfaction = Number(parsed.satisfaction ?? parsed.reputation ?? parsed.state?.satisfaction ?? 85);
+                if (parsed.upgrades || parsed.state?.upgrades) {
+                  bestUpgrades = parsed.upgrades || parsed.state?.upgrades;
+                }
+              }
+              if (candidateNick && !bestNickname) bestNickname = candidateNick;
+            } catch (e) {}
+          }
         }
-      });
+      } catch (e) {}
+
+      try {
+        const [usersSnap, playersSnap, lbSnap] = await Promise.all([
+          db.ref('users').once('value'),
+          db.ref('players').once('value'),
+          db.ref('leaderboard').once('value')
+        ]);
+
+        const mergeCandidate = obj => {
+          if (!obj) return;
+          Object.entries(obj).forEach(([k, val]) => {
+            if (!val || typeof val !== 'object') return;
+            const m = Number(val.money ?? val.cash ?? val.state?.money ?? 0);
+            const nick = val.nickname || k;
+            if (bestNickname && nick === bestNickname && m >= bestMoney) {
+              bestMoney = m;
+              bestDay = Number(val.day ?? val.state?.day ?? bestDay);
+              bestBranch = Number(val.branchCount ?? val.state?.branchCount ?? bestBranch);
+            }
+          });
+        };
+
+        mergeCandidate(usersSnap.val());
+        mergeCandidate(playersSnap.val());
+        mergeCandidate(lbSnap.val());
+      } catch (e) {}
+
+      if (bestMoney > 15000 || bestNickname) {
+        detectedRecoveryData = {
+          nickname: bestNickname,
+          money: Math.max(15000, bestMoney),
+          day: bestDay,
+          branchCount: bestBranch,
+          satisfaction: bestSatisfaction,
+          upgrades: bestUpgrades
+        };
+
+        const banner = document.getElementById('recoveryBanner');
+        const summary = document.getElementById('recoverySummaryText');
+        summary.textContent = `${bestNickname ? `[${bestNickname}] ` : ''}${bestBranch}호점 · 보유 자금 ${formatKRW(detectedRecoveryData.money)} (DAY ${bestDay}) 기록을 찾았습니다!`;
+        banner.classList.remove('hidden');
+
+        if (bestNickname && !document.getElementById('loginNickname').value) {
+          document.getElementById('loginNickname').value = bestNickname;
+        }
+      }
     }
 
+    function applyDetectedRecovery() {
+      if (!detectedRecoveryData) return;
+      if (detectedRecoveryData.nickname) {
+        document.getElementById('loginNickname').value = detectedRecoveryData.nickname;
+      }
+      gameState.money = Math.max(gameState.money, detectedRecoveryData.money);
+      gameState.day = Math.max(gameState.day, detectedRecoveryData.day || 1);
+      gameState.branchCount = Math.max(gameState.branchCount, detectedRecoveryData.branchCount || 1);
+      gameState.satisfaction = detectedRecoveryData.satisfaction || 85;
+      if (detectedRecoveryData.upgrades) {
+        gameState.upgrades = { ...gameState.upgrades, ...detectedRecoveryData.upgrades };
+      }
+      showToast(`✅ 복구 데이터(${formatKRW(gameState.money)}) 준비 완료! 4자리 PIN 입력 후 매장 오픈을 누르세요.`, 'success');
+      document.getElementById('loginPin').focus();
+    }
+
+    // ---------------------------------------------------------
+    // 5. Account Login, Real-Time Ban Check & Cloud Sync
+    // ---------------------------------------------------------
     async function handleAccountLogin() {
-      const nickInput = document.getElementById('loginNickname').value.trim();
-      const pinInput = document.getElementById('loginPin').value.trim();
-      const errBox = document.getElementById('loginError');
+      const nick = document.getElementById('loginNickname').value.trim();
+      const pin = document.getElementById('loginPin').value.trim();
+      const errEl = document.getElementById('loginError');
       const btn = document.getElementById('loginSubmitBtn');
 
-      errBox.classList.add('hidden');
+      errEl.classList.add('hidden');
 
-      // Validate nickname (no Firebase forbidden characters)
-      if (nickInput.length < 2 || nickInput.length > 10 || /[.#$\[\]\/]/.test(nickInput)) {
-        errBox.textContent = '닉네임은 특수문자(. # $ [ ] /) 제외 2~10자로 입력해주세요.';
-        errBox.classList.remove('hidden');
+      if (nick.length < 2 || nick.length > 10 || /[.#$\[\]\/]/.test(nick)) {
+        errEl.textContent = '닉네임은 특수문자(. # $ [ ] /) 제외 2~10자로 입력해주세요.';
+        errEl.classList.remove('hidden');
         return;
       }
-
-      if (!/^\d{4}$/.test(pinInput)) {
-        errBox.textContent = '보안 PIN은 반드시 숫자 4자리여야 합니다.';
-        errBox.classList.remove('hidden');
+      if (!/^\d{4}$/.test(pin)) {
+        errEl.textContent = '보안 PIN은 숫자 4자리를 입력해주세요.';
+        errEl.classList.remove('hidden');
         return;
       }
 
       btn.disabled = true;
-      btn.textContent = '서버 확인 중...';
+      btn.textContent = '계정 동기화 중...';
 
       try {
-        const userRef = db.ref(`users/${nickInput}`);
+        const userRef = db.ref(`users/${nick}`);
         const snap = await userRef.once('value');
 
         if (snap.exists()) {
-          const userData = snap.val();
-          if (String(userData.pin) !== pinInput) {
-            errBox.textContent = '❌ 4자리 PIN 번호가 일치하지 않습니다!';
-            errBox.classList.remove('hidden');
+          const data = snap.val();
+          if (data.banned) {
+            showBanScreen(data.banReason);
             btn.disabled = false;
-            btn.textContent = '매장 오픈하기 🚀';
+            btn.textContent = '매장 오픈 & 데이터 연결 🚀';
             return;
           }
-          // Load saved data
-          if (userData.state) {
+
+          if (data.pin && String(data.pin) !== pin) {
+            errEl.textContent = '❌ 4자리 PIN 번호가 일치하지 않습니다!';
+            errEl.classList.remove('hidden');
+            btn.disabled = false;
+            btn.textContent = '매장 오픈 & 데이터 연결 🚀';
+            return;
+          }
+
+          const serverMoney = Number(data.money ?? data.state?.money ?? 0);
+          const mergedMoney = Math.max(serverMoney, gameState.money);
+
+          if (data.state) {
             gameState = {
               ...gameState,
-              ...userData.state,
-              stocks: { ...gameState.stocks, ...(userData.state.stocks || {}) },
-              upgrades: { ...gameState.upgrades, ...(userData.state.upgrades || {}) }
+              ...data.state,
+              money: mergedMoney,
+              branchCount: Math.max(1, Number(data.state.branchCount || data.branchCount || 1)),
+              usedCoupons: data.state.usedCoupons || {},
+              upgrades: { ...gameState.upgrades, ...(data.state.upgrades || {}) }
             };
+          } else {
+            gameState.money = mergedMoney;
           }
-          if (typeof userData.money === 'number') {
-            gameState.money = userData.money;
-          }
-          showToast(`환영합니다, ${nickInput} 사장님! 기존 매장 데이터를 불러왔습니다.`, 'success');
-        } else {
-          // Register new account
-          const initialPayload = {
-            nickname: nickInput,
-            pin: pinInput,
+
+          await userRef.update({
+            nickname: nick,
+            pin: pin,
             money: gameState.money,
+            branchCount: gameState.branchCount,
+            updatedAt: Date.now()
+          });
+          showToast(`환영합니다, ${nick} 사장님! 매장 데이터를 연결했습니다.`, 'success');
+        } else {
+          const [legacyPlayerSnap, legacyLbSnap] = await Promise.all([
+            db.ref(`players/${nick}`).once('value'),
+            db.ref(`leaderboard/${nick}`).once('value')
+          ]);
+
+          let legacyMoney = 0;
+          if (legacyPlayerSnap.exists()) {
+            legacyMoney = Math.max(legacyMoney, Number(legacyPlayerSnap.val().money || 0));
+          }
+          if (legacyLbSnap.exists()) {
+            legacyMoney = Math.max(legacyMoney, Number(legacyLbSnap.val().money || 0));
+          }
+          if (legacyMoney > gameState.money) {
+            gameState.money = legacyMoney;
+          }
+
+          await userRef.set({
+            nickname: nick,
+            pin: pin,
+            money: gameState.money,
+            branchCount: gameState.branchCount,
+            banned: false,
             createdAt: Date.now(),
             updatedAt: Date.now(),
             state: gameState
-          };
-          await userRef.set(initialPayload);
-          await syncLeaderboardEntry(nickInput);
-          showToast(`신규 매장 오픈! ${nickInput} 사장님 환영합니다 🎉`, 'success');
+          });
+          showToast(`신규 매장 오픈 완료! 쿠폰 버튼에서 open_261119를 입력해 보세요 🎉`, 'success');
         }
 
-        currentUser = { nickname: nickInput, pin: pinInput };
-        document.getElementById('headerNickname').textContent = nickInput;
+        currentUser = { nickname: nick, pin: pin };
+        localStorage.setItem('cvs_last_nickname', nick);
+        document.getElementById('headerNickname').textContent = nick;
         document.getElementById('loginModal').classList.add('hidden');
 
-        // Attach Real-Time Listener for Admin Money Grants!
-        attachRealtimeMoneyListener(nickInput);
+        attachRealtimeUserListeners(nick);
         listenGlobalNotices();
         listenLivePoll();
+        listenServerFever();
+        listenShoutbox();
 
-        // Spawn initial customers & start game loop
-        spawnCustomer();
-        spawnCustomer();
+        initPOSCustomers();
         renderAll();
         startGameLoops();
-      } catch (error) {
-        console.error(error);
-        errBox.textContent = '서버 연결 오류가 발생했습니다. 네트워크를 확인해주세요.';
-        errBox.classList.remove('hidden');
+      } catch (e) {
+        console.error(e);
+        errEl.textContent = '서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.';
+        errEl.classList.remove('hidden');
         btn.disabled = false;
-        btn.textContent = '매장 오픈하기 🚀';
+        btn.textContent = '매장 오픈 & 데이터 연결 🚀';
       }
     }
 
-    // ---------------------------------------------------------
-    // F. Real-Time Money Listener (Receives Admin Money Grants Immediately)
-    // ---------------------------------------------------------
-    function attachRealtimeMoneyListener(nickname) {
-      if (userMoneyRef) userMoneyRef.off();
-      userMoneyRef = db.ref(`users/${nickname}/money`);
-      userMoneyRef.on('value', snapshot => {
-        const serverMoney = snapshot.val();
-        if (typeof serverMoney === 'number' && !isRemoteMoneySyncing) {
-          const diff = serverMoney - gameState.money;
-          // If server money changed externally (e.g., admin grant or edit)
+    function showBanScreen(reason) {
+      document.getElementById('banReasonDisplay').textContent =
+        reason && reason.trim()
+          ? `차단 사유: ${reason.trim()}`
+          : '운영 정책 위반으로 인해 관리자에 의해 접근이 제한되었습니다.';
+      document.getElementById('banLockModal').classList.remove('hidden');
+    }
+
+    function attachRealtimeUserListeners(nickname) {
+      // Live balance sync
+      db.ref(`users/${nickname}/money`).on('value', snap => {
+        const val = snap.val();
+        if (typeof val === 'number' && !isRemoteMoneySyncing) {
+          const diff = val - gameState.money;
           if (Math.abs(diff) >= 1) {
-            gameState.money = serverMoney;
-            updateStatsUI();
+            gameState.money = val;
+            updateHeaderStats();
             if (diff > 0) {
-              playGiftSound();
+              playGiftFanfare();
               showToast(`🎉 관리자로부터 지원금 +${formatKRW(diff)}이 지급되었습니다!`, 'warning');
             } else {
-              showToast(`ℹ️ 관리자에 의해 보유 자금이 ${formatKRW(serverMoney)}으로 조정되었습니다.`, 'info');
+              showToast(`ℹ️ 관리자에 의해 자금이 ${formatKRW(val)}으로 조정되었습니다.`, 'info');
             }
           }
+        }
+      });
+
+      // Live ban enforcement
+      db.ref(`users/${nickname}`).on('value', snap => {
+        const data = snap.val();
+        if (data && data.banned) {
+          showBanScreen(data.banReason);
+        } else {
+          document.getElementById('banLockModal').classList.add('hidden');
         }
       });
     }
@@ -758,244 +1125,353 @@
       try {
         isRemoteMoneySyncing = true;
         const nick = currentUser.nickname;
+        const cleanMoney = Math.floor(gameState.money);
         await db.ref(`users/${nick}`).update({
-          money: Math.floor(gameState.money),
+          money: cleanMoney,
+          branchCount: gameState.branchCount,
           updatedAt: Date.now(),
-          state: {
-            money: Math.floor(gameState.money),
-            day: gameState.day,
-            reputation: gameState.reputation,
-            cleanliness: gameState.cleanliness,
-            trashCount: gameState.trashCount,
-            totalServed: gameState.totalServed,
-            stocks: gameState.stocks,
-            upgrades: gameState.upgrades
-          }
+          state: { ...gameState, money: cleanMoney }
         });
-        await syncLeaderboardEntry(nick);
-        if (!silent) showToast('☁️ 클라우드 서버에 안전하게 저장되었습니다!', 'success');
+        await db.ref(`leaderboard/${nick}`).set({
+          nickname: nick,
+          money: cleanMoney,
+          branchCount: gameState.branchCount,
+          day: gameState.day,
+          satisfaction: gameState.satisfaction,
+          updatedAt: Date.now()
+        });
+        localStorage.setItem('cvs_backup_save', JSON.stringify({ nickname: nick, ...gameState, money: cleanMoney }));
+        if (!silent) showToast('☁️ 클라우드 서버에 저장되었습니다!', 'success');
       } catch (e) {
-        if (!silent) showToast('저장 중 일시적인 오류가 발생했습니다.', 'error');
+        if (!silent) showToast('저장 중 오류가 발생했습니다.', 'error');
       } finally {
         setTimeout(() => { isRemoteMoneySyncing = false; }, 350);
       }
     }
 
-    async function syncLeaderboardEntry(nickname) {
-      await db.ref(`leaderboard/${nickname}`).set({
-        nickname: nickname,
-        money: Math.floor(gameState.money),
-        day: gameState.day,
-        reputation: gameState.reputation,
-        updatedAt: Date.now()
-      });
-    }
-
     function manualCloudSave() {
-      playTone(660, 'sine', 0.1, 0.06);
+      playTone(720, 'sine', 0.09, 0.06);
       syncCloudSave(false);
     }
 
     // ---------------------------------------------------------
-    // G. Core Gameplay Mechanics
+    // 6. Coupon Redeem System (Built-in open_261119 + Firebase)
     // ---------------------------------------------------------
-    function getMaxStock(product) {
-      return product.maxStock + (gameState.upgrades.shelfCapacity * 10);
+    function openCouponModal() {
+      document.getElementById('couponModal').classList.remove('hidden');
+      document.getElementById('couponCodeInput').focus();
     }
 
-    function spawnCustomer() {
-      const maxQueue = 5 + Math.floor(gameState.upgrades.interiorLevel / 2);
-      if (customerQueue.length >= maxQueue) return;
-
-      const template = CUSTOMER_TYPES[Math.floor(Math.random() * CUSTOMER_TYPES.length)];
-      const wantedProduct = PRODUCTS[Math.floor(Math.random() * PRODUCTS.length)];
-      const qty = Math.random() < 0.25 ? 2 : 1;
-
-      customerQueue.push({
-        id: Date.now() + Math.random(),
-        emoji: template.emoji,
-        title: template.title,
-        tipMult: template.tipMult,
-        productId: wantedProduct.id,
-        productEmoji: wantedProduct.emoji,
-        productName: wantedProduct.name,
-        qty: qty,
-        patience: 100
-      });
-      renderCustomerQueue();
+    function closeCouponModal() {
+      document.getElementById('couponModal').classList.add('hidden');
     }
 
-    function serveFrontCustomer(event) {
-      if (customerQueue.length === 0) {
-        showToast('현재 계산 대기 중인 손님이 없습니다!', 'info');
+    async function redeemCouponCode() {
+      if (!currentUser) return;
+      const rawCode = document.getElementById('couponCodeInput').value.trim();
+      const normCode = rawCode.toLowerCase();
+      if (!normCode) {
+        showToast('쿠폰 코드를 입력해주세요!', 'warning');
         return;
       }
 
-      const customer = customerQueue[0];
-      const product = PRODUCTS.find(p => p.id === customer.productId);
-      const currentStock = gameState.stocks[customer.productId] || 0;
-
-      if (currentStock < customer.qty) {
-        playTone(200, 'sawtooth', 0.15, 0.08);
-        showToast(`❌ ${product.emoji} ${product.name} 재고가 부족합니다! 아래 진열대를 눌러 채우세요.`, 'error');
+      if (gameState.usedCoupons && gameState.usedCoupons[normCode]) {
+        showToast('이미 사용한 쿠폰 코드입니다!', 'error');
         return;
       }
 
-      // Deduct stock & remove customer
-      gameState.stocks[customer.productId] -= customer.qty;
-      customerQueue.shift();
-
-      // Calculate revenue
-      const interiorMult = 1 + (gameState.upgrades.interiorLevel - 1) * 0.18;
-      const cleanMult = gameState.cleanliness >= 70 ? 1.1 : (gameState.cleanliness < 40 ? 0.8 : 1.0);
-      const feverMult = feverSeconds > 0 ? 2.0 : 1.0;
-
-      const earned = Math.round(product.price * customer.qty * customer.tipMult * interiorMult * cleanMult * feverMult);
-      gameState.money += earned;
-      gameState.totalServed += 1;
-      gameState.reputation = Math.min(100, gameState.reputation + 1);
-
-      // Chance to drop trash on floor
-      if (Math.random() < 0.35) {
-        gameState.trashCount = Math.min(10, gameState.trashCount + 1);
-        gameState.cleanliness = Math.max(10, 100 - gameState.trashCount * 9);
-      }
-
-      playCashSound();
-      if (event && event.clientX) {
-        spawnFloatingText(event.clientX, event.clientY, `+${formatKRW(earned)}`, '#fbbf24');
-      }
-
-      renderAll();
-    }
-
-    function cleanStoreAction(event) {
-      if (gameState.trashCount === 0 && gameState.cleanliness >= 100) {
-        showToast('매장이 이미 반짝반짝 깨끗합니다! ✨', 'info');
-        return;
-      }
-      gameState.trashCount = Math.max(0, gameState.trashCount - 1);
-      gameState.cleanliness = Math.min(100, 100 - gameState.trashCount * 9);
-      const bonus = 250;
-      gameState.money += bonus;
-
-      playSweepSound();
-      if (event && event.clientX) {
-        spawnFloatingText(event.clientX, event.clientY, `🧹 청결 +9% (+${bonus}원)`, '#38bdf8');
-      }
-      renderAll();
-    }
-
-    function restockProduct(productId, event) {
-      const product = PRODUCTS.find(p => p.id === productId);
-      const maxS = getMaxStock(product);
-      const current = gameState.stocks[productId] || 0;
-      const needed = maxS - current;
-
-      if (needed <= 0) {
-        showToast(`${product.name} 진열대가 이미 가득 찼습니다!`, 'info');
+      // 1) Launch celebration code: open_261119
+      if (normCode === LAUNCH_COUPON_CODE) {
+        gameState.usedCoupons[normCode] = Date.now();
+        gameState.money += LAUNCH_COUPON_REWARD;
+        gameState.satisfaction = 100;
+        playGiftFanfare();
+        closeCouponModal();
+        document.getElementById('couponCodeInput').value = '';
+        renderAll();
+        await syncCloudSave(true);
+        showToast(`🎉 출시 기념 쿠폰 적용! +${formatKRW(LAUNCH_COUPON_REWARD)} & 만족도 100% 달성!`, 'success');
         return;
       }
 
-      const buyQty = Math.min(needed, 5);
-      const totalCost = buyQty * product.cost;
-
-      if (gameState.money < totalCost) {
-        playTone(190, 'sawtooth', 0.14, 0.08);
-        showToast(`자금이 부족합니다! (${formatKRW(totalCost)} 필요)`, 'error');
-        return;
-      }
-
-      gameState.money -= totalCost;
-      gameState.stocks[productId] += buyQty;
-      playTone(540, 'sine', 0.08, 0.06);
-
-      if (event && event.clientX) {
-        spawnFloatingText(event.clientX, event.clientY, `📦 +${buyQty}개 (-${formatKRW(totalCost)})`, '#34d399');
-      }
-      renderAll();
-    }
-
-    function restockAllProducts(event) {
-      let totalCost = 0;
-      let totalItems = 0;
-
-      PRODUCTS.forEach(p => {
-        const maxS = getMaxStock(p);
-        const need = maxS - (gameState.stocks[p.id] || 0);
-        if (need > 0) {
-          totalCost += need * p.cost;
-          totalItems += need;
+      // 2) Custom Firebase admin coupons
+      try {
+        const snap = await db.ref(`coupons/${normCode}`).once('value');
+        if (!snap.exists()) {
+          showToast('❌ 존재하지 않거나 만료된 쿠폰 코드입니다.', 'error');
+          return;
         }
-      });
+        const coupon = snap.val();
+        const reward = Number(coupon.reward || 0);
+        gameState.usedCoupons[normCode] = Date.now();
+        gameState.money += reward;
+        playGiftFanfare();
+        closeCouponModal();
+        document.getElementById('couponCodeInput').value = '';
+        renderAll();
+        await syncCloudSave(true);
+        showToast(`🎁 쿠폰 보상 +${formatKRW(reward)}이 지급되었습니다!`, 'success');
+      } catch (e) {
+        showToast('쿠폰 확인 중 오류가 발생했습니다.', 'error');
+      }
+    }
 
-      if (totalItems === 0) {
-        showToast('모든 진열대 재고가 가득 차 있습니다!', 'info');
+    // ---------------------------------------------------------
+    // 7. Franchise Expansion (Prestige System: 2호점, 3호점...)
+    // ---------------------------------------------------------
+    function getNextBranchRequirement() {
+      return 500000 * Math.pow(3, gameState.branchCount - 1);
+    }
+
+    function getBranchMultiplier() {
+      return 1 + (gameState.branchCount - 1) * 0.5;
+    }
+
+    function getTotalRevenueMultiplier() {
+      const feverMult = Date.now() < serverFeverUntil ? 2.0 : 1.0;
+      const comboMult = getComboMultiplier();
+      const scannerMult = 1 + (gameState.upgrades.posScanner || 0) * 0.15;
+      return getBranchMultiplier() * comboMult * scannerMult * feverMult;
+    }
+
+    async function expandNewBranch() {
+      const req = getNextBranchRequirement();
+      if (gameState.money < req) {
+        showToast(`점포 확장 자금이 부족합니다! (${formatKRW(req)} 필요)`, 'error');
         return;
       }
 
-      if (gameState.money < totalCost) {
-        showToast(`전체 발주 비용(${formatKRW(totalCost)})이 부족합니다!`, 'error');
-        return;
+      gameState.branchCount += 1;
+      gameState.money = 20000 * gameState.branchCount;
+      gameState.combo = 0;
+      gameState.upgrades = {
+        partTimer: 0,
+        posScanner: 0,
+        coffeeMachine: 0,
+        storeExpansion: 0
+      };
+
+      playGiftFanfare();
+      showToast(`🎊 축하합니다! ${gameState.branchCount}호점 오픈 완료! 영구 수익 배율 x${getBranchMultiplier().toFixed(1)} 적용!`, 'success');
+      renderAll();
+      renderUpgradesList();
+      await syncCloudSave(true);
+    }
+
+    // ---------------------------------------------------------
+    // 8. Interactive POS Register & Special Incidents
+    // ---------------------------------------------------------
+    function generateCustomerOrder() {
+      // ~20% chance for a special age-check / troublemaker incident
+      if (Math.random() < 0.20) {
+        return {
+          isIncident: true,
+          emoji: '🧢',
+          name: '신분증 미소지 손님',
+          title: '🚨 돌발 상황! 신분증 미소지 주류·담배 구매 시도',
+          desc: '손님이 캔맥주와 담배를 계산대에 올렸지만 신분증이 없다고 합니다! 어떻게 처리할까요?',
+          items: [],
+          total: 9000,
+          paymentType: 'incident'
+        };
       }
 
-      gameState.money -= totalCost;
-      PRODUCTS.forEach(p => {
-        gameState.stocks[p.id] = getMaxStock(p);
-      });
+      const profile = CUSTOMER_PROFILES[Math.floor(Math.random() * CUSTOMER_PROFILES.length)];
+      const itemCount = Math.floor(Math.random() * 3) + 2;
+      const items = [];
+      let total = 0;
 
-      playTone(620, 'triangle', 0.12, 0.08);
-      showToast(`⚡ 전 품목 ${totalItems}개 일괄 발주 완료! (-${formatKRW(totalCost)})`, 'success');
+      for (let i = 0; i < itemCount; i++) {
+        const pick = STORE_ITEMS[Math.floor(Math.random() * STORE_ITEMS.length)];
+        items.push({
+          uid: i,
+          id: pick.id,
+          name: pick.name,
+          emoji: pick.emoji,
+          price: pick.price,
+          scanned: false
+        });
+        total += pick.price;
+      }
+
+      const isCash = Math.random() < 0.5;
+      let cashGiven = 0;
+      if (isCash) {
+        if (total <= 5000) cashGiven = 5000;
+        else if (total <= 10000) cashGiven = 10000;
+        else if (total <= 15000) cashGiven = 15000;
+        else cashGiven = 20000;
+      }
+
+      return {
+        isIncident: false,
+        emoji: profile.emoji,
+        name: profile.name,
+        items,
+        total,
+        paymentType: isCash ? 'cash' : 'card',
+        cashGiven
+      };
+    }
+
+    function initPOSCustomers() {
+      currentCustomer = generateCustomerOrder();
+      waitingQueue = [
+        generateCustomerOrder(),
+        generateCustomerOrder(),
+        generateCustomerOrder()
+      ];
+      preparedChange = 0;
+      renderPOSRegister();
+    }
+
+    function getComboMultiplier() {
+      if (gameState.combo >= 15) return 2.0;
+      if (gameState.combo >= 8) return 1.5;
+      if (gameState.combo >= 3) return 1.2;
+      return 1.0;
+    }
+
+    function resolveSpecialIncident(refusedProperly, event) {
+      if (!currentCustomer || !currentCustomer.isIncident) return;
+      if (refusedProperly) {
+        const bonus = Math.round(6000 * getBranchMultiplier() * (Date.now() < serverFeverUntil ? 2 : 1));
+        gameState.money += bonus;
+        gameState.combo += 1;
+        gameState.satisfaction = Math.min(100, gameState.satisfaction + 4);
+        playRegisterComplete();
+        if (event && event.clientX) {
+          spawnFloatingText(event.clientX, event.clientY, `모범업소 포상 +${formatKRW(bonus)}!`, '#34d399');
+        }
+        showToast(`👮 청소년 보호 모범 업소 포상금 +${formatKRW(bonus)} 지급!`, 'success');
+      } else {
+        const fine = 5000;
+        gameState.money = Math.max(0, gameState.money - fine);
+        gameState.combo = 0;
+        gameState.satisfaction = Math.max(10, gameState.satisfaction - 10);
+        playTone(170, 'sawtooth', 0.25, 0.1);
+        showToast(`🚨 신분증 미확인 판매 적발! 과태료 -${formatKRW(fine)} 차감!`, 'error');
+      }
+
+      currentCustomer = waitingQueue.shift() || generateCustomerOrder();
+      waitingQueue.push(generateCustomerOrder());
+      renderAll();
+    }
+
+    function scanPOSItem(uid, event) {
+      if (!currentCustomer || currentCustomer.isIncident) return;
+      const item = currentCustomer.items.find(it => it.uid === uid);
+      if (!item || item.scanned) return;
+
+      item.scanned = true;
+      playBarcodeBeep();
+
+      if (event && event.clientX) {
+        spawnFloatingText(event.clientX, event.clientY, `삑! +${formatKRW(item.price)}`, '#34d399');
+      }
+
+      if (currentCustomer.items.every(it => it.scanned)) {
+        preparedChange = 0;
+      }
+      renderPOSRegister();
+    }
+
+    function addChangeCash(amount) {
+      preparedChange += amount;
+      playCoinTap();
+      document.getElementById('cashPreparedText').textContent = formatKRW(preparedChange);
+    }
+
+    function resetChangeCash() {
+      preparedChange = 0;
+      playTone(300, 'sine', 0.08, 0.05);
+      document.getElementById('cashPreparedText').textContent = '0원';
+    }
+
+    function completeCardPayment(event) {
+      if (!currentCustomer || currentCustomer.paymentType !== 'card') return;
+      finalizeTransaction(true, event);
+    }
+
+    function completeCashPayment(event) {
+      if (!currentCustomer || currentCustomer.paymentType !== 'cash') return;
+      const expectedChange = currentCustomer.cashGiven - currentCustomer.total;
+      const isExact = preparedChange === expectedChange;
+      finalizeTransaction(isExact, event, expectedChange);
+    }
+
+    function finalizeTransaction(isAccurate, event, expectedChange = 0) {
+      const baseTotal = currentCustomer.total;
+      const totalMult = getTotalRevenueMultiplier();
+
+      if (isAccurate) {
+        gameState.combo += 1;
+        const tipBonus = currentCustomer.paymentType === 'cash' ? 1.2 : 1.0;
+        const finalEarned = Math.round(baseTotal * totalMult * tipBonus);
+
+        gameState.money += finalEarned;
+        gameState.totalServed += 1;
+        gameState.satisfaction = Math.min(100, gameState.satisfaction + 2);
+        gameState.cleanliness = Math.max(20, gameState.cleanliness - 2);
+
+        playRegisterComplete();
+        if (event && event.clientX) {
+          spawnFloatingText(event.clientX, event.clientY, `정산완료 +${formatKRW(finalEarned)}!`, '#fbbf24');
+        }
+        if (currentCustomer.paymentType === 'cash') {
+          showToast(`🪙 정확한 거스름돈! 팁 보너스 포함 +${formatKRW(finalEarned)}`, 'success');
+        }
+      } else {
+        gameState.combo = 0;
+        gameState.money += baseTotal;
+        gameState.satisfaction = Math.max(10, gameState.satisfaction - 6);
+        playTone(190, 'sawtooth', 0.18, 0.09);
+        showToast(`❌ 거스름돈 오차! (정답: ${formatKRW(expectedChange)}) 콤보가 초기화되었습니다.`, 'error');
+      }
+
+      currentCustomer = waitingQueue.shift() || generateCustomerOrder();
+      waitingQueue.push(generateCustomerOrder());
+      preparedChange = 0;
+
+      renderAll();
+    }
+
+    function cleanStoreFloor(event) {
+      if (gameState.cleanliness >= 100) {
+        showToast('매장이 이미 최상의 청결 상태입니다 ✨', 'info');
+        return;
+      }
+      gameState.cleanliness = Math.min(100, gameState.cleanliness + 20);
+      gameState.satisfaction = Math.min(100, gameState.satisfaction + 1);
+      gameState.money += Math.round(300 * getBranchMultiplier());
+      playTone(560, 'sine', 0.09, 0.06);
+      if (event && event.clientX) {
+        spawnFloatingText(event.clientX, event.clientY, '🧹 청결 +20%', '#38bdf8');
+      }
       renderAll();
     }
 
     // ---------------------------------------------------------
-    // H. Upgrades & Staff System
+    // 9. Upgrades & Passive Revenue
     // ---------------------------------------------------------
-    const UPGRADE_DEFS = [
-      {
-        key: 'cashierStaff',
-        title: '👩‍💼 계산 알바생 고용',
-        desc: '일정 시간마다 자동으로 손님 계산을 처리합니다.',
-        baseCost: 8000,
-        mult: 1.75,
-        maxLv: 10
-      },
-      {
-        key: 'cleanerStaff',
-        title: '🤖 로봇 청소기 / 청소 알바',
-        desc: '매장 쓰레기를 자동으로 치워 청결도를 유지합니다.',
-        baseCost: 6000,
-        mult: 1.7,
-        maxLv: 8
-      },
-      {
-        key: 'shelfCapacity',
-        title: '🗄️ 대형 진열대 확장',
-        desc: '모든 상품의 최대 재고 보관량이 +10개씩 증가합니다.',
-        baseCost: 10000,
-        mult: 1.8,
-        maxLv: 10
-      },
-      {
-        key: 'interiorLevel',
-        title: '✨ 프리미엄 인테리어',
-        desc: '상품 판매 단가가 +18% 상승하고 손님이 더 자주 옵니다.',
-        baseCost: 15000,
-        mult: 1.9,
-        maxLv: 15
-      }
-    ];
-
     function getUpgradeCost(def) {
       const lv = gameState.upgrades[def.key] || 0;
       return Math.round(def.baseCost * Math.pow(def.mult, lv));
     }
 
+    function getPassiveIncomePerSec() {
+      let total = 0;
+      UPGRADE_DEFS.forEach(def => {
+        total += (gameState.upgrades[def.key] || 0) * def.passivePerLv;
+      });
+      const feverMult = Date.now() < serverFeverUntil ? 2.0 : 1.0;
+      return Math.round(total * getBranchMultiplier() * feverMult);
+    }
+
     function buyUpgrade(key) {
       const def = UPGRADE_DEFS.find(u => u.key === key);
-      const currentLv = gameState.upgrades[key] || 0;
-      if (currentLv >= def.maxLv) return;
+      const lv = gameState.upgrades[key] || 0;
+      if (lv >= def.maxLv) return;
 
       const cost = getUpgradeCost(def);
       if (gameState.money < cost) {
@@ -1006,119 +1482,161 @@
 
       gameState.money -= cost;
       gameState.upgrades[key] += 1;
-      playGiftSound();
-      showToast(`🎉 ${def.title} 업그레이드 완료! (Lv.${gameState.upgrades[key]})`, 'success');
+      playGiftFanfare();
+      showToast(`🎉 ${def.title} Lv.${gameState.upgrades[key]} 달성!`, 'success');
       renderAll();
-      renderUpgrades();
+      renderUpgradesList();
       syncCloudSave(true);
     }
 
     // ---------------------------------------------------------
-    // I. Render Functions
+    // 10. Rendering Functions
     // ---------------------------------------------------------
-    function updateStatsUI() {
+    function formatKRW(num) {
+      return Math.floor(num).toLocaleString('ko-KR') + '원';
+    }
+
+    function updateHeaderStats() {
       document.getElementById('statMoney').textContent = formatKRW(gameState.money);
-      document.getElementById('statRep').textContent = `${gameState.reputation}%`;
-      document.getElementById('statClean').textContent = `${gameState.cleanliness}%`;
-      document.getElementById('headerDayBadge').textContent = `DAY ${gameState.day}`;
+      document.getElementById('statSatisfaction').textContent = `${gameState.satisfaction}%`;
+      document.getElementById('statMultiplier').textContent = `x${getTotalRevenueMultiplier().toFixed(1)}`;
+      document.getElementById('headerBranchBadge').textContent = `${gameState.branchCount}호점`;
+      document.getElementById('headerDayBadge').textContent = `D-${gameState.day}`;
+      document.getElementById('cleanlinessText').textContent = `${gameState.cleanliness}%`;
 
-      const gradeNames = [
-        'Lv.1 동네 구멍가게',
-        'Lv.2 골목길 편의점',
-        'Lv.3 역세권 24시 편의점',
-        'Lv.4 대형 플래그십 스토어',
-        'Lv.5 대한민국 1등 본점'
-      ];
-      const gradeIdx = Math.min(gradeNames.length - 1, Math.floor((gameState.upgrades.interiorLevel - 1) / 2));
-      document.getElementById('storeGradeLabel').textContent = gradeNames[gradeIdx];
+      const passive = getPassiveIncomePerSec();
+      document.getElementById('passiveIncomeLabel').textContent = `알바 자동매출: +${formatKRW(passive)}/초`;
 
-      const totalStaff = (gameState.upgrades.cashierStaff || 0) + (gameState.upgrades.cleanerStaff || 0);
-      document.getElementById('staffSummaryText').textContent = `알바 ${totalStaff}명 근무중`;
+      const storeLv = 1 + (gameState.upgrades.storeExpansion || 0);
+      const names = ['동네 편의점', '역세권 편의점', '24시 메가스토어', '플래그십 본점', '전국 1등 편의점'];
+      document.getElementById('storeGradeBadge').textContent = `${gameState.branchCount}호점 · ${names[Math.min(names.length - 1, storeLv - 1)]}`;
 
-      const feverBadge = document.getElementById('feverBadge');
-      if (feverSeconds > 0) {
-        feverBadge.classList.remove('hidden');
-        feverBadge.textContent = `🔥 피버 ${feverSeconds}s`;
+      // Update Prestige Card
+      const nextReq = getNextBranchRequirement();
+      document.getElementById('nextBranchTitle').textContent = `🏢 ${gameState.branchCount + 1}호점 오픈하기 (영구 매출 +50%)`;
+      document.getElementById('currentBranchMultText').textContent = `현재 ${gameState.branchCount}호점 (x${getBranchMultiplier().toFixed(1)})`;
+      const expandBtn = document.getElementById('expandBranchBtn');
+      if (gameState.money >= nextReq) {
+        expandBtn.textContent = `🚀 지금 ${gameState.branchCount + 1}호점 오픈하기! (비용: ${formatKRW(nextReq)})`;
+        expandBtn.className = 'w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs active:scale-[0.98] transition shadow-lg';
       } else {
-        feverBadge.classList.add('hidden');
+        expandBtn.textContent = `필요 자금: ${formatKRW(nextReq)} (현재 ${Math.min(99, Math.floor((gameState.money / nextReq) * 100))}%)`;
+        expandBtn.className = 'w-full py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-bold text-xs cursor-not-allowed';
       }
     }
 
-    function renderCustomerQueue() {
-      const area = document.getElementById('customerQueueArea');
-      document.getElementById('queueCountBadge').textContent = `대기 ${customerQueue.length}명`;
-      document.getElementById('trashCountTag').textContent = `${gameState.trashCount}개`;
+    function renderPOSRegister() {
+      if (!currentCustomer) return;
 
-      if (customerQueue.length === 0) {
-        area.innerHTML = `<div class="w-full text-center text-xs text-slate-500 py-6">손님이 들어오고 있습니다... 잠시만 기다려주세요 🚶</div>`;
-        return;
-      }
+      document.getElementById('posCustomerTitle').textContent = `${currentCustomer.emoji} ${currentCustomer.name}`;
+      document.getElementById('posComboText').textContent = `${gameState.combo}콤보`;
 
-      area.innerHTML = customerQueue.map((c, idx) => {
-        const isFirst = idx === 0;
-        const hasStock = (gameState.stocks[c.productId] || 0) >= c.qty;
-        return `
-          <div onclick="${isFirst ? 'serveFrontCustomer(event)' : ''}"
-            class="shrink-0 w-24 p-2 rounded-xl border ${isFirst ? 'bg-slate-800 border-amber-400 shadow-md cursor-pointer fever-glow' : 'bg-slate-900/90 border-slate-800 opacity-80'} flex flex-col items-center text-center transition">
-            <span class="text-[10px] font-black ${isFirst ? 'text-amber-400' : 'text-slate-500'} mb-0.5">
-              ${isFirst ? '▶ 계산차례' : `대기 #${idx + 1}`}
-            </span>
-            <span class="text-2xl my-0.5">${c.emoji}</span>
-            <span class="text-[10px] font-bold text-slate-300 truncate w-full">${c.title}</span>
-            <div class="mt-1 px-1.5 py-0.5 rounded-md w-full text-[10px] font-extrabold ${hasStock ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/25 text-rose-300'}">
-              ${c.productEmoji} x${c.qty}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
+      const stepBadge = document.getElementById('posStepBadge');
+      const incidentArea = document.getElementById('posSpecialIncidentArea');
+      const step1Area = document.getElementById('posStep1Area');
+      const cardArea = document.getElementById('posStep2CardArea');
+      const cashArea = document.getElementById('posStep2CashArea');
+      const laser = document.getElementById('scannerLaserLine');
 
-    function renderProducts() {
-      const grid = document.getElementById('productGrid');
-      grid.innerHTML = PRODUCTS.map(p => {
-        const stock = gameState.stocks[p.id] || 0;
-        const maxS = getMaxStock(p);
-        const pct = Math.min(100, Math.round((stock / maxS) * 100));
-        const isLow = stock <= 3;
+      if (currentCustomer.isIncident) {
+        stepBadge.textContent = '🚨 돌발 이벤트';
+        stepBadge.className = 'px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/50 text-rose-300 text-[10px] font-black shrink-0';
+        laser.classList.add('hidden');
+        incidentArea.classList.remove('hidden');
+        step1Area.classList.add('hidden');
+        cardArea.classList.add('hidden');
+        cashArea.classList.add('hidden');
+        document.getElementById('scanProgressText').textContent = '민증 확인 필요!';
+        document.getElementById('posScannedTotal').textContent = '판매 보류';
+        document.getElementById('incidentTitle').textContent = currentCustomer.title;
+        document.getElementById('incidentDesc').textContent = currentCustomer.desc;
+      } else {
+        incidentArea.classList.add('hidden');
+        const scannedItems = currentCustomer.items.filter(it => it.scanned);
+        const scannedSum = scannedItems.reduce((acc, it) => acc + it.price, 0);
+        const allScanned = scannedItems.length === currentCustomer.items.length;
 
-        return `
-          <button onclick="restockProduct('${p.id}', event)"
-            class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border ${isLow ? 'border-rose-500/70' : 'border-slate-700/80'} text-left active:scale-[0.98] transition flex flex-col justify-between">
-            <div class="flex items-center justify-between w-full">
-              <div class="flex items-center gap-1.5 min-w-0">
-                <span class="text-xl shrink-0">${p.emoji}</span>
-                <div class="min-w-0">
-                  <div class="text-xs font-extrabold text-white truncate">${p.name}</div>
-                  <div class="text-[10px] text-amber-400 font-bold">판매 ${formatKRW(p.price)}</div>
+        document.getElementById('scanProgressText').textContent = `${scannedItems.length} / ${currentCustomer.items.length}개`;
+        document.getElementById('posScannedTotal').textContent = formatKRW(scannedSum);
+
+        if (!allScanned) {
+          stepBadge.textContent = 'STEP 1 · 바코드 스캔';
+          stepBadge.className = 'px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-black shrink-0';
+          laser.classList.remove('hidden');
+          step1Area.classList.remove('hidden');
+          cardArea.classList.add('hidden');
+          cashArea.classList.add('hidden');
+
+          const basketGrid = document.getElementById('posBasketGrid');
+          basketGrid.innerHTML = currentCustomer.items.map(it => {
+            if (it.scanned) {
+              return `
+                <div class="p-2.5 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 flex items-center justify-between opacity-75">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="text-xl shrink-0">${it.emoji}</span>
+                    <div class="min-w-0">
+                      <div class="text-xs font-bold text-emerald-300 truncate line-through">${it.name}</div>
+                      <div class="text-[10px] text-emerald-400 font-extrabold">스캔 완료 ✓</div>
+                    </div>
+                  </div>
+                  <span class="text-xs font-black text-emerald-300 shrink-0">${formatKRW(it.price)}</span>
                 </div>
-              </div>
-              <span class="text-xs font-black ${isLow ? 'text-rose-400' : 'text-emerald-400'} shrink-0">
-                ${stock}/${maxS}
-              </span>
-            </div>
+              `;
+            }
+            return `
+              <button onclick="scanPOSItem(${it.uid}, event)"
+                class="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-750 border border-amber-400/60 hover:border-amber-300 text-left active:scale-95 transition flex items-center justify-between shadow-md">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="text-xl shrink-0">${it.emoji}</span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-black text-white truncate">${it.name}</div>
+                    <div class="text-[10px] text-amber-300 font-bold">터치해 바코드 찍기 🔫</div>
+                  </div>
+                </div>
+                <span class="text-xs font-black text-amber-400 shrink-0 ml-1">${formatKRW(it.price)}</span>
+              </button>
+            `;
+          }).join('');
+        } else {
+          laser.classList.add('hidden');
+          step1Area.classList.add('hidden');
 
-            <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden my-2">
-              <div class="h-full ${isLow ? 'bg-rose-500' : 'bg-emerald-400'} transition-all" style="width: ${pct}%"></div>
-            </div>
+          if (currentCustomer.paymentType === 'card') {
+            stepBadge.textContent = 'STEP 2 · 카드/페이 결제';
+            stepBadge.className = 'px-2 py-0.5 rounded-full bg-sky-500/20 border border-sky-500/40 text-sky-300 text-[10px] font-black shrink-0';
+            cardArea.classList.remove('hidden');
+            cashArea.classList.add('hidden');
+            document.getElementById('cardPayAmountText').textContent = formatKRW(currentCustomer.total);
+          } else {
+            stepBadge.textContent = 'STEP 2 · 현금 거스름돈';
+            stepBadge.className = 'px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-black shrink-0';
+            cardArea.classList.add('hidden');
+            cashArea.classList.remove('hidden');
+            document.getElementById('cashGivenText').textContent = formatKRW(currentCustomer.cashGiven);
+            document.getElementById('cashTotalText').textContent = formatKRW(currentCustomer.total);
+            document.getElementById('cashPreparedText').textContent = formatKRW(preparedChange);
+          }
+        }
+      }
 
-            <div class="flex items-center justify-between text-[10px] text-slate-400 w-full">
-              <span>+5개 발주</span>
-              <span class="font-bold text-slate-200">-${formatKRW(p.cost * 5)}</span>
-            </div>
-          </button>
-        `;
-      }).join('');
+      const queueBar = document.getElementById('waitingLineBar');
+      document.getElementById('waitingLineCount').textContent = `${waitingQueue.length}명 대기중`;
+      queueBar.innerHTML = waitingQueue.map((w, idx) => `
+        <div class="shrink-0 px-2.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/70 flex items-center gap-1.5 text-[11px]">
+          <span>${w.emoji}</span>
+          <span class="font-bold text-slate-300">#${idx + 1} (${w.isIncident ? '🚨민증확인' : `${w.items.length}개 · ${w.paymentType === 'cash' ? '💵현금' : '💳카드'}`})</span>
+        </div>
+      `).join('');
     }
 
-    function renderUpgrades() {
-      const list = document.getElementById('upgradeList');
-      list.innerHTML = UPGRADE_DEFS.map(def => {
+    function renderUpgradesList() {
+      const container = document.getElementById('upgradeListContainer');
+      container.innerHTML = UPGRADE_DEFS.map(def => {
         const lv = gameState.upgrades[def.key] || 0;
         const isMax = lv >= def.maxLv;
         const cost = getUpgradeCost(def);
-
         return `
-          <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-between gap-2.5">
+          <div class="p-3 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-between gap-2.5">
             <div class="min-w-0">
               <div class="flex items-center gap-1.5">
                 <span class="text-xs sm:text-sm font-black text-white truncate">${def.title}</span>
@@ -1140,105 +1658,167 @@
     }
 
     function renderAll() {
-      updateStatsUI();
-      renderCustomerQueue();
-      renderProducts();
+      updateHeaderStats();
+      renderPOSRegister();
     }
 
     // ---------------------------------------------------------
-    // J. Real-Time Game Loop & Random Events
+    // 11. Game Loops & Server Fever Countdown
     // ---------------------------------------------------------
+    function listenServerFever() {
+      db.ref('globalEvent/feverUntil').on('value', snap => {
+        serverFeverUntil = Number(snap.val() || 0);
+      });
+    }
+
     function startGameLoops() {
       setInterval(() => {
         const now = Date.now();
-        const dt = (now - lastTickTimestamp) / 1000;
-        lastTickTimestamp = now;
+        const dt = (now - lastTick) / 1000;
+        lastTick = now;
 
-        // Day timer progression
+        // Global Fever Banner Timer
+        const feverBanner = document.getElementById('globalFeverBanner');
+        if (now < serverFeverUntil) {
+          const remSec = Math.ceil((serverFeverUntil - now) / 1000);
+          const mins = String(Math.floor(remSec / 60)).padStart(2, '0');
+          const secs = String(remSec % 60).padStart(2, '0');
+          document.getElementById('globalFeverTimer').textContent = `${mins}:${secs}`;
+          feverBanner.classList.remove('hidden');
+        } else {
+          feverBanner.classList.add('hidden');
+        }
+
         dayTimer += dt;
         if (dayTimer >= DAY_DURATION_SEC) {
           dayTimer = 0;
           gameState.day += 1;
-          // Daily settlement bonus
-          const dailyBonus = 2000 + gameState.upgrades.interiorLevel * 1000;
-          gameState.money += dailyBonus;
-          showToast(`🌅 DAY ${gameState.day} 시작! 일일 정산 보너스 +${formatKRW(dailyBonus)}`, 'success');
+          const settlementBonus = Math.round((3000 + (gameState.upgrades.storeExpansion || 0) * 2000) * getBranchMultiplier());
+          gameState.money += settlementBonus;
+          showToast(`🌅 DAY ${gameState.day} 시작! 일일 정산 보너스 +${formatKRW(settlementBonus)}`, 'success');
           syncCloudSave(true);
         }
-
-        const remSec = Math.max(0, Math.ceil(DAY_DURATION_SEC - dayTimer));
-        document.getElementById('dayTimerText').textContent = `영업중 00:${String(remSec).padStart(2, '0')}`;
         document.getElementById('dayProgressBar').style.width = `${(dayTimer / DAY_DURATION_SEC) * 100}%`;
 
-        // Fever countdown
-        if (feverSeconds > 0) {
-          feverSeconds = Math.max(0, Math.ceil(feverSeconds - dt));
+        const passivePerSec = getPassiveIncomePerSec();
+        if (passivePerSec > 0) {
+          gameState.money += passivePerSec * dt;
         }
 
-        // Customer spawn interval
-        const spawnRate = Math.max(1.3, 3.6 - gameState.upgrades.interiorLevel * 0.15 - (feverSeconds > 0 ? 1.0 : 0));
-        customerSpawnTimer += dt;
-        if (customerSpawnTimer >= spawnRate) {
-          customerSpawnTimer = 0;
-          spawnCustomer();
-        }
-
-        // Auto Cashier Staff
-        if (gameState.upgrades.cashierStaff > 0 && customerQueue.length > 0) {
-          const cashierInterval = Math.max(0.6, 3.2 - gameState.upgrades.cashierStaff * 0.25);
-          autoCashierTimer += dt;
-          if (autoCashierTimer >= cashierInterval) {
-            autoCashierTimer = 0;
-            serveFrontCustomer(null);
-          }
-        }
-
-        // Auto Cleaner Staff
-        if (gameState.upgrades.cleanerStaff > 0 && gameState.trashCount > 0) {
-          const cleanerInterval = Math.max(1.2, 5.5 - gameState.upgrades.cleanerStaff * 0.5);
-          autoCleanerTimer += dt;
-          if (autoCleanerTimer >= cleanerInterval) {
-            autoCleanerTimer = 0;
-            gameState.trashCount = Math.max(0, gameState.trashCount - 1);
-            gameState.cleanliness = Math.min(100, 100 - gameState.trashCount * 9);
-            renderAll();
-          }
-        }
-
-        // Random Rush Hour Fever Event (approx every 50 seconds)
-        if (feverSeconds === 0 && Math.random() < 0.008) {
-          feverSeconds = 15;
-          playGiftSound();
-          showToast('🔥 점심/퇴근 러시 피버 타임! 15초간 모든 매출 2배!', 'warning');
-        }
-
-        updateStatsUI();
+        updateHeaderStats();
       }, 500);
 
-      // Periodic cloud auto-save every 20 seconds
       setInterval(() => {
         syncCloudSave(true);
       }, 20000);
     }
 
     // ---------------------------------------------------------
-    // K. Leaderboard (Global Real-Time Ranking)
+    // 12. Tab Navigation, Toast & Floating Text
     // ---------------------------------------------------------
+    function switchTab(tabName) {
+      ['store', 'upgrade', 'ranking', 'community'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`nav-${t}`);
+        btn.className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition';
+      });
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      const active = document.getElementById(`nav-${tabName}`);
+      active.className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition';
+
+      if (tabName === 'upgrade') renderUpgradesList();
+      if (tabName === 'ranking') fetchLeaderboard();
+      if (tabName === 'community') loadNoticeHistory();
+    }
+
+    function showToast(msg, type = 'info') {
+      const box = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      const styles = {
+        info: 'bg-slate-800/95 border-slate-600 text-white',
+        success: 'bg-emerald-950/95 border-emerald-500 text-emerald-200',
+        warning: 'bg-amber-950/95 border-amber-500 text-amber-200',
+        error: 'bg-rose-950/95 border-rose-500 text-rose-200'
+      };
+      el.className = `px-3.5 py-2 rounded-2xl border shadow-xl text-xs font-bold text-center animate-pop ${styles[type] || styles.info}`;
+      el.textContent = msg;
+      box.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.25s';
+        setTimeout(() => el.remove(), 260);
+      }, 2600);
+    }
+
+    function spawnFloatingText(x, y, text, color = '#fbbf24') {
+      const el = document.createElement('div');
+      el.className = 'floating-text text-xs sm:text-sm';
+      el.style.left = `${Math.min(window.innerWidth - 100, Math.max(14, x - 35))}px`;
+      el.style.top = `${Math.max(55, y - 22)}px`;
+      el.style.color = color;
+      el.textContent = text;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 900);
+    }
+
+    // ---------------------------------------------------------
+    // 13. Leaderboard, Shoutbox & Community
+    // ---------------------------------------------------------
+    function listenShoutbox() {
+      db.ref('shoutbox').limitToLast(20).on('value', snap => {
+        const data = snap.val();
+        const box = document.getElementById('shoutboxList');
+        if (!data) {
+          box.innerHTML = `<p class="text-slate-400 text-[11px]">첫 번째 방명록을 남겨보세요!</p>`;
+          return;
+        }
+        box.innerHTML = Object.values(data).map(item => `
+          <div class="px-2.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-baseline justify-between gap-2">
+            <div class="min-w-0">
+              <span class="font-black text-emerald-300">[${item.branch || 1}호점] ${item.nickname}:</span>
+              <span class="text-slate-200 break-words ml-1">${item.text}</span>
+            </div>
+            <span class="text-[9px] text-slate-500 shrink-0">${new Date(item.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+        `).join('');
+        box.scrollTop = box.scrollHeight;
+      });
+    }
+
+    async function postShoutboxMessage() {
+      if (!currentUser) return;
+      const input = document.getElementById('shoutboxInput');
+      const text = input.value.trim();
+      if (!text) return;
+      await db.ref('shoutbox').push({
+        nickname: currentUser.nickname,
+        branch: gameState.branchCount,
+        text: text,
+        createdAt: Date.now()
+      });
+      input.value = '';
+    }
+
     async function fetchLeaderboard() {
       const listEl = document.getElementById('leaderboardList');
       listEl.innerHTML = `<div class="text-center text-xs text-slate-400 py-6">실시간 순위 집계 중...</div>`;
-
       try {
         const snap = await db.ref('users').once('value');
         const usersObj = snap.val() || {};
-        const arr = Object.values(usersObj).map(u => ({
-          nickname: u.nickname || '알수없음',
-          money: typeof u.money === 'number' ? u.money : (u.state?.money || 0),
-          day: u.state?.day || 1,
-          reputation: u.state?.reputation || 50
-        }));
+        const arr = Object.values(usersObj)
+          .filter(u => !u.banned)
+          .map(u => ({
+            nickname: u.nickname || '사장님',
+            money: Number(u.money ?? u.state?.money ?? 0),
+            branchCount: Number(u.branchCount ?? u.state?.branchCount ?? 1),
+            day: u.state?.day || 1,
+            satisfaction: u.state?.satisfaction || 85
+          }));
 
-        arr.sort((a, b) => b.money - a.money);
+        arr.sort((a, b) => {
+          if (b.branchCount !== a.branchCount) return b.branchCount - a.branchCount;
+          return b.money - a.money;
+        });
 
         if (arr.length === 0) {
           listEl.innerHTML = `<div class="text-center text-xs text-slate-400 py-6">아직 등록된 사장님이 없습니다.</div>`;
@@ -1246,18 +1826,19 @@
         }
 
         listEl.innerHTML = arr.slice(0, 30).map((item, idx) => {
-          const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}위`;
+          const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}위`;
           const isMe = currentUser && item.nickname === currentUser.nickname;
           return `
-            <div class="p-2.5 rounded-xl border ${isMe ? 'bg-emerald-950/50 border-emerald-500/60' : 'bg-slate-800/70 border-slate-700/70'} flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-7 text-center font-black text-xs ${idx < 3 ? 'text-base' : 'text-slate-400'} shrink-0">${medal}</span>
+            <div class="p-2.5 rounded-xl border ${isMe ? 'bg-emerald-950/50 border-emerald-500/60' : 'bg-slate-800/75 border-slate-700/70'} flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-7 text-center font-black text-xs ${idx < 3 ? 'text-base' : 'text-slate-400'} shrink-0">${rankIcon}</span>
                 <div class="min-w-0">
                   <div class="text-xs font-extrabold text-white truncate flex items-center gap-1">
-                    <span>${item.nickname}</span>
+                    <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] shrink-0">${item.branchCount}호점</span>
+                    <span class="truncate">${item.nickname}</span>
                     ${isMe ? '<span class="px-1.5 py-0.2 rounded bg-emerald-500/30 text-emerald-300 text-[9px]">나</span>' : ''}
                   </div>
-                  <div class="text-[10px] text-slate-400">DAY ${item.day} · 평판 ${item.reputation}%</div>
+                  <div class="text-[10px] text-slate-400">DAY ${item.day} · 만족도 ${item.satisfaction}%</div>
                 </div>
               </div>
               <div class="text-xs font-black text-amber-400 shrink-0">${formatKRW(item.money)}</div>
@@ -1265,20 +1846,16 @@
           `;
         }).join('');
       } catch (e) {
-        listEl.innerHTML = `<div class="text-center text-xs text-rose-400 py-6">랭킹을 불러오지 못했습니다.</div>`;
+        listEl.innerHTML = `<div class="text-center text-xs text-rose-400 py-6">랭킹 불러오기 오류</div>`;
       }
     }
 
-    // ---------------------------------------------------------
-    // L. Community: Global Notices, Live Polls & Private Feedback
-    // ---------------------------------------------------------
     function listenGlobalNotices() {
       db.ref('notices/active').on('value', snap => {
         const val = snap.val();
         const banner = document.getElementById('globalNoticeBanner');
-        const textEl = document.getElementById('globalNoticeText');
         if (val && val.text) {
-          textEl.textContent = val.text;
+          document.getElementById('globalNoticeText').textContent = val.text;
           banner.classList.remove('hidden');
         } else {
           banner.classList.add('hidden');
@@ -1289,33 +1866,32 @@
     function listenLivePoll() {
       db.ref('poll/active').on('value', snap => {
         const poll = snap.val();
-        const container = document.getElementById('pollContainer');
+        const box = document.getElementById('pollContainer');
         if (!poll || !poll.question) {
-          container.innerHTML = `<p class="text-xs text-slate-400">현재 진행 중인 투표가 없습니다.</p>`;
+          box.innerHTML = `<p class="text-xs text-slate-400">현재 진행 중인 투표가 없습니다.</p>`;
           return;
         }
-
         const v1 = poll.votes1 || 0;
         const v2 = poll.votes2 || 0;
         const total = v1 + v2;
         const p1 = total > 0 ? Math.round((v1 / total) * 100) : 0;
         const p2 = total > 0 ? Math.round((v2 / total) * 100) : 0;
-        const userVoted = currentUser && poll.voters && poll.voters[currentUser.nickname];
+        const voted = currentUser && poll.voters && poll.voters[currentUser.nickname];
 
-        container.innerHTML = `
+        box.innerHTML = `
           <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-3 space-y-2">
             <div class="text-xs font-black text-amber-300">Q. ${poll.question}</div>
             <div class="space-y-1.5">
-              <button onclick="castPollVote(1)" ${userVoted ? 'disabled' : ''}
-                class="w-full p-2 rounded-lg bg-slate-900 hover:bg-slate-950 border ${userVoted === 1 ? 'border-emerald-400' : 'border-slate-700'} text-left relative overflow-hidden">
+              <button onclick="castPollVote(1)" ${voted ? 'disabled' : ''}
+                class="w-full p-2 rounded-lg bg-slate-900 border ${voted === 1 ? 'border-emerald-400' : 'border-slate-700'} text-left relative overflow-hidden">
                 <div class="absolute inset-y-0 left-0 bg-emerald-500/20" style="width: ${p1}%"></div>
                 <div class="relative flex justify-between text-xs font-bold">
                   <span>1. ${poll.opt1}</span>
                   <span class="text-emerald-300">${v1}표 (${p1}%)</span>
                 </div>
               </button>
-              <button onclick="castPollVote(2)" ${userVoted ? 'disabled' : ''}
-                class="w-full p-2 rounded-lg bg-slate-900 hover:bg-slate-950 border ${userVoted === 2 ? 'border-sky-400' : 'border-slate-700'} text-left relative overflow-hidden">
+              <button onclick="castPollVote(2)" ${voted ? 'disabled' : ''}
+                class="w-full p-2 rounded-lg bg-slate-900 border ${voted === 2 ? 'border-sky-400' : 'border-slate-700'} text-left relative overflow-hidden">
                 <div class="absolute inset-y-0 left-0 bg-sky-500/20" style="width: ${p2}%"></div>
                 <div class="relative flex justify-between text-xs font-bold">
                   <span>2. ${poll.opt2}</span>
@@ -1323,41 +1899,37 @@
                 </div>
               </button>
             </div>
-            <div class="text-[10px] text-slate-400 text-right">
-              ${userVoted ? '✅ 투표 완료 (총 ' + total + '명 참여)' : '항목을 눌러 투표하세요!'}
-            </div>
+            <div class="text-[10px] text-slate-400 text-right">${voted ? `✅ 투표 완료 (총 ${total}명)` : '항목을 터치해 투표하세요'}</div>
           </div>
         `;
       });
     }
 
-    async function castPollVote(optionNum) {
+    async function castPollVote(opt) {
       if (!currentUser) return;
-      const pollRef = db.ref('poll/active');
-      await pollRef.transaction(poll => {
+      await db.ref('poll/active').transaction(poll => {
         if (!poll) return poll;
         if (!poll.voters) poll.voters = {};
-        if (poll.voters[currentUser.nickname]) return poll; // Already voted
-        poll.voters[currentUser.nickname] = optionNum;
-        if (optionNum === 1) poll.votes1 = (poll.votes1 || 0) + 1;
-        if (optionNum === 2) poll.votes2 = (poll.votes2 || 0) + 1;
+        if (poll.voters[currentUser.nickname]) return poll;
+        poll.voters[currentUser.nickname] = opt;
+        if (opt === 1) poll.votes1 = (poll.votes1 || 0) + 1;
+        if (opt === 2) poll.votes2 = (poll.votes2 || 0) + 1;
         return poll;
       });
-      showToast('🗳️ 소중한 한 표가 반영되었습니다!', 'success');
+      showToast('🗳️ 투표가 완료되었습니다!', 'success');
     }
 
-    async function loadCommunityData() {
+    async function loadNoticeHistory() {
       const snap = await db.ref('notices/history').limitToLast(5).once('value');
       const hist = snap.val();
-      const list = document.getElementById('noticeHistoryList');
+      const el = document.getElementById('noticeHistoryList');
       if (!hist) {
-        list.innerHTML = `<p class="text-slate-400">등록된 공지가 없습니다.</p>`;
+        el.innerHTML = `<p class="text-slate-400">등록된 공지가 없습니다.</p>`;
         return;
       }
-      const items = Object.values(hist).reverse();
-      list.innerHTML = items.map(n => `
+      el.innerHTML = Object.values(hist).reverse().map(n => `
         <div class="p-2 rounded-lg bg-slate-800/70 border border-slate-700/70">
-          <div class="text-slate-200 font-medium">${n.text}</div>
+          <div class="text-slate-200">${n.text}</div>
           <div class="text-[10px] text-slate-500 mt-0.5">${new Date(n.createdAt).toLocaleString('ko-KR')}</div>
         </div>
       `).join('');
@@ -1366,30 +1938,28 @@
     async function submitFeedback() {
       if (!currentUser) return;
       const input = document.getElementById('feedbackInput');
-      const msg = input.value.trim();
-      if (!msg) {
-        showToast('건의할 내용을 입력해주세요!', 'warning');
+      const text = input.value.trim();
+      if (!text) {
+        showToast('내용을 입력해주세요!', 'warning');
         return;
       }
       await db.ref('feedbacks').push({
         nickname: currentUser.nickname,
-        message: msg,
+        message: text,
         createdAt: Date.now()
       });
       input.value = '';
-      showToast('💌 관리자에게 비공개 메시지가 전달되었습니다!', 'success');
+      showToast('📨 관리자에게 비공개 전송되었습니다!', 'success');
     }
 
     // ---------------------------------------------------------
-    // M. Admin Panel (Password: landers_0724_jaeha) + User Money Grant
+    // 14. Admin Panel (landers_0724_jaeha)
     // ---------------------------------------------------------
     let isAdminUnlocked = false;
 
     function openAdminModal() {
       document.getElementById('adminModal').classList.remove('hidden');
-      if (isAdminUnlocked) {
-        loadAdminDashboardData();
-      }
+      if (isAdminUnlocked) loadAdminDashboardData();
     }
 
     function closeAdminModal() {
@@ -1397,47 +1967,114 @@
     }
 
     function verifyAdminPass() {
-      const val = document.getElementById('adminPassInput').value.trim();
+      const pass = document.getElementById('adminPassInput').value.trim();
       const err = document.getElementById('adminAuthError');
-      if (val === ADMIN_SECRET) {
+      if (pass === ADMIN_SECRET) {
         isAdminUnlocked = true;
         err.classList.add('hidden');
         document.getElementById('adminAuthGate').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
         loadAdminDashboardData();
-        showToast('🛡️ 관리자 권한이 인증되었습니다.', 'success');
+        showToast('🛡️ 관리자 패널이 열렸습니다.', 'success');
       } else {
         err.classList.remove('hidden');
       }
     }
 
     async function loadAdminDashboardData() {
-      const visitSnap = await db.ref('meta/totalVisits').once('value');
-      document.getElementById('adminTotalVisits').textContent = `${(visitSnap.val() || 0).toLocaleString()}회`;
+      const vSnap = await db.ref('meta/totalVisits').once('value');
+      document.getElementById('adminTotalVisits').textContent = `${(vSnap.val() || 0).toLocaleString()}회`;
       await loadAdminUserList();
       await loadAdminFeedbacks();
     }
 
     async function loadAdminUserList() {
       const snap = await db.ref('users').once('value');
-      adminUsersCache = snap.val() || {};
-      const keys = Object.keys(adminUsersCache);
+      const users = snap.val() || {};
+      const keys = Object.keys(users).sort();
       document.getElementById('adminTotalUsers').textContent = `${keys.length}명`;
 
-      const selectEl = document.getElementById('adminUserSelect');
-      selectEl.innerHTML = `<option value="">-- 가입 유저 선택 (${keys.length}명) --</option>` +
-        keys.sort().map(nick => {
-          const u = adminUsersCache[nick];
-          const m = typeof u.money === 'number' ? u.money : (u.state?.money || 0);
+      const select = document.getElementById('adminUserSelect');
+      select.innerHTML = `<option value="">-- 가입 유저 선택 (${keys.length}명) --</option>` +
+        keys.map(nick => {
+          const m = Number(users[nick].money ?? users[nick].state?.money ?? 0);
           return `<option value="${nick}">${nick} (보유: ${formatKRW(m)})</option>`;
         }).join('');
+
+      const statusList = document.getElementById('adminUserStatusList');
+      statusList.innerHTML = keys.map(nick => {
+        const u = users[nick];
+        const isBanned = Boolean(u.banned);
+        return `
+          <div class="flex items-center justify-between px-2 py-1 rounded bg-slate-900 border border-slate-700/70">
+            <span class="truncate font-bold ${isBanned ? 'text-rose-400 line-through' : 'text-slate-200'}">${nick}</span>
+            <div class="flex items-center gap-1 shrink-0">
+              <span class="text-[10px] ${isBanned ? 'text-rose-400 font-black' : 'text-emerald-400'}">${isBanned ? '차단됨' : '정상'}</span>
+              <button onclick="quickFillBanTarget('${nick}')" class="px-1.5 py-0.5 rounded bg-slate-700 text-[10px] text-white">선택</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function quickFillBanTarget(nick) {
+      document.getElementById('adminBanTargetInput').value = nick;
+      document.getElementById('adminTargetNickname').value = nick;
+    }
+
+    async function adminSetUserBan(shouldBan) {
+      const targetNick = document.getElementById('adminBanTargetInput').value.trim();
+      const reason = document.getElementById('adminBanReasonInput').value.trim();
+      if (!targetNick) {
+        showToast('차단/해제할 닉네임을 입력하세요!', 'warning');
+        return;
+      }
+      const ref = db.ref(`users/${targetNick}`);
+      const snap = await ref.once('value');
+      if (!snap.exists()) {
+        showToast(`❌ '${targetNick}' 유저를 찾을 수 없습니다.`, 'error');
+        return;
+      }
+      await ref.update({
+        banned: shouldBan,
+        banReason: shouldBan ? (reason || '관리자 직권 이용 정지') : '',
+        updatedAt: Date.now()
+      });
+      showToast(shouldBan ? `🚫 '${targetNick}' 유저를 즉시 차단했습니다.` : `✅ '${targetNick}' 유저의 차단을 해제했습니다.`, 'success');
+      await loadAdminUserList();
+    }
+
+    async function triggerServerFever(minutes) {
+      const until = Date.now() + minutes * 60 * 1000;
+      await db.ref('globalEvent/feverUntil').set(until);
+      playGiftFanfare();
+      showToast(`🔥 전체 서버 ${minutes}분간 매출 2배 피버 타임이 발동되었습니다!`, 'warning');
+    }
+
+    async function stopServerFever() {
+      await db.ref('globalEvent/feverUntil').set(0);
+      showToast('피버 이벤트를 종료했습니다.', 'info');
+    }
+
+    async function createAdminCoupon() {
+      const code = document.getElementById('adminNewCouponCode').value.trim().toLowerCase();
+      const reward = Number(document.getElementById('adminNewCouponReward').value);
+      if (!code || isNaN(reward) || reward <= 0) {
+        showToast('쿠폰 코드와 올바른 보상 금액을 입력하세요!', 'warning');
+        return;
+      }
+      await db.ref(`coupons/${code}`).set({
+        code,
+        reward,
+        createdAt: Date.now()
+      });
+      document.getElementById('adminNewCouponCode').value = '';
+      showToast(`🎁 새 쿠폰 '${code}' (${formatKRW(reward)}) 발행 완료!`, 'success');
     }
 
     function syncSelectedUserToInput() {
-      const selected = document.getElementById('adminUserSelect').value;
-      if (selected) {
-        document.getElementById('adminTargetNickname').value = selected;
-      }
+      const val = document.getElementById('adminUserSelect').value;
+      if (val) document.getElementById('adminTargetNickname').value = val;
     }
 
     function setAdminAmountPreset(amount) {
@@ -1446,48 +2083,41 @@
 
     async function adminModifyUserMoney(mode) {
       const targetNick = document.getElementById('adminTargetNickname').value.trim();
-      const amountVal = Number(document.getElementById('adminMoneyAmount').value);
-
+      const amount = Number(document.getElementById('adminMoneyAmount').value);
       if (!targetNick) {
-        showToast('자금을 지급할 유저 닉네임을 선택하거나 입력하세요!', 'warning');
+        showToast('유저 닉네임을 선택하거나 입력하세요!', 'warning');
         return;
       }
-      if (isNaN(amountVal)) {
-        showToast('올바른 금액(숫자)을 입력하세요!', 'error');
+      if (isNaN(amount)) {
+        showToast('올바른 금액을 입력하세요!', 'error');
         return;
       }
 
-      try {
-        const targetRef = db.ref(`users/${targetNick}`);
-        const snap = await targetRef.once('value');
-        if (!snap.exists()) {
-          showToast(`❌ '${targetNick}' 유저를 찾을 수 없습니다.`, 'error');
-          return;
-        }
-
-        const userData = snap.val();
-        const currentMoney = typeof userData.money === 'number' ? userData.money : (userData.state?.money || 0);
-        const newMoney = mode === 'add' ? Math.max(0, currentMoney + amountVal) : Math.max(0, amountVal);
-
-        // Update both root money and nested state.money + leaderboard
-        await targetRef.update({
-          money: newMoney,
-          'state/money': newMoney,
-          updatedAt: Date.now()
-        });
-        await db.ref(`leaderboard/${targetNick}`).update({
-          nickname: targetNick,
-          money: newMoney,
-          updatedAt: Date.now()
-        });
-
-        playGiftSound();
-        showToast(`✅ '${targetNick}'님의 자금이 ${formatKRW(newMoney)}으로 반영되었습니다!`, 'success');
-        await loadAdminUserList();
-      } catch (e) {
-        console.error(e);
-        showToast('자금 수정 중 오류가 발생했습니다.', 'error');
+      const ref = db.ref(`users/${targetNick}`);
+      const snap = await ref.once('value');
+      if (!snap.exists()) {
+        showToast(`❌ '${targetNick}' 유저를 찾을 수 없습니다.`, 'error');
+        return;
       }
+
+      const data = snap.val();
+      const cur = Number(data.money ?? data.state?.money ?? 0);
+      const nextMoney = mode === 'add' ? Math.max(0, cur + amount) : Math.max(0, amount);
+
+      await ref.update({
+        money: nextMoney,
+        'state/money': nextMoney,
+        updatedAt: Date.now()
+      });
+      await db.ref(`leaderboard/${targetNick}`).update({
+        nickname: targetNick,
+        money: nextMoney,
+        updatedAt: Date.now()
+      });
+
+      playGiftFanfare();
+      showToast(`✅ '${targetNick}'님의 자금이 ${formatKRW(nextMoney)}으로 반영되었습니다!`, 'success');
+      await loadAdminUserList();
     }
 
     async function postGlobalNotice() {
@@ -1497,7 +2127,7 @@
       await db.ref('notices/active').set(payload);
       await db.ref('notices/history').push(payload);
       document.getElementById('adminNoticeInput').value = '';
-      showToast('📢 전체 공지가 등록되었습니다!', 'success');
+      showToast('📢 공지가 등록되었습니다!', 'success');
     }
 
     async function clearGlobalNotice() {
@@ -1510,7 +2140,7 @@
       const o1 = document.getElementById('adminPollOpt1').value.trim();
       const o2 = document.getElementById('adminPollOpt2').value.trim();
       if (!q || !o1 || !o2) {
-        showToast('투표 질문과 항목 1, 2를 모두 입력하세요.', 'warning');
+        showToast('질문과 선택지 1, 2를 모두 입력하세요.', 'warning');
         return;
       }
       await db.ref('poll/active').set({
@@ -1522,12 +2152,12 @@
         voters: {},
         createdAt: Date.now()
       });
-      showToast('🗳️ 새 실시간 투표가 시작되었습니다 (0표 시작)!', 'success');
+      showToast('🗳️ 실시간 투표가 시작되었습니다 (0표 시작)!', 'success');
     }
 
     async function closeAdminPoll() {
       await db.ref('poll/active').remove();
-      showToast('진행 중이던 투표를 종료했습니다.', 'info');
+      showToast('투표를 종료했습니다.', 'info');
     }
 
     async function loadAdminFeedbacks() {
@@ -1538,8 +2168,7 @@
         box.innerHTML = `<p class="text-slate-400 text-[11px]">제보 내역이 없습니다.</p>`;
         return;
       }
-      const list = Object.values(data).reverse();
-      box.innerHTML = list.map(f => `
+      box.innerHTML = Object.values(data).reverse().map(f => `
         <div class="p-2 rounded-lg bg-slate-900 border border-slate-700">
           <div class="flex justify-between text-[10px] text-amber-300 font-bold mb-0.5">
             <span>보낸이: ${f.nickname}</span>
@@ -1550,9 +2179,17 @@
       `).join('');
     }
 
-    // Boot initialization
+    // ---------------------------------------------------------
+    // 15. Startup Boot
+    // ---------------------------------------------------------
     window.addEventListener('DOMContentLoaded', () => {
-      initVisitorCounter();
+      lucide.createIcons();
+      db.ref('meta/totalVisits').transaction(c => (c || 0) + 1, (err, _, snap) => {
+        if (!err && snap) {
+          document.getElementById('loginVisitorCount').textContent = `누적 방문 ${(snap.val() || 1).toLocaleString()}회`;
+        }
+      });
+      scanForRecoverableData();
     });
   </script>
 </body>
