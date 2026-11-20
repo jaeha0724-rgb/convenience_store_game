@@ -42,6 +42,32 @@
       50% { filter: hue-rotate(180deg) saturate(2.1); }
       100% { filter: hue-rotate(360deg) saturate(1.7); }
     }
+    @keyframes screenShake {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      20% { transform: translate(-8px, 6px) rotate(-1.2deg); }
+      40% { transform: translate(8px, -6px) rotate(1.2deg); }
+      60% { transform: translate(-6px, -4px) rotate(-0.8deg); }
+      80% { transform: translate(6px, 5px) rotate(0.8deg); }
+    }
+    .animate-shake {
+      animation: screenShake 0.45s ease-in-out 2;
+    }
+    @keyframes bossZoomSlam {
+      0% { transform: scale(3.2) translateY(-40px); opacity: 0; filter: blur(8px); }
+      65% { transform: scale(0.92) translateY(6px); opacity: 1; filter: blur(0px); }
+      82% { transform: scale(1.06) translateY(-3px); }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .animate-boss-slam {
+      animation: bossZoomSlam 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes sirenFlash {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.55; }
+    }
+    .animate-siren {
+      animation: sirenFlash 0.6s infinite ease-in-out;
+    }
     @keyframes moneyFall {
       0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
       100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
@@ -114,6 +140,46 @@
 </head>
 <body class="flex flex-col min-h-screen bg-[#080c14] text-slate-100">
 
+  <!-- ==================== CINEMATIC ADMIN CUTSCENE OVERLAY ==================== -->
+  <div id="adminCutsceneOverlay" class="hidden fixed inset-0 z-[120] flex flex-col justify-between bg-slate-950/92 backdrop-blur-md overflow-hidden">
+    <!-- Red/Crimson Siren Glow Background -->
+    <div id="cutsceneSirenBg" class="absolute inset-0 bg-gradient-to-b from-rose-600/30 via-transparent to-rose-600/30 animate-siren pointer-events-none"></div>
+
+    <!-- Top Cinema Letterbox Bar -->
+    <div id="cutsceneTopBar" class="w-full h-14 sm:h-16 bg-black border-b-2 border-rose-500/80 flex items-center justify-between px-4 z-10 transition-transform duration-500 -translate-y-full">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+        <span id="cutsceneTopTag" class="text-xs sm:text-sm font-black tracking-widest text-rose-400">⚠️ SYSTEM OVERRIDE · ADMIN EVENT</span>
+      </div>
+      <span class="text-[11px] font-bold text-slate-400">LIVE BROADCAST</span>
+    </div>
+
+    <!-- Center Boss Avatar & Visual Impact -->
+    <div class="relative flex-1 flex flex-col items-center justify-center px-4 text-center z-10">
+      <div id="cutsceneAura" class="absolute w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-rose-500/25 blur-3xl pointer-events-none"></div>
+      <div id="cutsceneAvatar" class="text-7xl sm:text-8xl drop-shadow-[0_0_25px_rgba(244,63,94,0.85)] mb-3">
+        👾
+      </div>
+      <div id="cutsceneTitleBadge" class="px-3.5 py-1 rounded-full bg-rose-600 text-white text-xs sm:text-sm font-black tracking-wider shadow-lg mb-4">
+        미스터리 시스템 침입자 등장!
+      </div>
+
+      <!-- Typewriter Dialogue Console Box -->
+      <div class="w-full max-w-md bg-black/90 border-2 border-emerald-400/80 rounded-2xl p-4 text-left shadow-[0_0_30px_rgba(16,185,129,0.25)]">
+        <div class="flex items-center justify-between text-[11px] font-black text-emerald-400 mb-1.5 border-b border-emerald-500/30 pb-1">
+          <span>&gt;_ ROOT_CONSOLE // ADMIN_MESSAGE</span>
+          <span class="animate-pulse">● REC</span>
+        </div>
+        <p id="cutsceneDialogueText" class="text-sm sm:text-base font-black text-emerald-200 min-h-[3.2rem] leading-relaxed break-keep"></p>
+      </div>
+    </div>
+
+    <!-- Bottom Cinema Letterbox Bar -->
+    <div id="cutsceneBottomBar" class="w-full h-14 sm:h-16 bg-black border-t-2 border-rose-500/80 flex items-center justify-center px-4 z-10 transition-transform duration-500 translate-y-full">
+      <span id="cutsceneEffectSubtext" class="text-xs font-black text-amber-300 tracking-wide">잠시 후 특수 효과가 발동됩니다...</span>
+    </div>
+  </div>
+
   <!-- ==================== 0. FULL-SCREEN BAN LOCK MODAL ==================== -->
   <div id="banLockModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/98 backdrop-blur-lg p-4">
     <div class="w-full max-w-sm bg-rose-950/90 border-2 border-rose-500 rounded-3xl p-6 text-center shadow-2xl space-y-3 animate-pop">
@@ -179,13 +245,12 @@
     </div>
   </div>
 
-  <!-- ==================== 2. TOAST CONTAINER (z-[90]으로 모든 모달 위에 표시) ==================== -->
+  <!-- ==================== 2. TOAST CONTAINER ==================== -->
   <div id="toastContainer" class="fixed top-6 left-1/2 -translate-x-1/2 z-[90] flex flex-col items-center gap-1.5 w-[92%] max-w-sm pointer-events-none"></div>
 
-  <!-- ==================== 3. TOP HEADER (MOBILE ZERO-OVERLAP) ==================== -->
+  <!-- ==================== 3. TOP HEADER ==================== -->
   <header class="sticky top-0 z-30 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-2.5 py-2">
     <div class="max-w-3xl mx-auto flex flex-col gap-1.5">
-      <!-- Row 1: Branch Badge + Nickname & Compact Action Buttons -->
       <div class="flex items-center justify-between gap-1 min-w-0">
         <div class="flex items-center gap-1.5 min-w-0">
           <span id="headerBranchBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[10px] font-black text-amber-300 whitespace-nowrap">
@@ -217,7 +282,6 @@
         </div>
       </div>
 
-      <!-- Row 2: 3 Equal Stat Cards -->
       <div class="grid grid-cols-3 gap-1.5">
         <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-2 py-1 flex items-center justify-between min-w-0">
           <span class="text-[10px] text-slate-400 shrink-0">💰 자금</span>
@@ -233,13 +297,11 @@
         </div>
       </div>
 
-      <!-- Global Server Fever Event Banner -->
       <div id="globalFeverBanner" class="hidden bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-amber-500/25 border border-amber-400 rounded-lg px-2.5 py-1 flex items-center justify-between text-[11px] text-amber-200 fever-pulse">
         <span id="globalFeverLabel" class="font-black text-amber-300">🔥 전체 서버 피버 타임! (모든 매출 2배!)</span>
         <span id="globalFeverTimer" class="font-black text-white bg-amber-600/60 px-1.5 py-0.2 rounded">05:00</span>
       </div>
 
-      <!-- Global Live Notice Ticker (모든 접속자 상단 3.5초 표시 후 자동 숨김) -->
       <div id="globalNoticeBanner" class="hidden bg-gradient-to-r from-indigo-600/95 via-purple-600/95 to-indigo-600/95 border border-indigo-300/80 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 text-[11px] text-white shadow-lg animate-pop">
         <span class="shrink-0 font-black text-amber-300">📢 긴급 공지</span>
         <span id="globalNoticeText" class="truncate font-bold"></span>
@@ -250,9 +312,8 @@
   <!-- ==================== 4. MAIN CONTENT ==================== -->
   <main class="flex-1 w-full max-w-3xl mx-auto px-3 pt-3 pb-nav-safe">
 
-    <!-- TAB 1: 매장 / 리얼 POS 계산대 (STORE & POS) -->
+    <!-- TAB 1: 매장 / 리얼 POS 계산대 -->
     <section id="tab-store" class="space-y-3">
-      <!-- Store Status & Passive Income Bar -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between gap-2">
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-1.5">
@@ -271,7 +332,6 @@
 
       <!-- INTERACTIVE POS CHECKOUT REGISTER -->
       <div class="bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-700/80 rounded-3xl p-3.5 shadow-xl relative overflow-hidden">
-        <!-- POS Header -->
         <div class="flex items-center justify-between mb-2.5 gap-2">
           <div class="flex items-center gap-2 min-w-0">
             <span class="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 text-[10px] font-black shrink-0">POS 1번기</span>
@@ -282,22 +342,18 @@
           </span>
         </div>
 
-        <!-- POS Digital LCD Screen -->
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 mb-3 relative overflow-hidden">
           <div id="scannerLaserLine" class="scanner-laser"></div>
-
           <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
             <span>스캔 진행도: <strong id="scanProgressText" class="text-emerald-400">0 / 0개</strong></span>
             <span>연속 콤보: <strong id="posComboText" class="text-amber-400">0콤보</strong></span>
           </div>
-
           <div class="flex items-baseline justify-between pt-1 border-t border-slate-800/80">
             <span class="text-xs font-bold text-slate-300">스캔 합계 금액</span>
             <span id="posScannedTotal" class="text-xl sm:text-2xl font-black text-emerald-400 tracking-tight">0원</span>
           </div>
         </div>
 
-        <!-- SPECIAL INCIDENT: AGE CHECK / TROUBLEMAKER -->
         <div id="posSpecialIncidentArea" class="hidden space-y-2.5 animate-pop">
           <div class="p-3.5 rounded-2xl bg-rose-950/60 border border-rose-500/60 space-y-1.5">
             <div class="flex items-center gap-2">
@@ -320,13 +376,11 @@
           </div>
         </div>
 
-        <!-- STEP 1 AREA: BARCODE ITEM BUTTONS -->
         <div id="posStep1Area" class="space-y-2">
           <p class="text-[11px] text-slate-400 font-medium">👇 손님이 올린 상품을 하나씩 터치해 바코드를 찍으세요!</p>
           <div id="posBasketGrid" class="grid grid-cols-2 gap-2"></div>
         </div>
 
-        <!-- STEP 2A AREA: CARD / SAMSUNG PAY -->
         <div id="posStep2CardArea" class="hidden space-y-2.5 animate-pop">
           <div class="p-3 rounded-2xl bg-sky-950/50 border border-sky-500/40 flex items-center justify-between">
             <div>
@@ -341,7 +395,6 @@
           </button>
         </div>
 
-        <!-- STEP 2B AREA: CASH REGISTER CHANGE MINI-GAME -->
         <div id="posStep2CashArea" class="hidden space-y-2.5 animate-pop">
           <div class="p-3 rounded-2xl bg-amber-950/40 border border-amber-500/40 space-y-1.5">
             <div class="flex items-center justify-between text-xs">
@@ -358,7 +411,6 @@
             </div>
           </div>
 
-          <!-- Tactile Coin & Bill Drawer Buttons -->
           <div class="grid grid-cols-5 gap-1.5">
             <button onclick="addChangeCash(5000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-amber-300 active:scale-95">+5,000</button>
             <button onclick="addChangeCash(1000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-sky-300 active:scale-95">+1,000</button>
@@ -374,7 +426,6 @@
         </div>
       </div>
 
-      <!-- Waiting Line Preview -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3">
         <div class="flex items-center justify-between text-xs mb-2">
           <span class="font-black text-slate-200">🚶 다음 대기 손님 줄</span>
@@ -384,9 +435,8 @@
       </div>
     </section>
 
-    <!-- TAB 2: 알바 및 다점포 확장(프레스티지) (UPGRADES & FRANCHISE) -->
+    <!-- TAB 2: 알바 및 다점포 확장 -->
     <section id="tab-upgrade" class="hidden space-y-3">
-      <!-- Franchise Branch Expansion Card (Prestige) -->
       <div class="bg-gradient-to-br from-amber-950/60 via-slate-900 to-slate-900 border border-amber-500/50 rounded-2xl p-3.5 space-y-2">
         <div class="flex items-center justify-between">
           <div>
@@ -406,7 +456,6 @@
         </button>
       </div>
 
-      <!-- Staff & Store Upgrades -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
         <h2 class="text-sm font-black text-white mb-1">👥 아르바이트 고용 & POS 시설 업그레이드</h2>
         <p class="text-xs text-slate-400 mb-3">알바생을 고용하면 계산대를 보지 않을 때도 초당 자동 수익이 쌓입니다!</p>
@@ -414,9 +463,8 @@
       </div>
     </section>
 
-    <!-- TAB 3: 실시간 글로벌 랭킹 & 한줄 방명록 (RANKING & SHOUTBOX) -->
+    <!-- TAB 3: 실시간 글로벌 랭킹 & 한줄 방명록 -->
     <section id="tab-ranking" class="hidden space-y-3">
-      <!-- Real-time Shoutbox (한줄 방명록) -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
         <div class="flex items-center justify-between">
           <h2 class="text-sm font-black text-white">💬 실시간 사장님 한줄 방명록</h2>
@@ -435,7 +483,6 @@
         </div>
       </div>
 
-      <!-- Live Leaderboard -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
         <div class="flex items-center justify-between mb-3">
           <div>
@@ -453,9 +500,8 @@
       </div>
     </section>
 
-    <!-- TAB 4: 공지 / 투표 / 버그신고 (COMMUNITY) -->
+    <!-- TAB 4: 공지 / 투표 / 버그신고 -->
     <section id="tab-community" class="hidden space-y-3">
-      <!-- Coupon Quick Banner -->
       <div class="bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/50 rounded-2xl p-3.5 flex items-center justify-between gap-2">
         <div>
           <div class="text-xs font-black text-amber-300">🎁 비밀 쿠폰 교환소</div>
@@ -578,7 +624,37 @@
           </div>
         </div>
 
-        <!-- Global Notice Control (상단 3.5초 표시, 공지탭 미기록) -->
+        <!-- CINEMATIC ADMIN CUTSCENE LAUNCHER -->
+        <div class="bg-gradient-to-br from-rose-950/80 via-slate-900 to-purple-950/80 border-2 border-rose-500/70 rounded-2xl p-3.5 space-y-2.5 shadow-lg">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-black text-rose-300">🎬 시네마틱 시스템 침입 컷씬 발동 (전체 화면 애니메이션)</h4>
+            <span class="px-1.5 py-0.5 rounded bg-rose-500/30 text-[10px] font-black text-rose-200">CUTSCENE</span>
+          </div>
+          <input id="adminCutsceneDialogueInput" type="text" maxlength="70" placeholder="컷씬 콘솔에 타자기처럼 찍힐 대사 입력 (비우면 기본 대사)"
+            class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-rose-500/40 text-xs text-emerald-300 font-bold focus:outline-none focus:border-rose-400" />
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" onclick="launchAdminCutscene('vault_drop')"
+              class="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/60 text-center active:scale-95 transition">
+              <div class="text-sm">💰</div>
+              <div class="text-[11px] font-black text-emerald-300">금고 대방출</div>
+              <div class="text-[9px] text-slate-300">컷씬 + 전원 5만원</div>
+            </button>
+            <button type="button" onclick="launchAdminCutscene('overclock_fever')"
+              class="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/60 text-center active:scale-95 transition">
+              <div class="text-sm">🔥</div>
+              <div class="text-[11px] font-black text-amber-300">POS 3배 폭주</div>
+              <div class="text-[9px] text-slate-300">컷씬 + 3분간 3배</div>
+            </button>
+            <button type="button" onclick="launchAdminCutscene('glitch_flip')"
+              class="p-2 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/60 text-center active:scale-95 transition">
+              <div class="text-sm">🙃</div>
+              <div class="text-[11px] font-black text-pink-300">화면 반전 장난</div>
+              <div class="text-[9px] text-slate-300">컷씬 + 8초 반전</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Global Notice Control -->
         <div class="bg-slate-800/60 border border-indigo-500/50 rounded-2xl p-3 space-y-2">
           <h4 class="text-xs font-black text-indigo-300">📢 전체 긴급 공지 발송 (모든 접속자 상단 3.5초 표시)</h4>
           <div class="flex gap-1.5">
@@ -594,7 +670,7 @@
 
         <!-- ADMIN SURPRISE EVENTS -->
         <div class="bg-gradient-to-r from-purple-950/70 to-fuchsia-950/70 border border-purple-500/50 rounded-2xl p-3 space-y-2">
-          <h4 class="text-xs font-black text-purple-300">🎪 운영자 깜짝 이벤트 연출 (전체 접속자 화면)</h4>
+          <h4 class="text-xs font-black text-purple-300">🎪 즉시 발동 깜짝 이벤트 (컷씬 없이 바로 효과)</h4>
           <div class="grid grid-cols-2 gap-1.5">
             <button onclick="triggerAdminSurprise('money_rain')"
               class="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-left active:scale-95">
@@ -619,7 +695,7 @@
           </div>
         </div>
 
-        <!-- GLOBAL FEVER EVENT TRIGGER (배수 & 시간 커스텀 조절) -->
+        <!-- GLOBAL FEVER EVENT TRIGGER -->
         <div class="bg-gradient-to-r from-amber-950/60 to-orange-950/60 border border-amber-500/50 rounded-2xl p-3 space-y-2">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-black text-amber-300">🔥 전체 서버 피버 이벤트 (매출 배수 조절)</h4>
@@ -759,18 +835,12 @@
 
   <!-- ==================== 8. JAVASCRIPT LOGIC ==================== -->
   <script>
-    // ---------------------------------------------------------
-    // 1. Firebase Initialization
-    // ---------------------------------------------------------
     const firebaseConfig = {
       databaseURL: "https://game-7b7db-default-rtdb.firebaseio.com/"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ---------------------------------------------------------
-    // 2. Web Audio API POS Beep & Cash Register Sound
-    // ---------------------------------------------------------
     let soundEnabled = true;
     let audioCtx = null;
 
@@ -811,6 +881,12 @@
       });
     }
 
+    function playCutsceneAlarm() {
+      playTone(220, 'sawtooth', 0.25, 0.12);
+      setTimeout(() => playTone(165, 'sawtooth', 0.35, 0.12), 180);
+      setTimeout(() => playTone(440, 'square', 0.2, 0.09), 380);
+    }
+
     function toggleSound() {
       soundEnabled = !soundEnabled;
       const btn = document.getElementById('soundToggleBtn');
@@ -821,9 +897,6 @@
       showToast(soundEnabled ? '🔊 효과음이 켜졌습니다.' : '🔇 효과음이 꺼졌습니다.');
     }
 
-    // ---------------------------------------------------------
-    // 3. Game State & Constants
-    // ---------------------------------------------------------
     const ADMIN_SECRET = "landers_0724_jaeha";
     const DAY_DURATION_SEC = 30;
     const LAUNCH_COUPON_CODE = "open_261119";
@@ -895,6 +968,8 @@
     let isInitialNoticeLoad = true;
     let noticeHideTimer = null;
     let lastSurpriseId = '';
+    let lastCutsceneId = '';
+    let isInitialCutsceneLoad = true;
 
     let gameState = {
       money: 15000,
@@ -920,7 +995,132 @@
     let lastTick = Date.now();
 
     // ---------------------------------------------------------
-    // 4. Legacy Data & Account Auto-Recovery Scanner
+    // Cinematic Admin Cutscene System (Full-Screen Animation)
+    // ---------------------------------------------------------
+    function listenAdminCutscene() {
+      db.ref('globalEvent/cutscene').on('value', snap => {
+        const data = snap.val();
+        if (isInitialCutsceneLoad) {
+          isInitialCutsceneLoad = false;
+          if (data && data.id) lastCutsceneId = data.id;
+          return;
+        }
+        if (!data || !data.id || data.id === lastCutsceneId) return;
+        lastCutsceneId = data.id;
+        playAdminCutsceneSequence(data);
+      });
+    }
+
+    function playAdminCutsceneSequence(data) {
+      const overlay = document.getElementById('adminCutsceneOverlay');
+      const topBar = document.getElementById('cutsceneTopBar');
+      const bottomBar = document.getElementById('cutsceneBottomBar');
+      const avatar = document.getElementById('cutsceneAvatar');
+      const titleBadge = document.getElementById('cutsceneTitleBadge');
+      const dialogueBox = document.getElementById('cutsceneDialogueText');
+      const subtext = document.getElementById('cutsceneEffectSubtext');
+
+      const presets = {
+        vault_drop: {
+          avatar: '👾',
+          title: '⚠️ SYSTEM BREACH · 금고 개방 프로토콜',
+          defaultMsg: '편의점 중앙 금고 보안을 해제했다... 전 매장 사장님들에게 +50,000원을 강제 송금한다!',
+          sub: '컷씬 종료 후 전 접속자 +50,000원 & 돈비 발동!'
+        },
+        overclock_fever: {
+          avatar: '🤖',
+          title: '⚡ SYSTEM OVERCLOCK · POS 3배 폭주',
+          defaultMsg: 'POS 계산기 리미터를 해제했다! 지금부터 3분간 모든 계산 매출이 3배로 폭주한다!',
+          sub: '컷씬 종료 후 3분간 전체 서버 3배 피버 발동!'
+        },
+        glitch_flip: {
+          avatar: '🃏',
+          title: '🌀 VISUAL GLITCH · 중력 반전 장난',
+          defaultMsg: '어드민 권한으로 매장 화면의 중력을 뒤집어 버리지! 8초간 버텨보라고!',
+          sub: '컷씬 종료 후 8초간 화면 반전 + 무지개 장난 발동!'
+        }
+      };
+
+      const info = presets[data.mode] || presets.vault_drop;
+      const finalMsg = (data.dialogue && data.dialogue.trim()) ? data.dialogue.trim() : info.defaultMsg;
+
+      avatar.textContent = info.avatar;
+      titleBadge.textContent = info.title;
+      subtext.textContent = info.sub;
+      dialogueBox.textContent = '';
+
+      // Show overlay & trigger shake + letterbox bars
+      overlay.classList.remove('hidden');
+      document.body.classList.add('animate-shake');
+      avatar.classList.remove('animate-boss-slam');
+      void avatar.offsetWidth;
+      avatar.classList.add('animate-boss-slam');
+      playCutsceneAlarm();
+
+      setTimeout(() => {
+        topBar.classList.remove('-translate-y-full');
+        bottomBar.classList.remove('translate-y-full');
+      }, 40);
+
+      // Typewriter text animation
+      let idx = 0;
+      const typeTimer = setInterval(() => {
+        if (idx < finalMsg.length) {
+          dialogueBox.textContent += finalMsg[idx];
+          if (idx % 2 === 0) playTone(880, 'square', 0.03, 0.03);
+          idx++;
+        } else {
+          clearInterval(typeTimer);
+        }
+      }, 45);
+
+      // End cutscene after 4.6 seconds and execute post-cutscene reward/effect
+      setTimeout(() => {
+        clearInterval(typeTimer);
+        document.body.classList.remove('animate-shake');
+        topBar.classList.add('-translate-y-full');
+        bottomBar.classList.add('translate-y-full');
+
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+          runPostCutsceneEffect(data.mode);
+        }, 420);
+      }, 4600);
+    }
+
+    function runPostCutsceneEffect(mode) {
+      if (mode === 'vault_drop') {
+        playGiftFanfare();
+        gameState.money += 50000;
+        renderAll();
+        showToast('💰 시스템 금고 개방! 전 접속자 +50,000원 입금 완료!', 'warning');
+        for (let i = 0; i < 28; i++) {
+          const el = document.createElement('div');
+          el.className = 'money-rain-item';
+          el.textContent = i % 2 === 0 ? '💸' : '💎';
+          el.style.left = `${Math.random() * 92}vw`;
+          el.style.animationDelay = `${Math.random() * 0.8}s`;
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 3600);
+        }
+      } else if (mode === 'overclock_fever') {
+        playGiftFanfare();
+        serverFeverMultiplier = 3.0;
+        serverFeverUntil = Math.max(serverFeverUntil, Date.now() + 3 * 60 * 1000);
+        document.getElementById('globalFeverLabel').textContent = '🔥 POS 오버클럭 피버! (모든 매출 3배!)';
+        showToast('🔥 POS 오버클럭 발동! 3분간 모든 매출 3배!', 'warning');
+      } else if (mode === 'glitch_flip') {
+        playTone(660, 'sawtooth', 0.25, 0.08);
+        showToast('🙃 시각 글리치 발동! (8초간 화면 반전)', 'warning');
+        document.body.classList.add('admin-flip', 'admin-psycho');
+        setTimeout(() => {
+          document.body.classList.remove('admin-flip', 'admin-psycho');
+        }, 8000);
+      }
+    }
+
+    // ---------------------------------------------------------
+    // Legacy Data & Account Auto-Recovery Scanner
     // ---------------------------------------------------------
     async function scanForRecoverableData() {
       let bestMoney = 0;
@@ -1026,7 +1226,7 @@
     }
 
     // ---------------------------------------------------------
-    // 5. Account Login, Real-Time Ban Check & Cloud Sync
+    // Account Login, Real-Time Ban Check & Cloud Sync
     // ---------------------------------------------------------
     async function handleAccountLogin() {
       const nick = document.getElementById('loginNickname').value.trim();
@@ -1135,6 +1335,7 @@
         listenLivePoll();
         listenServerFever();
         listenServerSurprise();
+        listenAdminCutscene();
         listenShoutbox();
 
         initPOSCustomers();
@@ -1220,7 +1421,7 @@
     }
 
     // ---------------------------------------------------------
-    // 6. Coupon Redeem System
+    // Coupon Redeem System
     // ---------------------------------------------------------
     function openCouponModal() {
       document.getElementById('couponModal').classList.remove('hidden');
@@ -1280,7 +1481,7 @@
     }
 
     // ---------------------------------------------------------
-    // 7. Franchise Expansion (Prestige System)
+    // Franchise Expansion & Multipliers
     // ---------------------------------------------------------
     function getNextBranchRequirement() {
       return 500000 * Math.pow(3, gameState.branchCount - 1);
@@ -1326,7 +1527,7 @@
     }
 
     // ---------------------------------------------------------
-    // 8. Interactive POS Register & Special Incidents
+    // Interactive POS Register & Special Incidents
     // ---------------------------------------------------------
     function generateCustomerOrder(forceVip = false) {
       if (forceVip) {
@@ -1542,7 +1743,7 @@
     }
 
     // ---------------------------------------------------------
-    // 9. Upgrades & Passive Revenue
+    // Upgrades & Passive Revenue
     // ---------------------------------------------------------
     function getUpgradeCost(def) {
       const lv = gameState.upgrades[def.key] || 0;
@@ -1580,7 +1781,7 @@
     }
 
     // ---------------------------------------------------------
-    // 10. Rendering Functions
+    // Rendering Functions
     // ---------------------------------------------------------
     function formatKRW(num) {
       return Math.floor(num).toLocaleString('ko-KR') + '원';
@@ -1752,7 +1953,7 @@
     }
 
     // ---------------------------------------------------------
-    // 11. Game Loops & Server Fever / Surprise Listeners
+    // Game Loops & Server Fever / Surprise Listeners
     // ---------------------------------------------------------
     function listenServerFever() {
       db.ref('globalEvent').on('value', snap => {
@@ -1858,7 +2059,7 @@
     }
 
     // ---------------------------------------------------------
-    // 12. Tab Navigation, Toast (3초 자동 사라짐) & Floating Text
+    // Tab Navigation, Toast & Floating Text
     // ---------------------------------------------------------
     function switchTab(tabName) {
       ['store', 'upgrade', 'ranking', 'community'].forEach(t => {
@@ -1906,7 +2107,7 @@
     }
 
     // ---------------------------------------------------------
-    // 13. Leaderboard, Shoutbox & Community
+    // Leaderboard, Shoutbox & Community
     // ---------------------------------------------------------
     function listenShoutbox() {
       db.ref('shoutbox').limitToLast(20).on('value', snap => {
@@ -1994,7 +2195,6 @@
       }
     }
 
-    // 상단 긴급 공지 배너: 발송 즉시 모든 접속자 상단에 3.5초 표시 후 자동 숨김 (공지탭 미기록)
     function listenGlobalNotices() {
       db.ref('notices/active').on('value', snap => {
         const val = snap.val();
@@ -2113,7 +2313,7 @@
     }
 
     // ---------------------------------------------------------
-    // 14. Admin Panel (landers_0724_jaeha)
+    // Admin Panel (landers_0724_jaeha)
     // ---------------------------------------------------------
     let isAdminUnlocked = false;
 
@@ -2202,6 +2402,24 @@
       });
       showToast(shouldBan ? `🚫 '${targetNick}' 유저를 즉시 차단했습니다.` : `✅ '${targetNick}' 유저의 차단을 해제했습니다.`, 'success');
       await loadAdminUserList();
+    }
+
+    async function launchAdminCutscene(mode) {
+      const input = document.getElementById('adminCutsceneDialogueInput');
+      const dialogue = input ? input.value.trim() : '';
+      try {
+        await db.ref('globalEvent/cutscene').set({
+          id: 'cs_' + Date.now(),
+          mode,
+          dialogue,
+          createdAt: Date.now()
+        });
+        if (input) input.value = '';
+        closeAdminModal();
+        showToast('🎬 전체 접속자 화면에 시네마틱 컷씬을 발동했습니다!', 'warning');
+      } catch (err) {
+        alert('컷씬 발동 오류: ' + (err.message || err));
+      }
     }
 
     async function triggerAdminSurprise(type) {
@@ -2373,9 +2591,6 @@
       `).join('');
     }
 
-    // ---------------------------------------------------------
-    // 15. Startup Boot
-    // ---------------------------------------------------------
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       db.ref('meta/totalVisits').transaction(c => (c || 0) + 1, (err, _, snap) => {
