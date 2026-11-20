@@ -52,6 +52,20 @@
     .animate-shake {
       animation: screenShake 0.45s ease-in-out 2;
     }
+    @keyframes ufoHover {
+      0%, 100% { transform: translateY(0px) rotate(-3deg); }
+      50% { transform: translateY(-12px) rotate(3deg); }
+    }
+    .animate-ufo-hover {
+      animation: ufoHover 2.2s infinite ease-in-out;
+    }
+    @keyframes clashPulse {
+      0%, 100% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.35); filter: brightness(1.8); }
+    }
+    .animate-clash {
+      animation: clashPulse 0.35s infinite ease-in-out;
+    }
     @keyframes bossZoomSlam {
       0% { transform: scale(3.2) translateY(-40px); opacity: 0; filter: blur(8px); }
       65% { transform: scale(0.92) translateY(6px); opacity: 1; filter: blur(0px); }
@@ -66,7 +80,7 @@
       50% { opacity: 0.55; }
     }
     .animate-siren {
-      animation: sirenFlash 0.6s infinite ease-in-out;
+      animation: sirenFlash 0.7s infinite ease-in-out;
     }
     @keyframes moneyFall {
       0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
@@ -140,43 +154,107 @@
 </head>
 <body class="flex flex-col min-h-screen bg-[#080c14] text-slate-100">
 
-  <!-- ==================== CINEMATIC ADMIN CUTSCENE OVERLAY ==================== -->
-  <div id="adminCutsceneOverlay" class="hidden fixed inset-0 z-[120] flex flex-col justify-between bg-slate-950/92 backdrop-blur-md overflow-hidden">
-    <!-- Red/Crimson Siren Glow Background -->
-    <div id="cutsceneSirenBg" class="absolute inset-0 bg-gradient-to-b from-rose-600/30 via-transparent to-rose-600/30 animate-siren pointer-events-none"></div>
+  <!-- ==================== UFO INVASION 1:30 CUTSCENE + 3S COUNTDOWN OVERLAY ==================== -->
+  <div id="ufoCutsceneOverlay" class="hidden fixed inset-0 z-[130] flex flex-col justify-between bg-[#03050a]/98 backdrop-blur-md overflow-hidden">
+    <!-- Ambient Purple/Crimson Invasion Glow -->
+    <div id="ufoSirenGlow" class="absolute inset-0 bg-gradient-to-b from-purple-700/25 via-transparent to-rose-700/25 animate-siren pointer-events-none"></div>
 
     <!-- Top Cinema Letterbox Bar -->
-    <div id="cutsceneTopBar" class="w-full h-14 sm:h-16 bg-black border-b-2 border-rose-500/80 flex items-center justify-between px-4 z-10 transition-transform duration-500 -translate-y-full">
+    <div id="ufoTopLetterbox" class="w-full h-14 sm:h-16 bg-black border-b-2 border-purple-500/80 flex items-center justify-between px-4 z-20 transition-transform duration-500 -translate-y-full">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
-        <span id="cutsceneTopTag" class="text-xs sm:text-sm font-black tracking-widest text-rose-400">⚠️ SYSTEM OVERRIDE · ADMIN EVENT</span>
+        <span class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-ping"></span>
+        <span id="ufoActBadge" class="text-xs sm:text-sm font-black tracking-widest text-purple-300">ACT 1 · 미확인 비행물체 추락</span>
       </div>
-      <span class="text-[11px] font-bold text-slate-400">LIVE BROADCAST</span>
+      <span id="ufoElapsedTimer" class="text-xs font-black text-amber-300 bg-slate-900 px-2.5 py-0.5 rounded-full border border-slate-700">00:00 / 01:30</span>
     </div>
 
-    <!-- Center Boss Avatar & Visual Impact -->
-    <div class="relative flex-1 flex flex-col items-center justify-center px-4 text-center z-10">
-      <div id="cutsceneAura" class="absolute w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-rose-500/25 blur-3xl pointer-events-none"></div>
-      <div id="cutsceneAvatar" class="text-7xl sm:text-8xl drop-shadow-[0_0_25px_rgba(244,63,94,0.85)] mb-3">
-        👾
-      </div>
-      <div id="cutsceneTitleBadge" class="px-3.5 py-1 rounded-full bg-rose-600 text-white text-xs sm:text-sm font-black tracking-wider shadow-lg mb-4">
-        미스터리 시스템 침입자 등장!
+    <!-- MAIN STAGE (1:30 STORY ANIMATION) -->
+    <div id="ufoMainStage" class="relative flex-1 flex flex-col items-center justify-center px-4 text-center z-10 max-w-xl mx-auto w-full">
+      <!-- Visual Stage Box -->
+      <div class="w-full h-56 sm:h-64 rounded-3xl bg-gradient-to-b from-indigo-950/80 via-slate-950 to-emerald-950/40 border-2 border-purple-500/50 relative overflow-hidden flex items-center justify-center mb-4 shadow-[0_0_40px_rgba(168,85,247,0.25)]">
+        <!-- Starry Sky Dots -->
+        <div class="absolute inset-x-0 top-3 flex justify-around text-xs opacity-60 pointer-events-none">
+          <span>✨</span><span>⭐</span><span>✨</span><span>💫</span><span>⭐</span>
+        </div>
+
+        <!-- Ground & Convenience Store Silhouette -->
+        <div class="absolute bottom-0 inset-x-0 h-12 bg-slate-900/95 border-t border-slate-700 flex items-center justify-between px-5 text-xs text-slate-400">
+          <span>🏪 내 편의점</span>
+          <span id="ufoGroundLabel" class="text-purple-300 font-bold">편의점 앞 공터</span>
+        </div>
+
+        <!-- Dynamic Actors Layer -->
+        <div id="ufoStageActors" class="relative w-full h-full flex items-center justify-center pb-8">
+          <!-- Populated dynamically by JS timeline -->
+        </div>
+
+        <!-- Battle HP Bars (Visible during Act 3 Fight) -->
+        <div id="ufoBattleHud" class="hidden absolute top-3 inset-x-3 flex items-center justify-between gap-3 bg-black/75 border border-slate-700 rounded-xl px-3 py-1.5">
+          <div class="flex-1 text-left">
+            <div class="text-[10px] font-black text-emerald-300 mb-0.5">🧑‍💼 나 (사장님)</div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="heroHpBar" class="h-full bg-emerald-400 transition-all duration-300" style="width: 100%"></div>
+            </div>
+          </div>
+          <span class="text-xs font-black text-amber-400">VS</span>
+          <div class="flex-1 text-right">
+            <div class="text-[10px] font-black text-purple-300 mb-0.5">👽 외계인 사령관</div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="alienHpBar" class="h-full bg-purple-500 transition-all duration-300" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Typewriter Dialogue Console Box -->
-      <div class="w-full max-w-md bg-black/90 border-2 border-emerald-400/80 rounded-2xl p-4 text-left shadow-[0_0_30px_rgba(16,185,129,0.25)]">
-        <div class="flex items-center justify-between text-[11px] font-black text-emerald-400 mb-1.5 border-b border-emerald-500/30 pb-1">
-          <span>&gt;_ ROOT_CONSOLE // ADMIN_MESSAGE</span>
-          <span class="animate-pulse">● REC</span>
+      <!-- Subtitle / Dialogue Console -->
+      <div class="w-full bg-black/90 border-2 border-purple-400/70 rounded-2xl p-4 text-left shadow-2xl">
+        <div class="flex items-center justify-between text-[11px] font-black text-purple-300 mb-1 border-b border-purple-500/30 pb-1">
+          <span id="ufoSpeakerName">📡 긴급 속보</span>
+          <span id="ufoSceneProgressText" class="text-slate-400">진행률 0%</span>
         </div>
-        <p id="cutsceneDialogueText" class="text-sm sm:text-base font-black text-emerald-200 min-h-[3.2rem] leading-relaxed break-keep"></p>
+        <p id="ufoDialogueText" class="text-sm sm:text-base font-black text-white min-h-[3.2rem] leading-relaxed break-keep"></p>
+      </div>
+    </div>
+
+    <!-- FINAL 3-SECOND COUNTDOWN STAGE (2026-11-28 11:00:00 KST) -->
+    <div id="ufoCountdownFinaleStage" class="hidden relative flex-1 flex flex-col items-center justify-center px-4 text-center z-20 animate-pop">
+      <div class="px-4 py-1 rounded-full bg-rose-600/90 border border-rose-300 text-xs sm:text-sm font-black tracking-widest text-white mb-3 animate-pulse">
+        👽 ALIEN INVASION · D-DAY COUNTDOWN
+      </div>
+      <h2 class="text-lg sm:text-2xl font-black text-purple-200 mb-1">
+        외계인 편의점 점령 업데이트 예정 시각
+      </h2>
+      <p class="text-xs sm:text-sm font-bold text-amber-300 mb-5">
+        2026년 11월 28일 (토) 오전 11:00 (한국시간 KST)
+      </p>
+
+      <div class="grid grid-cols-4 gap-2 sm:gap-3 w-full max-w-md bg-slate-900/95 border-2 border-purple-400 rounded-3xl p-4 shadow-[0_0_50px_rgba(168,85,247,0.6)]">
+        <div class="bg-slate-950 border border-purple-500/50 rounded-2xl py-3 px-1">
+          <div id="cdDays" class="text-2xl sm:text-4xl font-black text-amber-400">00</div>
+          <div class="text-[11px] font-bold text-slate-400 mt-1">일 (DAYS)</div>
+        </div>
+        <div class="bg-slate-950 border border-purple-500/50 rounded-2xl py-3 px-1">
+          <div id="cdHours" class="text-2xl sm:text-4xl font-black text-white">00</div>
+          <div class="text-[11px] font-bold text-slate-400 mt-1">시간 (HRS)</div>
+        </div>
+        <div class="bg-slate-950 border border-purple-500/50 rounded-2xl py-3 px-1">
+          <div id="cdMinutes" class="text-2xl sm:text-4xl font-black text-white">00</div>
+          <div class="text-[11px] font-bold text-slate-400 mt-1">분 (MIN)</div>
+        </div>
+        <div class="bg-slate-950 border border-purple-500/50 rounded-2xl py-3 px-1">
+          <div id="cdSeconds" class="text-2xl sm:text-4xl font-black text-rose-400">00</div>
+          <div class="text-[11px] font-bold text-slate-400 mt-1">초 (SEC)</div>
+        </div>
       </div>
     </div>
 
     <!-- Bottom Cinema Letterbox Bar -->
-    <div id="cutsceneBottomBar" class="w-full h-14 sm:h-16 bg-black border-t-2 border-rose-500/80 flex items-center justify-center px-4 z-10 transition-transform duration-500 translate-y-full">
-      <span id="cutsceneEffectSubtext" class="text-xs font-black text-amber-300 tracking-wide">잠시 후 특수 효과가 발동됩니다...</span>
+    <div id="ufoBottomLetterbox" class="w-full h-14 sm:h-16 bg-black border-t-2 border-purple-500/80 flex items-center justify-center px-4 z-20 transition-transform duration-500 translate-y-full">
+      <div class="w-full max-w-md">
+        <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+          <div id="ufoTimelineBar" class="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-amber-400 transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -203,7 +281,6 @@
         <p class="text-xs text-slate-400 mt-0.5">리얼 POS 계산 · 다점포 확장 · 실시간 랭킹</p>
       </div>
 
-      <!-- LEGACY / CLOUD RECOVERY BANNER -->
       <div id="recoveryBanner" class="hidden mb-3.5 p-3 rounded-2xl bg-amber-500/15 border border-amber-400/60 space-y-2">
         <div class="flex items-start gap-2">
           <span class="text-lg shrink-0">🔄</span>
@@ -297,6 +374,12 @@
         </div>
       </div>
 
+      <!-- Alien Occupation Banner (컷씬 종료 후 점령 상태 표시) -->
+      <div id="alienOccupationBanner" class="hidden bg-gradient-to-r from-purple-900/90 via-fuchsia-900/90 to-purple-900/90 border border-purple-400 rounded-lg px-2.5 py-1 flex items-center justify-between text-[11px] text-purple-100">
+        <span class="font-black text-purple-200">👽 외계인 점령 모드 활성 중! (우주 손님 출현)</span>
+        <span class="text-[10px] font-bold text-amber-300">11/28 11:00 KST</span>
+      </div>
+
       <div id="globalFeverBanner" class="hidden bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-amber-500/25 border border-amber-400 rounded-lg px-2.5 py-1 flex items-center justify-between text-[11px] text-amber-200 fever-pulse">
         <span id="globalFeverLabel" class="font-black text-amber-300">🔥 전체 서버 피버 타임! (모든 매출 2배!)</span>
         <span id="globalFeverTimer" class="font-black text-white bg-amber-600/60 px-1.5 py-0.2 rounded">05:00</span>
@@ -331,7 +414,7 @@
       </div>
 
       <!-- INTERACTIVE POS CHECKOUT REGISTER -->
-      <div class="bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-700/80 rounded-3xl p-3.5 shadow-xl relative overflow-hidden">
+      <div id="posRegisterCard" class="bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-700/80 rounded-3xl p-3.5 shadow-xl relative overflow-hidden">
         <div class="flex items-center justify-between mb-2.5 gap-2">
           <div class="flex items-center gap-2 min-w-0">
             <span class="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 text-[10px] font-black shrink-0">POS 1번기</span>
@@ -624,32 +707,23 @@
           </div>
         </div>
 
-        <!-- CINEMATIC ADMIN CUTSCENE LAUNCHER -->
-        <div class="bg-gradient-to-br from-rose-950/80 via-slate-900 to-purple-950/80 border-2 border-rose-500/70 rounded-2xl p-3.5 space-y-2.5 shadow-lg">
+        <!-- UFO INVASION LIVE EVENT CUTSCENE (1:30 + 3S COUNTDOWN) -->
+        <div class="bg-gradient-to-br from-purple-950/90 via-slate-900 to-rose-950/80 border-2 border-purple-400/80 rounded-2xl p-3.5 space-y-2.5 shadow-lg">
           <div class="flex items-center justify-between">
-            <h4 class="text-xs font-black text-rose-300">🎬 시네마틱 시스템 침입 컷씬 발동 (전체 화면 애니메이션)</h4>
-            <span class="px-1.5 py-0.5 rounded bg-rose-500/30 text-[10px] font-black text-rose-200">CUTSCENE</span>
+            <h4 class="text-xs font-black text-purple-200">🛸 UFO 침공 라이브 이벤트 컷씬 (1분 33초 풀버전)</h4>
+            <span class="px-1.5 py-0.5 rounded bg-purple-500/30 text-[10px] font-black text-purple-200">LIVE EVENT</span>
           </div>
-          <input id="adminCutsceneDialogueInput" type="text" maxlength="70" placeholder="컷씬 콘솔에 타자기처럼 찍힐 대사 입력 (비우면 기본 대사)"
-            class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-rose-500/40 text-xs text-emerald-300 font-bold focus:outline-none focus:border-rose-400" />
-          <div class="grid grid-cols-3 gap-1.5">
-            <button type="button" onclick="launchAdminCutscene('vault_drop')"
-              class="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/60 text-center active:scale-95 transition">
-              <div class="text-sm">💰</div>
-              <div class="text-[11px] font-black text-emerald-300">금고 대방출</div>
-              <div class="text-[9px] text-slate-300">컷씬 + 전원 5만원</div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            UFO 추락 → 외계인 조우 → 지구 방어전 격돌 → 패배 및 편의점 점령(<strong>1분 30초</strong>) 후, 마지막 <strong>3초 동안 2026/11/28 오전 11:00 (KST) 카운트다운</strong>이 전 접속자 화면에 동시 송출됩니다!
+          </p>
+          <div class="flex gap-1.5">
+            <button type="button" onclick="launchUfoInvasionCutscene()"
+              class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 via-fuchsia-500 to-rose-500 hover:opacity-95 text-white font-black text-xs active:scale-95 transition shadow-lg">
+              🎬 UFO 침공 라이브 컷씬 발동하기!
             </button>
-            <button type="button" onclick="launchAdminCutscene('overclock_fever')"
-              class="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/60 text-center active:scale-95 transition">
-              <div class="text-sm">🔥</div>
-              <div class="text-[11px] font-black text-amber-300">POS 3배 폭주</div>
-              <div class="text-[9px] text-slate-300">컷씬 + 3분간 3배</div>
-            </button>
-            <button type="button" onclick="launchAdminCutscene('glitch_flip')"
-              class="p-2 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/60 text-center active:scale-95 transition">
-              <div class="text-sm">🙃</div>
-              <div class="text-[11px] font-black text-pink-300">화면 반전 장난</div>
-              <div class="text-[9px] text-slate-300">컷씬 + 8초 반전</div>
+            <button type="button" onclick="resetAlienOccupation()"
+              class="px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-600 text-slate-300 font-bold text-[11px]">
+              점령 해제
             </button>
           </div>
         </div>
@@ -670,7 +744,7 @@
 
         <!-- ADMIN SURPRISE EVENTS -->
         <div class="bg-gradient-to-r from-purple-950/70 to-fuchsia-950/70 border border-purple-500/50 rounded-2xl p-3 space-y-2">
-          <h4 class="text-xs font-black text-purple-300">🎪 즉시 발동 깜짝 이벤트 (컷씬 없이 바로 효과)</h4>
+          <h4 class="text-xs font-black text-purple-300">🎪 즉시 발동 깜짝 이벤트</h4>
           <div class="grid grid-cols-2 gap-1.5">
             <button onclick="triggerAdminSurprise('money_rain')"
               class="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-left active:scale-95">
@@ -881,10 +955,10 @@
       });
     }
 
-    function playCutsceneAlarm() {
-      playTone(220, 'sawtooth', 0.25, 0.12);
-      setTimeout(() => playTone(165, 'sawtooth', 0.35, 0.12), 180);
-      setTimeout(() => playTone(440, 'square', 0.2, 0.09), 380);
+    function playUfoAlarm() {
+      playTone(180, 'sawtooth', 0.35, 0.11);
+      setTimeout(() => playTone(320, 'sawtooth', 0.35, 0.11), 220);
+      setTimeout(() => playTone(140, 'square', 0.4, 0.1), 450);
     }
 
     function toggleSound() {
@@ -917,6 +991,13 @@
       { emoji: '🧔', name: '야간 택배 기사님' },
       { emoji: '👵', name: '이웃집 할머니' },
       { emoji: '🕵️', name: '본사 우수매장 심사관' }
+    ];
+
+    const ALIEN_PROFILES = [
+      { emoji: '👽', name: '외계인 정찰병 (우주선 탑승)' },
+      { emoji: '👾', name: '픽셀 외계 전사' },
+      { emoji: '🛸', name: 'UFO 함대 보급관' },
+      { emoji: '🧬', name: '은하계 연구원 외계인' }
     ];
 
     const UPGRADE_DEFS = [
@@ -968,8 +1049,13 @@
     let isInitialNoticeLoad = true;
     let noticeHideTimer = null;
     let lastSurpriseId = '';
-    let lastCutsceneId = '';
-    let isInitialCutsceneLoad = true;
+
+    // UFO Invasion Cutscene State
+    let lastUfoEventId = '';
+    let isInitialUfoLoad = true;
+    let isAlienOccupied = false;
+    let ufoCutsceneInterval = null;
+    let ufoCountdownInterval = null;
 
     let gameState = {
       money: 15000,
@@ -995,128 +1081,433 @@
     let lastTick = Date.now();
 
     // ---------------------------------------------------------
-    // Cinematic Admin Cutscene System (Full-Screen Animation)
+    // UFO INVASION 1:30 CUTSCENE + 3-SECOND 2026/11/28 11:00 KST COUNTDOWN
     // ---------------------------------------------------------
-    function listenAdminCutscene() {
-      db.ref('globalEvent/cutscene').on('value', snap => {
+    function listenUfoInvasionEvent() {
+      db.ref('globalEvent/ufoInvasion').on('value', snap => {
         const data = snap.val();
-        if (isInitialCutsceneLoad) {
-          isInitialCutsceneLoad = false;
-          if (data && data.id) lastCutsceneId = data.id;
+        if (isInitialUfoLoad) {
+          isInitialUfoLoad = false;
+          if (data && data.id) lastUfoEventId = data.id;
+          if (data && data.occupied) applyAlienOccupationTheme(true);
           return;
         }
-        if (!data || !data.id || data.id === lastCutsceneId) return;
-        lastCutsceneId = data.id;
-        playAdminCutsceneSequence(data);
+        if (!data) {
+          applyAlienOccupationTheme(false);
+          return;
+        }
+        applyAlienOccupationTheme(Boolean(data.occupied));
+
+        if (data.id && data.id !== lastUfoEventId && data.playCutscene) {
+          lastUfoEventId = data.id;
+          startUfoInvasionCutscene();
+        }
       });
     }
 
-    function playAdminCutsceneSequence(data) {
-      const overlay = document.getElementById('adminCutsceneOverlay');
-      const topBar = document.getElementById('cutsceneTopBar');
-      const bottomBar = document.getElementById('cutsceneBottomBar');
-      const avatar = document.getElementById('cutsceneAvatar');
-      const titleBadge = document.getElementById('cutsceneTitleBadge');
-      const dialogueBox = document.getElementById('cutsceneDialogueText');
-      const subtext = document.getElementById('cutsceneEffectSubtext');
+    function applyAlienOccupationTheme(occupied) {
+      isAlienOccupied = occupied;
+      const banner = document.getElementById('alienOccupationBanner');
+      const posCard = document.getElementById('posRegisterCard');
+      if (occupied) {
+        banner.classList.remove('hidden');
+        posCard.classList.remove('from-slate-900', 'to-slate-900/90', 'border-slate-700/80');
+        posCard.classList.add('from-purple-950/90', 'to-slate-950', 'border-purple-500/80');
+      } else {
+        banner.classList.add('hidden');
+        posCard.classList.remove('from-purple-950/90', 'to-slate-950', 'border-purple-500/80');
+        posCard.classList.add('from-slate-900', 'to-slate-900/90', 'border-slate-700/80');
+      }
+    }
 
-      const presets = {
-        vault_drop: {
-          avatar: '👾',
-          title: '⚠️ SYSTEM BREACH · 금고 개방 프로토콜',
-          defaultMsg: '편의점 중앙 금고 보안을 해제했다... 전 매장 사장님들에게 +50,000원을 강제 송금한다!',
-          sub: '컷씬 종료 후 전 접속자 +50,000원 & 돈비 발동!'
-        },
-        overclock_fever: {
-          avatar: '🤖',
-          title: '⚡ SYSTEM OVERCLOCK · POS 3배 폭주',
-          defaultMsg: 'POS 계산기 리미터를 해제했다! 지금부터 3분간 모든 계산 매출이 3배로 폭주한다!',
-          sub: '컷씬 종료 후 3분간 전체 서버 3배 피버 발동!'
-        },
-        glitch_flip: {
-          avatar: '🃏',
-          title: '🌀 VISUAL GLITCH · 중력 반전 장난',
-          defaultMsg: '어드민 권한으로 매장 화면의 중력을 뒤집어 버리지! 8초간 버텨보라고!',
-          sub: '컷씬 종료 후 8초간 화면 반전 + 무지개 장난 발동!'
-        }
-      };
+    // 1분 30초(90초) 스토리 스크립트 (총 15개 장면, 각 6초씩 = 정확히 90초)
+    const UFO_STORY_BEATS = [
+      // ACT 1: UFO 추락 (0:00 ~ 0:18)
+      {
+        startSec: 0,
+        act: 'ACT 1 · 미확인 비행물체 추락',
+        speaker: '📡 기상 관측소 경보',
+        ground: '고요한 편의점 앞 밤하늘',
+        actorsHtml: `
+          <div class="flex flex-col items-center">
+            <div class="text-6xl sm:text-7xl animate-bounce">☄️🛸</div>
+            <div class="text-xs font-black text-amber-300 mt-2">대기권 돌파! 편의점 방향으로 급강하 중!</div>
+          </div>`,
+        text: '밤하늘을 가르는 거대한 붉은 섬광! 정체불명의 거대 UFO가 편의점 앞 공터로 빠르게 추락하고 있습니다!',
+        shake: true,
+        alarm: true
+      },
+      {
+        startSec: 6,
+        act: 'ACT 1 · 미확인 비행물체 추락',
+        speaker: '💥 굉음과 충격파',
+        ground: '편의점 앞 공터 (충돌 직전)',
+        actorsHtml: `
+          <div class="relative flex items-center justify-center">
+            <div class="text-7xl sm:text-8xl animate-ping absolute opacity-40">💥</div>
+            <div class="text-7xl sm:text-8xl">🛸🔥</div>
+          </div>`,
+        text: '쿠우우웅—!! 엄청난 굉음과 함께 UFO가 지면에 불시착했습니다! 편의점 유리창이 크게 흔들립니다!',
+        shake: true,
+        alarm: true
+      },
+      {
+        startSec: 12,
+        act: 'ACT 1 · 미확인 비행물체 추락',
+        speaker: '🧑‍💼 나 (편의점 사장님)',
+        ground: '연기가 피어오르는 추락 현장',
+        actorsHtml: `
+          <div class="flex items-center gap-6">
+            <div class="text-5xl sm:text-6xl">🧑‍💼</div>
+            <div class="text-2xl text-slate-400">➡️</div>
+            <div class="text-6xl sm:text-7xl animate-ufo-hover">🛸💨</div>
+          </div>`,
+        text: '나: "방금 하늘에서 떨어진 게 뭐지...?! 편의점 간판이 부서졌잖아! 당장 밖으로 나가서 확인해봐야겠어!"',
+        shake: false,
+        alarm: false
+      },
 
-      const info = presets[data.mode] || presets.vault_drop;
-      const finalMsg = (data.dialogue && data.dialogue.trim()) ? data.dialogue.trim() : info.defaultMsg;
+      // ACT 2: UFO 접근 및 외계인 등장 (0:18 ~ 0:36)
+      {
+        startSec: 18,
+        act: 'ACT 2 · 외계 생명체와의 조우',
+        speaker: '🧑‍💼 나 (편의점 사장님)',
+        ground: '추락한 UFO 바로 앞',
+        actorsHtml: `
+          <div class="flex items-center gap-4">
+            <div class="text-6xl sm:text-7xl">🧑‍💼🔦</div>
+            <div class="text-6xl sm:text-7xl animate-ufo-hover">🛸</div>
+          </div>`,
+        text: '조심스럽게 UFO 가까이 다가가자, 차가운 금속 선체에서 기묘한 보라색 빛과 함께 해치가 열리기 시작합니다...',
+        shake: false,
+        alarm: false
+      },
+      {
+        startSec: 24,
+        act: 'ACT 2 · 외계 생명체와의 조우',
+        speaker: '👽 미지의 존재 출현',
+        ground: 'UFO 해치 개방 구역',
+        actorsHtml: `
+          <div class="flex flex-col items-center">
+            <div class="text-6xl sm:text-7xl animate-boss-slam">🛸✨👽</div>
+            <div class="mt-2 px-3 py-0.5 rounded-full bg-purple-600/80 text-[11px] font-black text-white">은하 제국 선봉 사령관</div>
+          </div>`,
+        text: '짙은 연기를 뚫고 UFO 안에서 외계인 사령관이 모습을 드러냈습니다! 차가운 눈빛으로 편의점을 노려봅니다.',
+        shake: true,
+        alarm: true
+      },
+      {
+        startSec: 30,
+        act: 'ACT 2 · 외계 생명체와의 조우',
+        speaker: '👽 외계인 사령관',
+        ground: '대치 상태',
+        actorsHtml: `
+          <div class="flex items-center justify-around w-full px-6">
+            <div class="text-center">
+              <div class="text-5xl sm:text-6xl">🧑‍💼</div>
+              <div class="text-[10px] font-bold text-emerald-300 mt-1">사장님</div>
+            </div>
+            <div class="text-3xl animate-pulse">⚡</div>
+            <div class="text-center">
+              <div class="text-5xl sm:text-6xl">👽</div>
+              <div class="text-[10px] font-bold text-purple-300 mt-1">외계인 사령관</div>
+            </div>
+          </div>`,
+        text: '외계인: "지구인... 우리는 이 행성을 침공하러 왔다. 먼저 그 보급 기지(편의점)부터 접수하겠다!"',
+        shake: false,
+        alarm: false
+      },
 
-      avatar.textContent = info.avatar;
-      titleBadge.textContent = info.title;
-      subtext.textContent = info.sub;
-      dialogueBox.textContent = '';
+      // ACT 3: 지구 방어전 격돌 (0:36 ~ 1:06)
+      {
+        startSec: 36,
+        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
+        speaker: '⚔️ 전투 개시!',
+        ground: '편의점 앞 방어선',
+        actorsHtml: `
+          <div class="flex items-center justify-center gap-3">
+            <div class="text-5xl sm:text-6xl">🧑‍💼🔫</div>
+            <div class="text-4xl sm:text-5xl animate-clash">💥⚡💥</div>
+            <div class="text-5xl sm:text-6xl">👽🔮</div>
+          </div>`,
+        text: '나: "내 피땀으로 키운 편의점과 지구는 절대 못 내줘!" 바코드 스캐너 광선을 출력 최대로 끌어올려 맞섭니다!',
+        shake: true,
+        alarm: false,
+        battle: true,
+        heroHp: 100,
+        alienHp: 100
+      },
+      {
+        startSec: 42,
+        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
+        speaker: '🧑‍💼 나 (필살 반격!)',
+        ground: '편의점 앞 방어선',
+        actorsHtml: `
+          <div class="flex items-center justify-center gap-2">
+            <div class="text-5xl sm:text-6xl">🧑‍💼</div>
+            <div class="text-3xl sm:text-4xl text-emerald-400 font-black">━━⚡▶</div>
+            <div class="text-5xl sm:text-6xl animate-shake">👽💦</div>
+          </div>`,
+        text: '초고속 스캐너 레이저 적중! 외계인 사령관이 뒤로 밀려나며 방어막에 금이 가기 시작합니다!',
+        shake: true,
+        alarm: false,
+        battle: true,
+        heroHp: 90,
+        alienHp: 62
+      },
+      {
+        startSec: 48,
+        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
+        speaker: '👽 외계인 사령관',
+        ground: '편의점 앞 방어선',
+        actorsHtml: `
+          <div class="flex items-center justify-center gap-2">
+            <div class="text-5xl sm:text-6xl animate-shake">🧑‍💼💢</div>
+            <div class="text-3xl sm:text-4xl text-purple-400 font-black">◀🟣━━</div>
+            <div class="text-5xl sm:text-6xl">👽🔥</div>
+          </div>`,
+        text: '외계인: "건방진 지구인 같으니! 우주 함대 지원 사격 개시!" UFO 상공에서 보라색 플라즈마 포격이 쏟아집니다!',
+        shake: true,
+        alarm: true,
+        battle: true,
+        heroHp: 54,
+        alienHp: 62
+      },
+      {
+        startSec: 54,
+        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
+        speaker: '🔥 최후의 총력전',
+        ground: '편의점 정문 앞',
+        actorsHtml: `
+          <div class="flex items-center justify-center gap-3">
+            <div class="text-5xl sm:text-6xl">🧑‍💼🛡️</div>
+            <div class="text-5xl sm:text-6xl animate-clash">☄️💥⚡</div>
+            <div class="text-5xl sm:text-6xl">👽🛸</div>
+          </div>`,
+        text: '포스기와 삼각김밥 바리케이드까지 총동원해 버텨보지만, 외계인의 압도적인 에너지 출력이 한계를 넘어섭니다!',
+        shake: true,
+        alarm: false,
+        battle: true,
+        heroHp: 25,
+        alienHp: 45
+      },
+      {
+        startSec: 60,
+        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
+        speaker: '👽 외계인 사령관 (최종 일격)',
+        ground: '편의점 정문 앞',
+        actorsHtml: `
+          <div class="flex flex-col items-center">
+            <div class="text-6xl sm:text-7xl animate-clash">👽⚡🌌</div>
+            <div class="text-xs font-black text-rose-400 mt-1">초거대 우주 레이저 충전 100%!</div>
+          </div>`,
+        text: '외계인: "이것으로 끝이다, 지구인!! 사라져라!" 하늘을 뒤덮는 거대한 우주 광선이 발사됩니다!',
+        shake: true,
+        alarm: true,
+        battle: true,
+        heroHp: 12,
+        alienHp: 45
+      },
 
-      // Show overlay & trigger shake + letterbox bars
+      // ACT 4: 패배 및 편의점 점령 (1:06 ~ 1:30)
+      {
+        startSec: 66,
+        act: 'ACT 4 · 방어선 붕괴 및 패배',
+        speaker: '💥 방어 실패...',
+        ground: '무너진 방어선',
+        actorsHtml: `
+          <div class="flex items-center justify-around w-full px-6">
+            <div class="text-center">
+              <div class="text-5xl sm:text-6xl rotate-90 opacity-80">🧑‍💼💫</div>
+              <div class="text-[10px] font-bold text-rose-400 mt-2">전투 불능 (패배)</div>
+            </div>
+            <div class="text-center">
+              <div class="text-6xl sm:text-7xl">👽👑</div>
+              <div class="text-[10px] font-bold text-purple-300 mt-1">승리 선언</div>
+            </div>
+          </div>`,
+        text: '콰광—!! 충격파에 휩쓸려 쓰러지고 말았습니다... 결국 지구 방어전은 외계인의 승리로 끝나고 말았습니다.',
+        shake: true,
+        alarm: true,
+        battle: true,
+        heroHp: 0,
+        alienHp: 45
+      },
+      {
+        startSec: 72,
+        act: 'ACT 4 · 편의점 침범 및 점령',
+        speaker: '🛸 외계인 함대 진입',
+        ground: '포위된 편의점 상공',
+        actorsHtml: `
+          <div class="flex flex-col items-center">
+            <div class="text-5xl sm:text-6xl animate-ufo-hover">🛸  🛸  🛸</div>
+            <div class="text-4xl mt-1">⬇️ 🟣 ⬇️</div>
+            <div class="text-4xl">🏪</div>
+          </div>`,
+        text: '수십 대의 UFO 함대가 편의점 상공을 완전히 포위하고, 외계 병력들이 편의점 안으로 쏟아져 들어옵니다!',
+        shake: false,
+        alarm: true
+      },
+      {
+        startSec: 78,
+        act: 'ACT 4 · 편의점 침범 및 점령',
+        speaker: '👽 외계인 사령관',
+        ground: '점령당한 편의점 내부',
+        actorsHtml: `
+          <div class="flex items-center gap-4">
+            <div class="text-5xl sm:text-6xl">👽</div>
+            <div class="text-5xl sm:text-6xl">👾</div>
+            <div class="text-5xl sm:text-6xl">🛸</div>
+          </div>`,
+        text: '외계인: "오늘부로 이 편의점은 은하 제국의 지구 전초기지로 점령되었다! 모든 거래를 외계식으로 전환한다!"',
+        shake: false,
+        alarm: false
+      },
+      {
+        startSec: 84,
+        act: 'ACT 4 · 점령 완료 임박',
+        speaker: '⚠️ SYSTEM ALERT',
+        ground: '외계인 점령 완료',
+        actorsHtml: `
+          <div class="flex flex-col items-center">
+            <div class="text-6xl sm:text-7xl animate-pulse">👽🏪🟣</div>
+            <div class="text-xs font-black text-purple-300 mt-2">곧 침공 업데이트 카운트다운이 공개됩니다...</div>
+          </div>`,
+        text: '편의점 전체가 보라색 외계 에너지로 물들었습니다! 대침공 본편 개시 시각 카운트다운이 시작됩니다!',
+        shake: true,
+        alarm: true
+      }
+    ];
+
+    function startUfoInvasionCutscene() {
+      clearInterval(ufoCutsceneInterval);
+      clearInterval(ufoCountdownInterval);
+
+      const overlay = document.getElementById('ufoCutsceneOverlay');
+      const topBar = document.getElementById('ufoTopLetterbox');
+      const bottomBar = document.getElementById('ufoBottomLetterbox');
+      const mainStage = document.getElementById('ufoMainStage');
+      const finaleStage = document.getElementById('ufoCountdownFinaleStage');
+
       overlay.classList.remove('hidden');
-      document.body.classList.add('animate-shake');
-      avatar.classList.remove('animate-boss-slam');
-      void avatar.offsetWidth;
-      avatar.classList.add('animate-boss-slam');
-      playCutsceneAlarm();
+      mainStage.classList.remove('hidden');
+      finaleStage.classList.add('hidden');
 
       setTimeout(() => {
         topBar.classList.remove('-translate-y-full');
         bottomBar.classList.remove('translate-y-full');
       }, 40);
 
-      // Typewriter text animation
-      let idx = 0;
-      const typeTimer = setInterval(() => {
-        if (idx < finalMsg.length) {
-          dialogueBox.textContent += finalMsg[idx];
-          if (idx % 2 === 0) playTone(880, 'square', 0.03, 0.03);
-          idx++;
-        } else {
-          clearInterval(typeTimer);
-        }
-      }, 45);
+      const totalStorySec = 90; // 정확히 1분 30초
+      let elapsedSec = 0;
+      let lastBeatIndex = -1;
 
-      // End cutscene after 4.6 seconds and execute post-cutscene reward/effect
+      const renderBeatAtSecond = sec => {
+        const mins = String(Math.floor(sec / 60)).padStart(2, '0');
+        const secs = String(sec % 60).padStart(2, '0');
+        document.getElementById('ufoElapsedTimer').textContent = `${mins}:${secs} / 01:30`;
+
+        const pct = Math.min(100, Math.round((sec / totalStorySec) * 100));
+        document.getElementById('ufoTimelineBar').style.width = `${pct}%`;
+        document.getElementById('ufoSceneProgressText').textContent = `진행률 ${pct}%`;
+
+        // 현재 초에 해당하는 장면 찾기
+        let beatIdx = 0;
+        for (let i = 0; i < UFO_STORY_BEATS.length; i++) {
+          if (sec >= UFO_STORY_BEATS[i].startSec) beatIdx = i;
+        }
+
+        if (beatIdx !== lastBeatIndex) {
+          lastBeatIndex = beatIdx;
+          const b = UFO_STORY_BEATS[beatIdx];
+          document.getElementById('ufoActBadge').textContent = b.act;
+          document.getElementById('ufoSpeakerName').textContent = b.speaker;
+          document.getElementById('ufoGroundLabel').textContent = b.ground;
+          document.getElementById('ufoStageActors').innerHTML = b.actorsHtml;
+          document.getElementById('ufoDialogueText').textContent = b.text;
+
+          const battleHud = document.getElementById('ufoBattleHud');
+          if (b.battle) {
+            battleHud.classList.remove('hidden');
+            document.getElementById('heroHpBar').style.width = `${b.heroHp}%`;
+            document.getElementById('alienHpBar').style.width = `${b.alienHp}%`;
+          } else {
+            battleHud.classList.add('hidden');
+          }
+
+          if (b.shake) {
+            document.body.classList.remove('animate-shake');
+            void document.body.offsetWidth;
+            document.body.classList.add('animate-shake');
+          }
+          if (b.alarm) {
+            playUfoAlarm();
+          } else {
+            playTone(620, 'sine', 0.08, 0.05);
+          }
+        }
+      };
+
+      renderBeatAtSecond(0);
+
+      ufoCutsceneInterval = setInterval(() => {
+        elapsedSec += 1;
+        if (elapsedSec < totalStorySec) {
+          renderBeatAtSecond(elapsedSec);
+        } else {
+          // 1분 30초 완료 -> 마지막 3초 카운트다운(2026-11-28 11:00 KST) 표시!
+          clearInterval(ufoCutsceneInterval);
+          showThreeSecondCountdownFinale();
+        }
+      }, 1000);
+    }
+
+    function showThreeSecondCountdownFinale() {
+      const overlay = document.getElementById('ufoCutsceneOverlay');
+      const topBar = document.getElementById('ufoTopLetterbox');
+      const bottomBar = document.getElementById('ufoBottomLetterbox');
+      const mainStage = document.getElementById('ufoMainStage');
+      const finaleStage = document.getElementById('ufoCountdownFinaleStage');
+
+      mainStage.classList.add('hidden');
+      finaleStage.classList.remove('hidden');
+      document.getElementById('ufoActBadge').textContent = 'FINAL · 2026.11.28 11:00 KST';
+      document.getElementById('ufoElapsedTimer').textContent = 'COUNTDOWN';
+      playGiftFanfare();
+
+      // 목표 시각: 2026년 11월 28일 오전 11:00:00 한국시간 (+09:00)
+      const targetTimeMs = new Date('2026-11-28T11:00:00+09:00').getTime();
+
+      const updateCountdownClock = () => {
+        const diff = Math.max(0, targetTimeMs - Date.now());
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const mins = Math.floor((diff / (1000 * 60)) % 60);
+        const secs = Math.floor((diff / 1000) % 60);
+
+        document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
+        document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('cdMinutes').textContent = String(mins).padStart(2, '0');
+        document.getElementById('cdSeconds').textContent = String(secs).padStart(2, '0');
+      };
+
+      updateCountdownClock();
+      ufoCountdownInterval = setInterval(updateCountdownClock, 250);
+
+      // 정확히 3초 동안 카운트다운 표시 후 종료 및 외계인 점령 상태 적용
       setTimeout(() => {
-        clearInterval(typeTimer);
+        clearInterval(ufoCountdownInterval);
         document.body.classList.remove('animate-shake');
         topBar.classList.add('-translate-y-full');
         bottomBar.classList.add('translate-y-full');
 
         setTimeout(() => {
           overlay.classList.add('hidden');
-          runPostCutsceneEffect(data.mode);
-        }, 420);
-      }, 4600);
-    }
-
-    function runPostCutsceneEffect(mode) {
-      if (mode === 'vault_drop') {
-        playGiftFanfare();
-        gameState.money += 50000;
-        renderAll();
-        showToast('💰 시스템 금고 개방! 전 접속자 +50,000원 입금 완료!', 'warning');
-        for (let i = 0; i < 28; i++) {
-          const el = document.createElement('div');
-          el.className = 'money-rain-item';
-          el.textContent = i % 2 === 0 ? '💸' : '💎';
-          el.style.left = `${Math.random() * 92}vw`;
-          el.style.animationDelay = `${Math.random() * 0.8}s`;
-          document.body.appendChild(el);
-          setTimeout(() => el.remove(), 3600);
-        }
-      } else if (mode === 'overclock_fever') {
-        playGiftFanfare();
-        serverFeverMultiplier = 3.0;
-        serverFeverUntil = Math.max(serverFeverUntil, Date.now() + 3 * 60 * 1000);
-        document.getElementById('globalFeverLabel').textContent = '🔥 POS 오버클럭 피버! (모든 매출 3배!)';
-        showToast('🔥 POS 오버클럭 발동! 3분간 모든 매출 3배!', 'warning');
-      } else if (mode === 'glitch_flip') {
-        playTone(660, 'sawtooth', 0.25, 0.08);
-        showToast('🙃 시각 글리치 발동! (8초간 화면 반전)', 'warning');
-        document.body.classList.add('admin-flip', 'admin-psycho');
-        setTimeout(() => {
-          document.body.classList.remove('admin-flip', 'admin-psycho');
-        }, 8000);
-      }
+          applyAlienOccupationTheme(true);
+          initPOSCustomers();
+          showToast('👽 외계인이 편의점을 점령했습니다! 이제 외계인 손님들이 찾아옵니다!', 'warning');
+        }, 400);
+      }, 3000);
     }
 
     // ---------------------------------------------------------
@@ -1335,7 +1726,7 @@
         listenLivePoll();
         listenServerFever();
         listenServerSurprise();
-        listenAdminCutscene();
+        listenUfoInvasionEvent();
         listenShoutbox();
 
         initPOSCustomers();
@@ -1550,7 +1941,7 @@
         };
       }
 
-      if (Math.random() < 0.20) {
+      if (!isAlienOccupied && Math.random() < 0.20) {
         return {
           isIncident: true,
           emoji: '🧢',
@@ -1563,7 +1954,8 @@
         };
       }
 
-      const profile = CUSTOMER_PROFILES[Math.floor(Math.random() * CUSTOMER_PROFILES.length)];
+      const pool = isAlienOccupied ? ALIEN_PROFILES : CUSTOMER_PROFILES;
+      const profile = pool[Math.floor(Math.random() * pool.length)];
       const itemCount = Math.floor(Math.random() * 3) + 2;
       const items = [];
       let total = 0;
@@ -1800,7 +2192,9 @@
 
       const storeLv = 1 + (gameState.upgrades.storeExpansion || 0);
       const names = ['동네 편의점', '역세권 편의점', '24시 메가스토어', '플래그십 본점', '전국 1등 편의점'];
-      document.getElementById('storeGradeBadge').textContent = `${gameState.branchCount}호점 · ${names[Math.min(names.length - 1, storeLv - 1)]}`;
+      document.getElementById('storeGradeBadge').textContent = isAlienOccupied
+        ? `${gameState.branchCount}호점 · 👽 외계인 점령 기지`
+        : `${gameState.branchCount}호점 · ${names[Math.min(names.length - 1, storeLv - 1)]}`;
 
       const nextReq = getNextBranchRequirement();
       document.getElementById('nextBranchTitle').textContent = `🏢 ${gameState.branchCount + 1}호점 오픈하기 (영구 매출 +50%)`;
@@ -2404,21 +2798,29 @@
       await loadAdminUserList();
     }
 
-    async function launchAdminCutscene(mode) {
-      const input = document.getElementById('adminCutsceneDialogueInput');
-      const dialogue = input ? input.value.trim() : '';
+    async function launchUfoInvasionCutscene() {
       try {
-        await db.ref('globalEvent/cutscene').set({
-          id: 'cs_' + Date.now(),
-          mode,
-          dialogue,
+        await db.ref('globalEvent/ufoInvasion').set({
+          id: 'ufo_' + Date.now(),
+          playCutscene: true,
+          occupied: true,
           createdAt: Date.now()
         });
-        if (input) input.value = '';
         closeAdminModal();
-        showToast('🎬 전체 접속자 화면에 시네마틱 컷씬을 발동했습니다!', 'warning');
+        showToast('🛸 전 접속자 화면에 1분 33초 UFO 침공 컷씬이 발동되었습니다!', 'warning');
       } catch (err) {
-        alert('컷씬 발동 오류: ' + (err.message || err));
+        alert('UFO 컷씬 발동 오류: ' + (err.message || err));
+      }
+    }
+
+    async function resetAlienOccupation() {
+      try {
+        await db.ref('globalEvent/ufoInvasion').remove();
+        applyAlienOccupationTheme(false);
+        initPOSCustomers();
+        showToast('외계인 점령 모드를 해제하고 일반 매장으로 복구했습니다.', 'info');
+      } catch (err) {
+        alert('점령 해제 오류: ' + (err.message || err));
       }
     }
 
