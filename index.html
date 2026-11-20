@@ -29,6 +29,30 @@
       background-color: #080c14;
       color: #f8fafc;
       user-select: none;
+      transition: transform 0.6s ease, filter 0.4s ease;
+    }
+    body.admin-flip {
+      transform: rotate(180deg);
+    }
+    body.admin-psycho {
+      animation: rainbowHue 0.5s infinite linear;
+    }
+    @keyframes rainbowHue {
+      0% { filter: hue-rotate(0deg) saturate(1.7); }
+      50% { filter: hue-rotate(180deg) saturate(2.1); }
+      100% { filter: hue-rotate(360deg) saturate(1.7); }
+    }
+    @keyframes moneyFall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+    }
+    .money-rain-item {
+      position: fixed;
+      top: -40px;
+      font-size: 28px;
+      pointer-events: none;
+      z-index: 9999;
+      animation: moneyFall 2.8s linear forwards;
     }
     ::-webkit-scrollbar {
       width: 4px;
@@ -211,14 +235,14 @@
 
       <!-- Global Server Fever Event Banner -->
       <div id="globalFeverBanner" class="hidden bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-amber-500/25 border border-amber-400 rounded-lg px-2.5 py-1 flex items-center justify-between text-[11px] text-amber-200 fever-pulse">
-        <span class="font-black text-amber-300">🔥 전체 서버 피버 타임! (모든 매출 2배!)</span>
+        <span id="globalFeverLabel" class="font-black text-amber-300">🔥 전체 서버 피버 타임! (모든 매출 2배!)</span>
         <span id="globalFeverTimer" class="font-black text-white bg-amber-600/60 px-1.5 py-0.2 rounded">05:00</span>
       </div>
 
-      <!-- Global Live Notice Ticker -->
-      <div id="globalNoticeBanner" class="hidden bg-indigo-500/15 border border-indigo-400/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 text-[11px] text-indigo-200">
-        <span class="shrink-0 font-black text-indigo-300">📢 공지</span>
-        <span id="globalNoticeText" class="truncate font-medium"></span>
+      <!-- Global Live Notice Ticker (3.5초 표시 후 자동 숨김) -->
+      <div id="globalNoticeBanner" class="hidden bg-gradient-to-r from-indigo-600/90 via-purple-600/90 to-indigo-600/90 border border-indigo-300/70 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 text-[11px] text-white shadow-lg animate-pop">
+        <span class="shrink-0 font-black text-amber-300">📢 긴급 공지</span>
+        <span id="globalNoticeText" class="truncate font-bold"></span>
       </div>
     </div>
   </header>
@@ -554,17 +578,56 @@
           </div>
         </div>
 
-        <!-- GLOBAL FEVER EVENT TRIGGER -->
-        <div class="bg-gradient-to-r from-amber-950/60 to-orange-950/60 border border-amber-500/50 rounded-2xl p-3 space-y-2">
-          <h4 class="text-xs font-black text-amber-300">🔥 전체 서버 피버 이벤트 (매출 2배)</h4>
-          <div class="flex gap-2">
-            <button onclick="triggerServerFever(5)"
-              class="flex-1 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs active:scale-95">
-              ⚡ 5분간 전체 매출 2배 발동!
+        <!-- ADMIN SURPRISE EVENTS (어드민 깜짝 이벤트 연출) -->
+        <div class="bg-gradient-to-r from-purple-950/70 to-fuchsia-950/70 border border-purple-500/50 rounded-2xl p-3 space-y-2">
+          <h4 class="text-xs font-black text-purple-300">🎪 운영자 깜짝 이벤트 연출 (전체 접속자 화면)</h4>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button onclick="triggerAdminSurprise('money_rain')"
+              class="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-left active:scale-95">
+              <div class="text-xs font-black text-emerald-300">💸 하늘에서 돈비</div>
+              <div class="text-[10px] text-slate-300">전원 +30,000원 지급</div>
             </button>
+            <button onclick="triggerAdminSurprise('vip_spawn')"
+              class="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-left active:scale-95">
+              <div class="text-xs font-black text-amber-300">👑 VIP 재벌 소환</div>
+              <div class="text-[10px] text-slate-300">매출 10배 손님 등장</div>
+            </button>
+            <button onclick="triggerAdminSurprise('flip_psycho')"
+              class="p-2 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/50 text-left active:scale-95">
+              <div class="text-xs font-black text-pink-300">🙃 화면 뒤집기 장난</div>
+              <div class="text-[10px] text-slate-300">5초간 화면 반전+무지개</div>
+            </button>
+            <button onclick="triggerAdminSurprise('auto_rush')"
+              class="p-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/50 text-left active:scale-95">
+              <div class="text-xs font-black text-sky-300">🚀 10초 초고속 러시</div>
+              <div class="text-[10px] text-slate-300">손님 즉시 자동정산</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- GLOBAL FEVER EVENT TRIGGER (배수 & 시간 커스텀 조절) -->
+        <div class="bg-gradient-to-r from-amber-950/60 to-orange-950/60 border border-amber-500/50 rounded-2xl p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-black text-amber-300">🔥 전체 서버 피버 이벤트 (매출 배수 조절)</h4>
             <button onclick="stopServerFever()"
-              class="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-300 font-bold text-xs">
+              class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-600 text-slate-300 font-bold text-[11px]">
               종료
+            </button>
+          </div>
+          <div class="grid grid-cols-4 gap-1.5">
+            <button onclick="triggerServerFever(5, 1.5)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] font-black text-amber-200">1.5배</button>
+            <button onclick="triggerServerFever(5, 2)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] font-black text-amber-200">2배</button>
+            <button onclick="triggerServerFever(5, 3)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] font-black text-amber-200">3배</button>
+            <button onclick="triggerServerFever(5, 5)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] font-black text-amber-200">5배</button>
+          </div>
+          <div class="grid grid-cols-3 gap-1.5">
+            <input id="adminFeverMultInput" type="number" step="0.5" min="0.5" max="100" value="2" placeholder="배수"
+              class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-amber-300" />
+            <input id="adminFeverMinInput" type="number" min="1" max="120" value="5" placeholder="시간(분)"
+              class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-white" />
+            <button onclick="triggerCustomFever()"
+              class="py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs active:scale-95">
+              ⚡ 피버 발동!
             </button>
           </div>
         </div>
@@ -643,15 +706,15 @@
           </button>
         </div>
 
-        <!-- Global Notice Control -->
+        <!-- Global Notice Control (3.5초 표시) -->
         <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-3 space-y-2">
-          <h4 class="text-xs font-black text-white">📢 전체 공지사항 등록</h4>
+          <h4 class="text-xs font-black text-white">📢 전체 긴급 공지 발송 (상단 3.5초 표시)</h4>
           <div class="flex gap-1.5">
             <input id="adminNoticeInput" type="text" placeholder="모든 접속자 상단에 띄울 공지 내용"
               class="flex-1 px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
             <button onclick="postGlobalNotice()"
               class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xs whitespace-nowrap">
-              등록
+              발송
             </button>
           </div>
           <button onclick="clearGlobalNotice()" class="text-[11px] text-rose-400 hover:underline">상단 공지 배너 내리기</button>
@@ -826,11 +889,16 @@
     let isRemoteMoneySyncing = false;
     let detectedRecoveryData = null;
     let serverFeverUntil = 0;
+    let serverFeverMultiplier = 2.0;
+    let autoRushUntil = 0;
+    let lastNoticeTimestamp = 0;
+    let noticeHideTimer = null;
+    let lastSurpriseId = '';
 
     let gameState = {
       money: 15000,
       day: 1,
-      branchCount: 1, // 1호점, 2호점, 3호점... (Prestige)
+      branchCount: 1,
       satisfaction: 85,
       cleanliness: 100,
       combo: 0,
@@ -1065,6 +1133,7 @@
         listenGlobalNotices();
         listenLivePoll();
         listenServerFever();
+        listenServerSurprise();
         listenShoutbox();
 
         initPOSCustomers();
@@ -1088,7 +1157,6 @@
     }
 
     function attachRealtimeUserListeners(nickname) {
-      // Live balance sync
       db.ref(`users/${nickname}/money`).on('value', snap => {
         const val = snap.val();
         if (typeof val === 'number' && !isRemoteMoneySyncing) {
@@ -1106,7 +1174,6 @@
         }
       });
 
-      // Live ban enforcement
       db.ref(`users/${nickname}`).on('value', snap => {
         const data = snap.val();
         if (data && data.banned) {
@@ -1177,7 +1244,6 @@
         return;
       }
 
-      // 1) Launch celebration code: open_261119
       if (normCode === LAUNCH_COUPON_CODE) {
         gameState.usedCoupons[normCode] = Date.now();
         gameState.money += LAUNCH_COUPON_REWARD;
@@ -1191,7 +1257,6 @@
         return;
       }
 
-      // 2) Custom Firebase admin coupons
       try {
         const snap = await db.ref(`coupons/${normCode}`).once('value');
         if (!snap.exists()) {
@@ -1224,8 +1289,12 @@
       return 1 + (gameState.branchCount - 1) * 0.5;
     }
 
+    function getActiveFeverMultiplier() {
+      return Date.now() < serverFeverUntil ? serverFeverMultiplier : 1.0;
+    }
+
     function getTotalRevenueMultiplier() {
-      const feverMult = Date.now() < serverFeverUntil ? 2.0 : 1.0;
+      const feverMult = getActiveFeverMultiplier();
       const comboMult = getComboMultiplier();
       const scannerMult = 1 + (gameState.upgrades.posScanner || 0) * 0.15;
       return getBranchMultiplier() * comboMult * scannerMult * feverMult;
@@ -1258,8 +1327,27 @@
     // ---------------------------------------------------------
     // 8. Interactive POS Register & Special Incidents
     // ---------------------------------------------------------
-    function generateCustomerOrder() {
-      // ~20% chance for a special age-check / troublemaker incident
+    function generateCustomerOrder(forceVip = false) {
+      if (forceVip) {
+        const items = [];
+        let total = 0;
+        for (let i = 0; i < 4; i++) {
+          const pick = STORE_ITEMS[Math.floor(Math.random() * STORE_ITEMS.length)];
+          items.push({ uid: i, id: pick.id, name: pick.name, emoji: pick.emoji, price: pick.price, scanned: false });
+          total += pick.price;
+        }
+        return {
+          isIncident: false,
+          isVip: true,
+          emoji: '👑',
+          name: 'VIP 재벌 손님 (매출 10배!)',
+          items,
+          total,
+          paymentType: 'card',
+          cashGiven: 0
+        };
+      }
+
       if (Math.random() < 0.20) {
         return {
           isIncident: true,
@@ -1302,6 +1390,7 @@
 
       return {
         isIncident: false,
+        isVip: false,
         emoji: profile.emoji,
         name: profile.name,
         items,
@@ -1332,7 +1421,7 @@
     function resolveSpecialIncident(refusedProperly, event) {
       if (!currentCustomer || !currentCustomer.isIncident) return;
       if (refusedProperly) {
-        const bonus = Math.round(6000 * getBranchMultiplier() * (Date.now() < serverFeverUntil ? 2 : 1));
+        const bonus = Math.round(6000 * getBranchMultiplier() * getActiveFeverMultiplier());
         gameState.money += bonus;
         gameState.combo += 1;
         gameState.satisfaction = Math.min(100, gameState.satisfaction + 4);
@@ -1400,11 +1489,12 @@
     function finalizeTransaction(isAccurate, event, expectedChange = 0) {
       const baseTotal = currentCustomer.total;
       const totalMult = getTotalRevenueMultiplier();
+      const vipBonus = currentCustomer.isVip ? 10 : 1;
 
       if (isAccurate) {
         gameState.combo += 1;
         const tipBonus = currentCustomer.paymentType === 'cash' ? 1.2 : 1.0;
-        const finalEarned = Math.round(baseTotal * totalMult * tipBonus);
+        const finalEarned = Math.round(baseTotal * totalMult * tipBonus * vipBonus);
 
         gameState.money += finalEarned;
         gameState.totalServed += 1;
@@ -1415,7 +1505,9 @@
         if (event && event.clientX) {
           spawnFloatingText(event.clientX, event.clientY, `정산완료 +${formatKRW(finalEarned)}!`, '#fbbf24');
         }
-        if (currentCustomer.paymentType === 'cash') {
+        if (currentCustomer.isVip) {
+          showToast(`👑 VIP 재벌 손님 10배 정산! +${formatKRW(finalEarned)}`, 'warning');
+        } else if (currentCustomer.paymentType === 'cash') {
           showToast(`🪙 정확한 거스름돈! 팁 보너스 포함 +${formatKRW(finalEarned)}`, 'success');
         }
       } else {
@@ -1461,7 +1553,7 @@
       UPGRADE_DEFS.forEach(def => {
         total += (gameState.upgrades[def.key] || 0) * def.passivePerLv;
       });
-      const feverMult = Date.now() < serverFeverUntil ? 2.0 : 1.0;
+      const feverMult = getActiveFeverMultiplier();
       return Math.round(total * getBranchMultiplier() * feverMult);
     }
 
@@ -1508,7 +1600,6 @@
       const names = ['동네 편의점', '역세권 편의점', '24시 메가스토어', '플래그십 본점', '전국 1등 편의점'];
       document.getElementById('storeGradeBadge').textContent = `${gameState.branchCount}호점 · ${names[Math.min(names.length - 1, storeLv - 1)]}`;
 
-      // Update Prestige Card
       const nextReq = getNextBranchRequirement();
       document.getElementById('nextBranchTitle').textContent = `🏢 ${gameState.branchCount + 1}호점 오픈하기 (영구 매출 +50%)`;
       document.getElementById('currentBranchMultText').textContent = `현재 ${gameState.branchCount}호점 (x${getBranchMultiplier().toFixed(1)})`;
@@ -1660,12 +1751,59 @@
     }
 
     // ---------------------------------------------------------
-    // 11. Game Loops & Server Fever Countdown
+    // 11. Game Loops & Server Fever / Surprise Listeners
     // ---------------------------------------------------------
     function listenServerFever() {
-      db.ref('globalEvent/feverUntil').on('value', snap => {
-        serverFeverUntil = Number(snap.val() || 0);
+      db.ref('globalEvent').on('value', snap => {
+        const data = snap.val() || {};
+        serverFeverUntil = Number(data.feverUntil || 0);
+        serverFeverMultiplier = Math.max(0.5, Number(data.feverMult || 2.0));
+        document.getElementById('globalFeverLabel').textContent = `🔥 전체 서버 피버 타임! (모든 매출 ${serverFeverMultiplier}배!)`;
       });
+    }
+
+    function listenServerSurprise() {
+      db.ref('globalEvent/surprise').on('value', snap => {
+        const data = snap.val();
+        if (!data || !data.id || data.id === lastSurpriseId) return;
+        if (Date.now() - Number(data.createdAt || 0) > 10000) return;
+        lastSurpriseId = data.id;
+        executeSurpriseEffect(data.type);
+      });
+    }
+
+    function executeSurpriseEffect(type) {
+      if (type === 'money_rain') {
+        playGiftFanfare();
+        gameState.money += 30000;
+        renderAll();
+        showToast('💸 하늘에서 운영자 지원금 돈비가 내립니다! (+30,000원)', 'warning');
+        for (let i = 0; i < 24; i++) {
+          const el = document.createElement('div');
+          el.className = 'money-rain-item';
+          el.textContent = i % 2 === 0 ? '💸' : '🪙';
+          el.style.left = `${Math.random() * 92}vw`;
+          el.style.animationDelay = `${Math.random() * 0.8}s`;
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 3600);
+        }
+      } else if (type === 'vip_spawn') {
+        playGiftFanfare();
+        currentCustomer = generateCustomerOrder(true);
+        renderPOSRegister();
+        showToast('👑 운영자가 VIP 재벌 손님(매출 10배)을 소환했습니다!', 'warning');
+      } else if (type === 'flip_psycho') {
+        playTone(660, 'sawtooth', 0.25, 0.08);
+        showToast('🙃 운영자가 장난을 쳤습니다! (5초간 화면 반전)', 'warning');
+        document.body.classList.add('admin-flip', 'admin-psycho');
+        setTimeout(() => {
+          document.body.classList.remove('admin-flip', 'admin-psycho');
+        }, 5000);
+      } else if (type === 'auto_rush') {
+        playGiftFanfare();
+        autoRushUntil = Date.now() + 10000;
+        showToast('🚀 10초간 초고속 자동 정산 러시 발동!', 'warning');
+      }
     }
 
     function startGameLoops() {
@@ -1674,7 +1812,6 @@
         const dt = (now - lastTick) / 1000;
         lastTick = now;
 
-        // Global Fever Banner Timer
         const feverBanner = document.getElementById('globalFeverBanner');
         if (now < serverFeverUntil) {
           const remSec = Math.ceil((serverFeverUntil - now) / 1000);
@@ -1684,6 +1821,15 @@
           feverBanner.classList.remove('hidden');
         } else {
           feverBanner.classList.add('hidden');
+        }
+
+        if (now < autoRushUntil && currentCustomer) {
+          const earned = Math.round(currentCustomer.total * getTotalRevenueMultiplier());
+          gameState.money += earned;
+          gameState.totalServed += 1;
+          currentCustomer = waitingQueue.shift() || generateCustomerOrder();
+          waitingQueue.push(generateCustomerOrder());
+          renderPOSRegister();
         }
 
         dayTimer += dt;
@@ -1711,7 +1857,7 @@
     }
 
     // ---------------------------------------------------------
-    // 12. Tab Navigation, Toast & Floating Text
+    // 12. Tab Navigation, Toast (3초 자동 사라짐) & Floating Text
     // ---------------------------------------------------------
     function switchTab(tabName) {
       ['store', 'upgrade', 'ranking', 'community'].forEach(t => {
@@ -1744,7 +1890,7 @@
         el.style.opacity = '0';
         el.style.transition = 'opacity 0.25s';
         setTimeout(() => el.remove(), 260);
-      }, 2600);
+      }, 3000);
     }
 
     function spawnFloatingText(x, y, text, color = '#fbbf24') {
@@ -1847,13 +1993,23 @@
       }
     }
 
+    // 상단 긴급 공지 배너: 공지가 등록되면 모든 접속자 상단에 3.5초 표시 후 자동 숨김
     function listenGlobalNotices() {
       db.ref('notices/active').on('value', snap => {
         const val = snap.val();
         const banner = document.getElementById('globalNoticeBanner');
         if (val && val.text) {
+          const created = Number(val.createdAt || 0);
+          if (created && created === lastNoticeTimestamp) return;
+          if (created && Date.now() - created > 15000) return;
+          lastNoticeTimestamp = created;
+
           document.getElementById('globalNoticeText').textContent = val.text;
           banner.classList.remove('hidden');
+          clearTimeout(noticeHideTimer);
+          noticeHideTimer = setTimeout(() => {
+            banner.classList.add('hidden');
+          }, 3500);
         } else {
           banner.classList.add('hidden');
         }
@@ -2041,15 +2197,36 @@
       await loadAdminUserList();
     }
 
-    async function triggerServerFever(minutes) {
+    async function triggerAdminSurprise(type) {
+      await db.ref('globalEvent/surprise').set({
+        id: 'sp_' + Date.now(),
+        type,
+        createdAt: Date.now()
+      });
+      showToast('🎪 전체 접속자 화면에 깜짝 이벤트를 발동했습니다!', 'warning');
+    }
+
+    async function triggerServerFever(minutes, mult = 2) {
       const until = Date.now() + minutes * 60 * 1000;
-      await db.ref('globalEvent/feverUntil').set(until);
+      await db.ref('globalEvent').update({
+        feverUntil: until,
+        feverMult: mult
+      });
       playGiftFanfare();
-      showToast(`🔥 전체 서버 ${minutes}분간 매출 2배 피버 타임이 발동되었습니다!`, 'warning');
+      showToast(`🔥 전체 서버 ${minutes}분간 매출 ${mult}배 피버 타임이 발동되었습니다!`, 'warning');
+    }
+
+    function triggerCustomFever() {
+      const mult = Math.max(0.5, Number(document.getElementById('adminFeverMultInput').value || 2));
+      const mins = Math.max(1, Number(document.getElementById('adminFeverMinInput').value || 5));
+      triggerServerFever(mins, mult);
     }
 
     async function stopServerFever() {
-      await db.ref('globalEvent/feverUntil').set(0);
+      await db.ref('globalEvent').update({
+        feverUntil: 0,
+        feverMult: 1
+      });
       showToast('피버 이벤트를 종료했습니다.', 'info');
     }
 
@@ -2124,7 +2301,7 @@
       await db.ref('notices/active').set(payload);
       await db.ref('notices/history').push(payload);
       document.getElementById('adminNoticeInput').value = '';
-      showToast('📢 공지가 등록되었습니다!', 'success');
+      showToast('📢 상단 긴급 공지가 발송되었습니다 (3.5초 표시)!', 'success');
     }
 
     async function clearGlobalNotice() {
