@@ -4,138 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>편의점 타이쿤 - 올인원 시즌 & 이벤트 에디션</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts: Noto Sans KR -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
-  <!-- Firebase v10 Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <style>
-    * {
-      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      box-sizing: border-box;
-    }
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-      overflow-x: hidden;
-      background-color: #080c14;
-      color: #f8fafc;
-      user-select: none;
-      transition: transform 0.6s ease, filter 0.4s ease;
-    }
+    * { font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; width: 100%; min-height: 100%; overflow-x: hidden; background-color: #080c14; color: #f8fafc; user-select: none; transition: transform 0.6s ease, filter 0.4s ease; }
     body.admin-flip { transform: rotate(180deg); }
     body.admin-psycho { animation: rainbowHue 0.5s infinite linear; }
     body.admin-shake { animation: screenShake 0.45s infinite ease-in-out; }
-    @keyframes screenShake {
-      0%, 100% { transform: translate(0, 0); }
-      25% { transform: translate(-6px, 4px); }
-      50% { transform: translate(6px, -4px); }
-      75% { transform: translate(-4px, -4px); }
-    }
-    @keyframes zeroGravity {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-9px) rotate(2deg); }
-    }
+    @keyframes screenShake { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-6px, 4px); } 50% { transform: translate(6px, -4px); } 75% { transform: translate(-4px, -4px); } }
+    @keyframes zeroGravity { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-9px) rotate(2deg); } }
     .zero-gravity-item { animation: zeroGravity 1.2s infinite ease-in-out; }
-    @keyframes rainbowHue {
-      0% { filter: hue-rotate(0deg) saturate(1.7); }
-      50% { filter: hue-rotate(180deg) saturate(2.1); }
-      100% { filter: hue-rotate(360deg) saturate(1.7); }
-    }
-    @keyframes sirenFlash {
-      0%, 100% { opacity: 0.1; }
-      50% { opacity: 0.35; }
-    }
+    @keyframes rainbowHue { 0% { filter: hue-rotate(0deg) saturate(1.7); } 50% { filter: hue-rotate(180deg) saturate(2.1); } 100% { filter: hue-rotate(360deg) saturate(1.7); } }
+    @keyframes sirenFlash { 0%, 100% { opacity: 0.1; } 50% { opacity: 0.35; } }
     .animate-siren { animation: sirenFlash 0.85s infinite ease-in-out; }
-    @keyframes moneyFall {
-      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
-    }
-    .money-rain-item {
-      position: fixed;
-      top: -40px;
-      font-size: 26px;
-      pointer-events: none;
-      z-index: 9999;
-      animation: moneyFall 2.8s linear forwards;
-    }
-    @keyframes snowFall {
-      0% { transform: translateY(-10vh) translateX(0px); opacity: 0.9; }
-      100% { transform: translateY(105vh) translateX(25px); opacity: 0.2; }
-    }
-    .snow-flake {
-      position: fixed;
-      top: -20px;
-      color: #ffffff;
-      pointer-events: none;
-      z-index: 25;
-      animation: snowFall 5.5s linear infinite;
-    }
+    @keyframes moneyFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(105vh) rotate(720deg); opacity: 0; } }
+    .money-rain-item { position: fixed; top: -40px; font-size: 26px; pointer-events: none; z-index: 9999; animation: moneyFall 2.8s linear forwards; }
+    @keyframes snowFall { 0% { transform: translateY(-10vh) translateX(0px); opacity: 0.9; } 100% { transform: translateY(105vh) translateX(25px); opacity: 0.2; } }
+    .snow-flake { position: fixed; top: -20px; color: #ffffff; pointer-events: none; z-index: 25; animation: snowFall 5.5s linear infinite; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 9999px; }
-    @keyframes popIn {
-      0% { transform: scale(0.92); opacity: 0; }
-      70% { transform: scale(1.02); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    @keyframes floatUp {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-38px) scale(1.1); opacity: 0; }
-    }
-    @keyframes laserSweep {
-      0% { top: 12%; opacity: 0.4; }
-      50% { top: 84%; opacity: 1; }
-      100% { top: 12%; opacity: 0.4; }
-    }
-    @keyframes feverGlow {
-      0%, 100% { box-shadow: 0 0 12px rgba(251, 191, 36, 0.35); }
-      50% { box-shadow: 0 0 24px rgba(251, 191, 36, 0.75); }
-    }
+    @keyframes popIn { 0% { transform: scale(0.92); opacity: 0; } 70% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-38px) scale(1.1); opacity: 0; } }
+    @keyframes laserSweep { 0% { top: 12%; opacity: 0.4; } 50% { top: 84%; opacity: 1; } 100% { top: 12%; opacity: 0.4; } }
+    @keyframes feverGlow { 0%, 100% { box-shadow: 0 0 12px rgba(251, 191, 36, 0.35); } 50% { box-shadow: 0 0 24px rgba(251, 191, 36, 0.75); } }
     .animate-pop { animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .fever-pulse { animation: feverGlow 1.5s infinite ease-in-out; }
-    .floating-text {
-      position: fixed;
-      pointer-events: none;
-      font-weight: 900;
-      z-index: 9999;
-      animation: floatUp 0.9s ease-out forwards;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
-    }
-    .scanner-laser {
-      position: absolute;
-      left: 8%;
-      right: 8%;
-      height: 2px;
-      background: #ef4444;
-      box-shadow: 0 0 8px #ef4444, 0 0 14px #f87171;
-      animation: laserSweep 1.6s infinite ease-in-out;
-      pointer-events: none;
-    }
+    .floating-text { position: fixed; pointer-events: none; font-weight: 900; z-index: 9999; animation: floatUp 0.9s ease-out forwards; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9); }
+    .scanner-laser { position: absolute; left: 8%; right: 8%; height: 2px; background: #ef4444; box-shadow: 0 0 8px #ef4444, 0 0 14px #f87171; animation: laserSweep 1.6s infinite ease-in-out; pointer-events: none; }
     .pb-nav-safe { padding-bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px)); }
   </style>
 </head>
 <body class="flex flex-col min-h-screen bg-[#080c14] text-slate-100">
 
-  <!-- Snow Layer for Christmas Theme -->
   <div id="christmasSnowContainer" class="hidden fixed inset-0 pointer-events-none z-[25]"></div>
 
-  <!-- ==================== 60FPS MULTI-THEME CINEMA CUTSCENE OVERLAY ==================== -->
-  <!-- Modes: 'alien_eve', 'alien_raid_start', 'alien_raid_win', 'cyber_eve', 'cyber_raid_start', 'cyber_raid_win', 'xmas_eve', 'xmas_win' -->
+  <!-- 60FPS MULTI-THEME CINEMA CUTSCENE OVERLAY -->
   <div id="ufoCutsceneOverlay" class="hidden fixed inset-0 z-[130] flex flex-col justify-between bg-[#03050a] overflow-hidden">
     <canvas id="ufoCinemaCanvas" class="absolute inset-0 w-full h-full z-0 block"></canvas>
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(2,4,10,0.85)_100%)] pointer-events-none z-[1]"></div>
     <div id="ufoSirenGlow" class="absolute inset-0 bg-gradient-to-b from-purple-600/15 via-transparent to-rose-600/15 animate-siren pointer-events-none z-[1]"></div>
 
-    <!-- Top Cinema Letterbox Bar -->
     <div id="ufoTopLetterbox" class="w-full h-14 sm:h-16 bg-black/95 border-b border-purple-500/60 flex items-center justify-between px-4 z-20 transition-transform duration-500 -translate-y-full">
       <div class="flex items-center gap-2 min-w-0">
         <span class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-ping shrink-0"></span>
@@ -147,7 +61,6 @@
       </div>
     </div>
 
-    <!-- MAIN HUD & SUBTITLE STAGE -->
     <div id="ufoMainStage" class="relative flex-1 flex flex-col justify-between p-3.5 sm:p-5 z-10 max-w-2xl mx-auto w-full pointer-events-none">
       <div class="w-full flex flex-col items-center">
         <div id="ufoBattleHud" class="hidden w-full flex items-center justify-between gap-3 bg-slate-950/85 backdrop-blur-md border border-purple-400/60 rounded-2xl px-4 py-2.5 shadow-[0_0_25px_rgba(168,85,247,0.35)]">
@@ -182,7 +95,6 @@
       </div>
     </div>
 
-    <!-- FINAL 3-SECOND COUNTDOWN STAGE -->
     <div id="ufoCountdownFinaleStage" class="hidden relative flex-1 flex flex-col items-center justify-center px-4 text-center z-20 bg-black/80 backdrop-blur-md animate-pop">
       <div id="finaleEventTag" class="px-4 py-1 rounded-full bg-rose-600 border border-rose-300 text-xs sm:text-sm font-black tracking-widest text-white mb-4 animate-pulse shadow-[0_0_20px_rgba(244,63,94,0.8)]">
         MAIN EVENT · D-DAY
@@ -214,7 +126,6 @@
       </div>
     </div>
 
-    <!-- Bottom Cinema Letterbox Bar -->
     <div id="ufoBottomLetterbox" class="w-full h-14 sm:h-16 bg-black/95 border-t border-purple-500/60 flex items-center justify-center px-4 z-20 transition-transform duration-500 translate-y-full">
       <div class="w-full max-w-md flex items-center gap-3">
         <div class="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -225,7 +136,7 @@
     </div>
   </div>
 
-  <!-- ==================== SURPRISE OVERLAYS ==================== -->
+  <!-- SURPRISE OVERLAYS -->
   <div id="slimeOverlay" class="hidden fixed inset-0 z-[85] pointer-events-none"></div>
   <div id="blackoutOverlay" class="hidden fixed inset-0 z-[84] pointer-events-none bg-black/95 transition-opacity duration-300"></div>
   <div id="megaphoneBanner" class="hidden fixed inset-x-4 top-24 z-[95] bg-gradient-to-r from-rose-600 via-amber-500 to-rose-600 border-2 border-white rounded-2xl p-4 text-center shadow-2xl animate-pop pointer-events-none">
@@ -233,7 +144,7 @@
     <div id="megaphoneText" class="text-base sm:text-lg font-black text-white mt-1 drop-shadow">장사 잘 되고 있나 사장님들?!</div>
   </div>
 
-  <!-- ==================== 0. FULL-SCREEN BAN LOCK MODAL ==================== -->
+  <!-- FULL-SCREEN BAN LOCK MODAL -->
   <div id="banLockModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/98 backdrop-blur-lg p-4">
     <div class="w-full max-w-sm bg-rose-950/90 border-2 border-rose-500 rounded-3xl p-6 text-center shadow-2xl space-y-3 animate-pop">
       <div class="text-5xl">🚫</div>
@@ -245,13 +156,11 @@
     </div>
   </div>
 
-  <!-- ==================== 1. LOGIN & DATA RECOVERY MODAL ==================== -->
+  <!-- LOGIN & DATA RECOVERY MODAL -->
   <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-3.5 overflow-y-auto">
     <div class="w-full max-w-sm bg-slate-900 border border-slate-700/80 rounded-3xl p-5 shadow-2xl animate-pop my-auto">
       <div class="text-center mb-4">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-3xl shadow-lg mb-2">
-          🏪
-        </div>
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-3xl shadow-lg mb-2">🏪</div>
         <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">편의점 타이쿤</h1>
         <p class="text-xs text-slate-400 mt-0.5">시즌제 · 보스 레이드 · 크리스마스 축제</p>
       </div>
@@ -297,24 +206,18 @@
     </div>
   </div>
 
-  <!-- ==================== 2. TOAST CONTAINER ==================== -->
+  <!-- TOAST CONTAINER -->
   <div id="toastContainer" class="fixed top-6 left-1/2 -translate-x-1/2 z-[90] flex flex-col items-center gap-1.5 w-[92%] max-w-sm pointer-events-none"></div>
 
-  <!-- ==================== 3. TOP HEADER ==================== -->
+  <!-- TOP HEADER -->
   <header class="sticky top-0 z-30 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-2.5 py-2">
     <div class="max-w-3xl mx-auto flex flex-col gap-1.5">
       <div class="flex items-center justify-between gap-1 min-w-0">
         <div class="flex items-center gap-1.5 min-w-0">
-          <span id="headerSeasonBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-purple-500/25 border border-purple-400/50 text-[10px] font-black text-purple-200 whitespace-nowrap">
-            S1
-          </span>
-          <span id="headerBranchBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[10px] font-black text-amber-300 whitespace-nowrap">
-            1호점
-          </span>
+          <span id="headerSeasonBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-purple-500/25 border border-purple-400/50 text-[10px] font-black text-purple-200 whitespace-nowrap">S1</span>
+          <span id="headerBranchBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[10px] font-black text-amber-300 whitespace-nowrap">1호점</span>
           <span id="headerNickname" class="font-black text-xs sm:text-sm text-white truncate max-w-[75px] sm:max-w-[140px]">로딩중</span>
-          <span id="headerTitleMedal" class="hidden shrink-0 px-1.5 py-0.5 rounded-md bg-rose-500/20 border border-rose-400/50 text-[10px] font-black text-rose-200 whitespace-nowrap">
-            🏅
-          </span>
+          <span id="headerTitleMedal" class="hidden shrink-0 px-1.5 py-0.5 rounded-md bg-rose-500/20 border border-rose-400/50 text-[10px] font-black text-rose-200 whitespace-nowrap">🏅</span>
         </div>
 
         <div class="flex items-center gap-1 shrink-0">
@@ -352,7 +255,7 @@
         </div>
       </div>
 
-      <!-- Theme Eve Countdown Banner (Alien / Cyber / Christmas) -->
+      <!-- Theme Eve Countdown Banner -->
       <div id="alienOccupationBanner" class="hidden bg-gradient-to-r from-purple-950 via-fuchsia-950 to-purple-950 border border-purple-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md">
         <div class="flex items-center gap-1.5 min-w-0">
           <span id="occupationBannerIcon" class="shrink-0">👽</span>
@@ -363,7 +266,7 @@
         </span>
       </div>
 
-      <!-- ACTIVE BOSS RAID HUD (Theme A Alien Mothership OR Theme B Cyber AI Boss) -->
+      <!-- ACTIVE BOSS RAID HUD -->
       <div id="mothershipRaidHud" class="hidden bg-gradient-to-r from-rose-950 via-purple-950 to-rose-950 border-2 border-rose-400 rounded-2xl p-2.5 space-y-2 shadow-[0_0_25px_rgba(244,63,94,0.45)] animate-pop">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-1.5 min-w-0">
@@ -373,7 +276,6 @@
           <span id="raidTimerBadge" class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black shrink-0">03:00</span>
         </div>
 
-        <!-- Boss HP Bar -->
         <div>
           <div class="flex justify-between text-[10px] font-black text-rose-200 mb-0.5">
             <span id="bossHpName">모선 에너지 코어 HP</span>
@@ -384,7 +286,6 @@
           </div>
         </div>
 
-        <!-- Cyber Firewall 4-Digit Code Puzzle (Only active in Cyber Raid when Firewall locks) -->
         <div id="cyberFirewallBox" class="hidden bg-cyan-950/90 border border-cyan-400 rounded-xl p-2 space-y-1.5 animate-pop">
           <div class="flex items-center justify-between text-[11px] font-black text-cyan-200">
             <span>🔐 AI 방화벽 가동! 보안 암호 입력: <strong id="cyberCodeDisplay" class="text-amber-300 tracking-widest text-sm">0000</strong></span>
@@ -400,7 +301,6 @@
           </div>
         </div>
 
-        <!-- Direct Attack Actions -->
         <div class="grid grid-cols-2 gap-1.5">
           <button onclick="attackMothership('laser', event)"
             class="py-2 px-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-[11px] active:scale-95 transition shadow">
@@ -413,7 +313,7 @@
         </div>
       </div>
 
-      <!-- ACTIVE CHRISTMAS TREE CO-OP FESTIVAL HUD (12/25 Main Event) -->
+      <!-- ACTIVE CHRISTMAS TREE CO-OP FESTIVAL HUD -->
       <div id="xmasTreeHud" class="hidden bg-gradient-to-r from-red-950 via-emerald-950 to-red-950 border-2 border-amber-400 rounded-2xl p-2.5 space-y-2 shadow-[0_0_25px_rgba(251,191,36,0.45)] animate-pop">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-1.5 min-w-0">
@@ -457,7 +357,7 @@
     </div>
   </header>
 
-  <!-- ==================== 4. MAIN CONTENT ==================== -->
+  <!-- MAIN CONTENT -->
   <main class="flex-1 w-full max-w-3xl mx-auto px-3 pt-3 pb-nav-safe">
 
     <!-- TAB 1: 매장 / 리얼 POS 계산대 -->
@@ -478,7 +378,6 @@
         </button>
       </div>
 
-      <!-- INTERACTIVE POS CHECKOUT REGISTER -->
       <div id="posRegisterCard" class="bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-700/80 rounded-3xl p-3.5 shadow-xl relative overflow-hidden">
         <div class="flex items-center justify-between mb-2.5 gap-2">
           <div class="flex items-center gap-2 min-w-0">
@@ -585,7 +484,6 @@
 
     <!-- TAB 2: 알바, 다점포 확장 & 반격 병기 -->
     <section id="tab-upgrade" class="hidden space-y-3">
-      <!-- Event Weapon Armory -->
       <div class="bg-gradient-to-br from-purple-950/80 via-slate-900 to-slate-900 border border-purple-500/60 rounded-2xl p-3.5 space-y-2.5">
         <div class="flex items-center justify-between">
           <div>
@@ -596,13 +494,10 @@
             보유 재화: <span id="armoryCoreCount">0</span>개
           </span>
         </div>
-        <p class="text-[11px] text-slate-300">
-          전야제 기간 동안 모은 이벤트 재화로 레이드 무기를 강화해 두세요!
-        </p>
+        <p class="text-[11px] text-slate-300">전야제 기간 동안 모은 이벤트 재화로 레이드 무기를 강화해 두세요!</p>
         <div id="coreWeaponList" class="space-y-2"></div>
       </div>
 
-      <!-- Franchise Expansion -->
       <div class="bg-gradient-to-br from-amber-950/60 via-slate-900 to-slate-900 border border-amber-500/50 rounded-2xl p-3.5 space-y-2">
         <div class="flex items-center justify-between">
           <div>
@@ -622,7 +517,6 @@
         </button>
       </div>
 
-      <!-- Staff & Store Upgrades -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
         <h2 class="text-sm font-black text-white mb-1">👥 아르바이트 고용 & POS 시설 업그레이드</h2>
         <p class="text-xs text-slate-400 mb-3">알바생을 고용하면 계산대를 보지 않을 때도 초당 자동 수익이 쌓입니다!</p>
@@ -650,7 +544,6 @@
         </div>
       </div>
 
-      <!-- Season Hall of Fame -->
       <div id="hallOfFameBox" class="hidden bg-gradient-to-br from-amber-950/60 to-slate-900 border border-amber-500/40 rounded-2xl p-3.5 space-y-2">
         <h2 class="text-sm font-black text-amber-300">👑 역대 시즌 명예의 전당</h2>
         <div id="hallOfFameList" class="space-y-1.5 text-xs"></div>
@@ -714,7 +607,7 @@
 
   </main>
 
-  <!-- ==================== 5. BOTTOM 4-TAB NAVIGATION ==================== -->
+  <!-- BOTTOM 4-TAB NAVIGATION -->
   <nav class="fixed bottom-0 inset-x-0 z-30 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-1.5 py-1.5">
     <div class="max-w-3xl mx-auto grid grid-cols-4 gap-1">
       <button onclick="switchTab('store')" id="nav-store"
@@ -740,16 +633,14 @@
     </div>
   </nav>
 
-  <!-- ==================== 6. COUPON REDEEM MODAL ==================== -->
+  <!-- COUPON REDEEM MODAL -->
   <div id="couponModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-3.5">
     <div class="w-full max-w-sm bg-slate-900 border border-amber-500/50 rounded-3xl p-5 shadow-2xl space-y-3 animate-pop">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-black text-white">🎁 쿠폰 코드 입력</h3>
         <button onclick="closeCouponModal()" class="px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-bold text-slate-300">✕</button>
       </div>
-      <p class="text-xs text-slate-300">
-        이벤트 또는 공지로 전달받은 비밀 쿠폰 코드를 입력하세요.
-      </p>
+      <p class="text-xs text-slate-300">이벤트 또는 공지로 전달받은 비밀 쿠폰 코드를 입력하세요.</p>
       <input id="couponCodeInput" type="text" placeholder="쿠폰 코드를 입력하세요"
         class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm font-bold text-white focus:outline-none focus:border-amber-400" />
       <button onclick="redeemCouponCode()"
@@ -759,7 +650,7 @@
     </div>
   </div>
 
-  <!-- ==================== 7. ADMIN ALL-IN-ONE MASTER MODAL ==================== -->
+  <!-- ADMIN ALL-IN-ONE MASTER MODAL -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-3">
     <div class="w-full max-w-lg max-h-[92vh] flex flex-col bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-pop">
       <div class="px-4 py-3 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between shrink-0">
@@ -772,7 +663,6 @@
         </button>
       </div>
 
-      <!-- Password Verification -->
       <div id="adminAuthGate" class="p-5 space-y-3">
         <p class="text-xs text-slate-300">관리자 전용 비밀번호를 입력하세요.</p>
         <input id="adminPassInput" type="password" placeholder="비밀번호 입력"
@@ -784,7 +674,6 @@
         </button>
       </div>
 
-      <!-- Admin Dashboard Content -->
       <div id="adminDashboard" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
         <div class="grid grid-cols-2 gap-2">
           <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-2.5">
@@ -797,14 +686,13 @@
           </div>
         </div>
 
-        <!-- 1. ALL-IN-ONE ROADMAP CONTROLLER (THEME A / THEME B / CHRISTMAS) -->
+        <!-- 1. SEASON & EVENT MASTER CONTROLLER -->
         <div class="bg-gradient-to-br from-purple-950/90 via-slate-900 to-rose-950/80 border-2 border-purple-400/80 rounded-2xl p-3.5 space-y-3 shadow-lg">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-black text-purple-200">🎛️ 2026 연말 시즌 & 이벤트 마스터 컨트롤러</h4>
             <span id="adminCurrentSeasonTag" class="px-2 py-0.5 rounded bg-purple-500/40 text-[10px] font-black text-white">시즌 1</span>
           </div>
 
-          <!-- Season Number & Banner Customizer -->
           <div class="grid grid-cols-3 gap-1.5">
             <input id="adminSeasonNumInput" type="number" min="1" max="99" value="1" placeholder="시즌 번호"
               class="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-bold text-amber-300" />
@@ -816,7 +704,6 @@
             💾 시즌 번호 & 배너 문구 즉시 반영
           </button>
 
-          <!-- THEME A: ALIEN INVASION (11/28) -->
           <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-black text-purple-300">👽 [시즌 1 · 테마 A] 외계인 대침공 (11/28)</span>
@@ -834,7 +721,6 @@
             </div>
           </div>
 
-          <!-- THEME B: CYBER AI VIRUS (12/5 Eve & 12/12 Main) -->
           <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
             <div class="text-[11px] font-black text-cyan-300">💻 [시즌 1 · 테마 B] 사이버 AI 바이러스 (12/5 · 12/12)</div>
             <div class="grid grid-cols-2 gap-1.5">
@@ -849,7 +735,6 @@
             </div>
           </div>
 
-          <!-- SEASON 2: CHRISTMAS FESTIVAL (12/19 Eve & 12/25 Main) -->
           <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
             <div class="text-[11px] font-black text-emerald-300">🎄 [시즌 2 · 크리스마스] 산타 썰매 & 트리 점등 (12/19 · 12/25)</div>
             <div class="grid grid-cols-2 gap-1.5">
@@ -864,7 +749,6 @@
             </div>
           </div>
 
-          <!-- Shared Raid / Event Controls -->
           <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
             <div class="grid grid-cols-3 gap-1.5">
               <button type="button" onclick="toggleAuto30MinRaid()"
@@ -887,7 +771,7 @@
           </div>
         </div>
 
-        <!-- 2. EXPANDED 12 SURPRISE EVENTS PACK -->
+        <!-- 2. SURPRISE EVENTS PACK -->
         <div class="bg-gradient-to-r from-purple-950/70 to-fuchsia-950/70 border border-purple-500/50 rounded-2xl p-3 space-y-2">
           <h4 class="text-xs font-black text-purple-300">🎪 즉시 발동 깜짝 이벤트 12종 확장팩</h4>
           <div class="flex gap-1.5 mb-1">
@@ -1098,11 +982,9 @@
     </div>
   </div>
 
-  <!-- ==================== 8. JAVASCRIPT LOGIC ==================== -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    const firebaseConfig = {
-      databaseURL: "https://game-7b7db-default-rtdb.firebaseio.com/"
-    };
+    const firebaseConfig = { databaseURL: "https://game-7b7db-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -1128,28 +1010,15 @@
     }
 
     function playBarcodeBeep() { playTone(1760, 'square', 0.075, 0.05); }
-    function playRegisterComplete() {
-      playTone(987.77, 'triangle', 0.08, 0.09);
-      setTimeout(() => playTone(1318.51, 'triangle', 0.16, 0.09), 65);
-    }
+    function playRegisterComplete() { playTone(987.77, 'triangle', 0.08, 0.09); setTimeout(() => playTone(1318.51, 'triangle', 0.16, 0.09), 65); }
     function playCoinTap() { playTone(1150, 'sine', 0.05, 0.05); }
-    function playGiftFanfare() {
-      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
-        setTimeout(() => playTone(f, 'triangle', 0.18, 0.1), i * 70);
-      });
-    }
-    function playUfoAlarm() {
-      playTone(165, 'sawtooth', 0.35, 0.11);
-      setTimeout(() => playTone(295, 'sawtooth', 0.35, 0.11), 210);
-      setTimeout(() => playTone(130, 'square', 0.4, 0.1), 430);
-    }
+    function playGiftFanfare() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => setTimeout(() => playTone(f, 'triangle', 0.18, 0.1), i * 70)); }
+    function playUfoAlarm() { playTone(165, 'sawtooth', 0.35, 0.11); setTimeout(() => playTone(295, 'sawtooth', 0.35, 0.11), 210); setTimeout(() => playTone(130, 'square', 0.4, 0.1), 430); }
 
     function toggleSound() {
       soundEnabled = !soundEnabled;
       const btn = document.getElementById('soundToggleBtn');
-      btn.innerHTML = soundEnabled
-        ? '<i data-lucide="volume-2" class="w-3.5 h-3.5"></i>'
-        : '<i data-lucide="volume-x" class="w-3.5 h-3.5 text-rose-400"></i>';
+      btn.innerHTML = soundEnabled ? '<i data-lucide="volume-2" class="w-3.5 h-3.5"></i>' : '<i data-lucide="volume-x" class="w-3.5 h-3.5 text-rose-400"></i>';
       lucide.createIcons();
       showToast(soundEnabled ? '🔊 효과음이 켜졌습니다.' : '🔇 효과음이 꺼졌습니다.');
     }
@@ -1222,59 +1091,15 @@
     ];
 
     const CORE_WEAPON_DEFS = [
-      {
-        key: 'hyperLaser',
-        title: '🔫 초고출력 바코드 레이저 개조',
-        desc: '보스 레이드 시 기본 사격 데미지가 레벨당 +100 증가합니다.',
-        baseCoreCost: 3,
-        maxLv: 15
-      },
-      {
-        key: 'autoTurret',
-        title: '🛰️ 자동 방어 포탑 / 백신 서버',
-        desc: '보스 레이드 시 매초 자동으로 +250 데미지를 입힙니다.',
-        baseCoreCost: 5,
-        maxLv: 10
-      }
+      { key: 'hyperLaser', title: '🔫 초고출력 바코드 레이저 개조', desc: '보스 레이드 시 기본 사격 데미지가 레벨당 +100 증가합니다.', baseCoreCost: 3, maxLv: 15 },
+      { key: 'autoTurret', title: '🛰️ 자동 방어 포탑 / 백신 서버', desc: '보스 레이드 시 매초 자동으로 +250 데미지를 입힙니다.', baseCoreCost: 5, maxLv: 10 }
     ];
 
     const UPGRADE_DEFS = [
-      {
-        key: 'partTimer',
-        title: '👩‍💼 야간/주간 알바생 고용',
-        desc: '초당 자동 매출 +800원을 벌어옵니다.',
-        baseCost: 8000,
-        mult: 1.65,
-        maxLv: 20,
-        passivePerLv: 800
-      },
-      {
-        key: 'posScanner',
-        title: '🔫 듀얼 초고속 바코드 스캐너',
-        desc: '모든 계산 정산 수익이 레벨당 +15% 증가합니다.',
-        baseCost: 12000,
-        mult: 1.75,
-        maxLv: 15,
-        passivePerLv: 0
-      },
-      {
-        key: 'coffeeMachine',
-        title: '☕ 원두커피 & 치킨 조리기',
-        desc: '초당 자동 매출 +2,500원을 추가로 벌어옵니다.',
-        baseCost: 25000,
-        mult: 1.8,
-        maxLv: 15,
-        passivePerLv: 2500
-      },
-      {
-        key: 'storeExpansion',
-        title: '🏬 프리미엄 매장 확장',
-        desc: '초당 자동 매출 +7,000원 & 매장 등급이 상승합니다.',
-        baseCost: 60000,
-        mult: 1.9,
-        maxLv: 10,
-        passivePerLv: 7000
-      }
+      { key: 'partTimer', title: '👩‍💼 야간/주간 알바생 고용', desc: '초당 자동 매출 +800원을 벌어옵니다.', baseCost: 8000, mult: 1.65, maxLv: 20, passivePerLv: 800 },
+      { key: 'posScanner', title: '🔫 듀얼 초고속 바코드 스캐너', desc: '모든 계산 정산 수익이 레벨당 +15% 증가합니다.', baseCost: 12000, mult: 1.75, maxLv: 15, passivePerLv: 0 },
+      { key: 'coffeeMachine', title: '☕ 원두커피 & 치킨 조리기', desc: '초당 자동 매출 +2,500원을 추가로 벌어옵니다.', baseCost: 25000, mult: 1.8, maxLv: 15, passivePerLv: 2500 },
+      { key: 'storeExpansion', title: '🏬 프리미엄 매장 확장', desc: '초당 자동 매출 +7,000원 & 매장 등급이 상승합니다.', baseCost: 60000, mult: 1.9, maxLv: 10, passivePerLv: 7000 }
     ];
 
     let currentUser = null;
@@ -1289,7 +1114,6 @@
     let noticeHideTimer = null;
     let lastSurpriseId = '';
 
-    // Season & Theme State ('normal' | 'alien' | 'cyber' | 'xmas')
     let currentSeasonNumber = 1;
     let currentBannerText = '대침공이 다가옵니다..';
     let lastSeasonResetId = '';
@@ -1302,7 +1126,6 @@
     let ufoCountdownInterval = null;
     let ufoCinemaAnimId = null;
 
-    // Boss Raid & Xmas Tree State
     let activeRaidState = null;
     let lastRaidId = '';
     let lastRaidWinId = '';
@@ -1337,21 +1160,12 @@
     let dayTimer = 0;
     let lastTick = Date.now();
 
-    // ---------------------------------------------------------
     // 60FPS MULTI-THEME CINEMA CANVAS ENGINE
-    // ---------------------------------------------------------
-    let cinemaState = {
-      mode: 'alien_eve',
-      elapsedSec: 0,
-      shakePower: 0,
-      stars: [],
-      particles: []
-    };
+    let cinemaState = { mode: 'alien_eve', elapsedSec: 0, shakePower: 0, stars: [], particles: [] };
 
     function initCinemaCanvas(mode = 'alien_eve') {
       const canvas = document.getElementById('ufoCinemaCanvas');
       const ctx = canvas.getContext('2d');
-
       const resizeCanvas = () => {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = window.innerWidth * dpr;
@@ -1362,12 +1176,7 @@
       window.addEventListener('resize', resizeCanvas);
 
       cinemaState.mode = mode;
-      cinemaState.stars = Array.from({ length: 110 }, () => ({
-        x: Math.random(),
-        y: Math.random() * 0.65,
-        r: Math.random() * 1.8 + 0.4,
-        twinkle: Math.random() * Math.PI * 2
-      }));
+      cinemaState.stars = Array.from({ length: 110 }, () => ({ x: Math.random(), y: Math.random() * 0.65, r: Math.random() * 1.8 + 0.4, twinkle: Math.random() * Math.PI * 2 }));
       cinemaState.particles = [];
       cinemaState.elapsedSec = 0;
       cinemaState.shakePower = 0;
@@ -1386,26 +1195,18 @@
           cinemaState.shakePower *= 0.91;
         }
 
-        // Sky Palette per theme
         const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.76);
         if (cMode.startsWith('cyber')) {
-          skyGrad.addColorStop(0, '#010813');
-          skyGrad.addColorStop(0.55, '#042f2e');
-          skyGrad.addColorStop(1, '#083344');
+          skyGrad.addColorStop(0, '#010813'); skyGrad.addColorStop(0.55, '#042f2e'); skyGrad.addColorStop(1, '#083344');
         } else if (cMode.startsWith('xmas')) {
-          skyGrad.addColorStop(0, '#090d24');
-          skyGrad.addColorStop(0.55, '#1e1b4b');
-          skyGrad.addColorStop(1, '#312e81');
+          skyGrad.addColorStop(0, '#090d24'); skyGrad.addColorStop(0.55, '#1e1b4b'); skyGrad.addColorStop(1, '#312e81');
         } else {
           const isPurple = (cMode === 'alien_eve' && sec >= 72) || cMode === 'alien_raid_start' || (cMode === 'alien_raid_win' && sec < 12);
-          skyGrad.addColorStop(0, isPurple ? '#090314' : '#02040a');
-          skyGrad.addColorStop(0.55, isPurple ? '#1e0b36' : '#0a1124');
-          skyGrad.addColorStop(1, isPurple ? '#3b0764' : '#131d38');
+          skyGrad.addColorStop(0, isPurple ? '#090314' : '#02040a'); skyGrad.addColorStop(0.55, isPurple ? '#1e0b36' : '#0a1124'); skyGrad.addColorStop(1, isPurple ? '#3b0764' : '#131d38');
         }
         ctx.fillStyle = skyGrad;
         ctx.fillRect(0, 0, w, h);
 
-        // Matrix digital rain for cyber mode
         if (cMode.startsWith('cyber')) {
           ctx.fillStyle = 'rgba(34, 211, 238, 0.25)';
           ctx.font = 'bold 13px monospace';
@@ -1418,217 +1219,130 @@
           cinemaState.stars.forEach(s => {
             const alpha = 0.35 + 0.65 * Math.abs(Math.sin(t * 2.2 + s.twinkle));
             ctx.fillStyle = `rgba(226, 232, 240, ${alpha})`;
-            ctx.beginPath();
-            ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2); ctx.fill();
           });
         }
 
-        // Snow for xmas mode
         if (cMode.startsWith('xmas')) {
           ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
           for (let i = 0; i < 45; i++) {
             const sx = ((i * 97 + t * 25) % w);
             const sy = ((i * 53 + t * 85) % (h * 0.75));
-            ctx.beginPath();
-            ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(sx, sy, 2.5, 0, Math.PI * 2); ctx.fill();
           }
         }
 
-        // Ground
         const groundY = h * 0.73;
         ctx.fillStyle = cMode.startsWith('xmas') ? '#e2e8f0' : '#0f172a';
         ctx.fillRect(0, groundY, w, h - groundY);
 
-        // Convenience Store
         const storeW = Math.min(210, w * 0.35);
         const storeH = Math.min(130, h * 0.21);
         const storeX = Math.max(16, w * 0.06);
         const storeY = groundY - storeH;
 
         ctx.fillStyle = '#1e293b';
-        ctx.beginPath();
-        ctx.roundRect(storeX, storeY, storeW, storeH, [8, 8, 0, 0]);
-        ctx.fill();
+        ctx.beginPath(); ctx.roundRect(storeX, storeY, storeW, storeH, [8, 8, 0, 0]); ctx.fill();
 
         const signColor = cMode.startsWith('cyber') ? '#06b6d4' : cMode.startsWith('xmas') ? '#ef4444' : '#a855f7';
-        ctx.fillStyle = '#090d16';
-        ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, 26);
-        ctx.fillStyle = signColor;
-        ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, 5);
-        ctx.fillStyle = '#f59e0b';
-        ctx.fillRect(storeX - 4, storeY + 15, storeW + 8, 5);
+        ctx.fillStyle = '#090d16'; ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, 26);
+        ctx.fillStyle = signColor; ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, 5);
+        ctx.fillStyle = '#f59e0b'; ctx.fillRect(storeX - 4, storeY + 15, storeW + 8, 5);
 
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '900 11px "Noto Sans KR", sans-serif';
-        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff'; ctx.font = '900 11px "Noto Sans KR", sans-serif'; ctx.textAlign = 'center';
         const signText = cMode.startsWith('cyber') ? 'SYSTEM HACKED 24' : cMode.startsWith('xmas') ? 'MERRY X-MAS 24' : '24H 편의점';
         ctx.fillText(signText, storeX + storeW * 0.5, storeY + 12);
 
         ctx.fillStyle = cMode.startsWith('cyber') ? '#164e63' : cMode.startsWith('xmas') ? '#fef08a' : '#059669';
         ctx.fillRect(storeX + 12, storeY + 26, storeW - 24, storeH - 32);
 
-        // Center-piece Entity per mode
         const heroX = storeX + storeW + 40;
         const enemyX = w * 0.68;
 
         if (cMode.startsWith('alien')) {
           drawHeroCharacter(ctx, heroX, groundY, cMode === 'alien_eve' && sec >= 66, true);
           drawSleekUFO(ctx, enemyX, groundY - 95 + Math.sin(t * 3) * 7, cMode === 'alien_raid_start' ? 1.8 : 1.1, Math.sin(t * 2) * 0.04, t);
-          if (cMode === 'alien_raid_win' && sec < 12) {
-            drawEnergyBeam(ctx, heroX + 24, groundY - 46, enemyX, groundY - 95, 22, '#10b981', '#fef08a');
-          }
+          if (cMode === 'alien_raid_win' && sec < 12) drawEnergyBeam(ctx, heroX + 24, groundY - 46, enemyX, groundY - 95, 22, '#10b981', '#fef08a');
         } else if (cMode.startsWith('cyber')) {
           drawHeroCharacter(ctx, heroX, groundY, cMode === 'cyber_eve' && sec >= 66, true);
           drawCyberCoreBoss(ctx, enemyX, groundY - 85 + Math.sin(t * 4) * 6, t);
-          if (cMode === 'cyber_raid_win' && sec < 12) {
-            drawEnergyBeam(ctx, heroX + 24, groundY - 46, enemyX, groundY - 85, 22, '#22d3ee', '#ffffff');
-          }
+          if (cMode === 'cyber_raid_win' && sec < 12) drawEnergyBeam(ctx, heroX + 24, groundY - 46, enemyX, groundY - 85, 22, '#22d3ee', '#ffffff');
         } else if (cMode.startsWith('xmas')) {
           drawHeroCharacter(ctx, heroX, groundY, false, false);
           drawSantaAndTree(ctx, enemyX, groundY, cMode === 'xmas_win', t);
         }
 
-        // Particles
         for (let i = cinemaState.particles.length - 1; i >= 0; i--) {
           const p = cinemaState.particles[i];
-          p.x += p.vx;
-          p.y += p.vy;
-          p.life -= 0.032;
+          p.x += p.vx; p.y += p.vy; p.life -= 0.032;
           if (p.life <= 0) { cinemaState.particles.splice(i, 1); continue; }
-          ctx.globalAlpha = p.life;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill();
         }
         ctx.globalAlpha = 1;
         ctx.restore();
       };
-
       renderFrame();
     }
 
     function drawSleekUFO(ctx, x, y, scale, tilt, t) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(tilt);
-      ctx.scale(scale, scale);
+      ctx.save(); ctx.translate(x, y); ctx.rotate(tilt); ctx.scale(scale, scale);
       const domeGrad = ctx.createLinearGradient(0, -34, 0, 0);
-      domeGrad.addColorStop(0, '#f0abfc');
-      domeGrad.addColorStop(1, '#7e22ce');
-      ctx.fillStyle = domeGrad;
-      ctx.beginPath();
-      ctx.ellipse(0, -8, 34, 24, 0, Math.PI, 0);
-      ctx.fill();
-      ctx.fillStyle = '#94a3b8';
-      ctx.beginPath();
-      ctx.ellipse(0, 2, 76, 17, 0, 0, Math.PI * 2);
-      ctx.fill();
+      domeGrad.addColorStop(0, '#f0abfc'); domeGrad.addColorStop(1, '#7e22ce');
+      ctx.fillStyle = domeGrad; ctx.beginPath(); ctx.ellipse(0, -8, 34, 24, 0, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = '#94a3b8'; ctx.beginPath(); ctx.ellipse(0, 2, 76, 17, 0, 0, Math.PI * 2); ctx.fill();
       for (let i = -3; i <= 3; i++) {
         ctx.fillStyle = Math.sin(t * 10 + i) > 0 ? '#38bdf8' : '#f472b6';
-        ctx.beginPath();
-        ctx.arc(i * 19, 3, 3.6, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(i * 19, 3, 3.6, 0, Math.PI * 2); ctx.fill();
       }
       ctx.restore();
     }
 
     function drawCyberCoreBoss(ctx, x, y, t) {
-      ctx.save();
-      ctx.translate(x, y);
-      // Rotating Hexagon Cyber Core
-      ctx.strokeStyle = '#22d3ee';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
+      ctx.save(); ctx.translate(x, y);
+      ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 4; ctx.beginPath();
       for (let i = 0; i < 6; i++) {
         const ang = t * 1.5 + (i * Math.PI) / 3;
-        const px = Math.cos(ang) * 58;
-        const py = Math.sin(ang) * 58;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
+        const px = Math.cos(ang) * 58, py = Math.sin(ang) * 58;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
       }
-      ctx.closePath();
-      ctx.stroke();
-
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.arc(0, 0, 38, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath();
-      ctx.arc(0, 0, 16 + Math.sin(t * 8) * 4, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.closePath(); ctx.stroke();
+      ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 38, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(0, 0, 16 + Math.sin(t * 8) * 4, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
     }
 
     function drawSantaAndTree(ctx, x, y, litTree, t) {
-      ctx.save();
-      ctx.translate(x, y);
-      // Giant Christmas Tree
-      ctx.fillStyle = '#78350f';
-      ctx.fillRect(-10, -25, 20, 25);
+      ctx.save(); ctx.translate(x, y);
+      ctx.fillStyle = '#78350f'; ctx.fillRect(-10, -25, 20, 25);
       ctx.fillStyle = litTree ? '#10b981' : '#065f46';
       for (let tier = 0; tier < 3; tier++) {
         ctx.beginPath();
-        ctx.moveTo(0, -145 + tier * 28);
-        ctx.lineTo(-55 + tier * 10, -85 + tier * 30);
-        ctx.lineTo(55 - tier * 10, -85 + tier * 30);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(0, -145 + tier * 28); ctx.lineTo(-55 + tier * 10, -85 + tier * 30); ctx.lineTo(55 - tier * 10, -85 + tier * 30);
+        ctx.closePath(); ctx.fill();
       }
-      // Star on top
       ctx.fillStyle = litTree ? '#fde047' : '#94a3b8';
-      ctx.beginPath();
-      ctx.arc(0, -152, 10 + (litTree ? Math.sin(t * 8) * 3 : 0), 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(0, -152, 10 + (litTree ? Math.sin(t * 8) * 3 : 0), 0, Math.PI * 2); ctx.fill();
       ctx.restore();
     }
 
     function drawHeroCharacter(ctx, x, y, knocked, firing) {
-      ctx.save();
-      ctx.translate(x, y);
+      ctx.save(); ctx.translate(x, y);
       if (knocked) { ctx.translate(0, -10); ctx.rotate(-Math.PI / 2); }
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(-10, -26, 8, 26);
-      ctx.fillRect(2, -26, 8, 26);
-      ctx.fillStyle = '#10b981';
-      ctx.beginPath();
-      ctx.roundRect(-13, -56, 26, 32, 6);
-      ctx.fill();
-      ctx.fillStyle = '#fde68a';
-      ctx.beginPath();
-      ctx.arc(0, -68, 12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#059669';
-      ctx.beginPath();
-      ctx.arc(0, -71, 12, Math.PI, 0);
-      ctx.fill();
-      ctx.fillRect(0, -73, 17, 4);
-      ctx.fillStyle = firing ? '#fde047' : '#f59e0b';
-      ctx.fillRect(10, -48, 16, 7);
+      ctx.fillStyle = '#1e293b'; ctx.fillRect(-10, -26, 8, 26); ctx.fillRect(2, -26, 8, 26);
+      ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.roundRect(-13, -56, 26, 32, 6); ctx.fill();
+      ctx.fillStyle = '#fde68a'; ctx.beginPath(); ctx.arc(0, -68, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#059669'; ctx.beginPath(); ctx.arc(0, -71, 12, Math.PI, 0); ctx.fill(); ctx.fillRect(0, -73, 17, 4);
+      ctx.fillStyle = firing ? '#fde047' : '#f59e0b'; ctx.fillRect(10, -48, 16, 7);
       ctx.restore();
     }
 
     function drawEnergyBeam(ctx, x1, y1, x2, y2, thickness, outerColor, coreColor) {
-      ctx.save();
-      ctx.lineCap = 'round';
-      ctx.strokeStyle = outerColor;
-      ctx.lineWidth = thickness * 2.1;
-      ctx.globalAlpha = 0.45;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.strokeStyle = coreColor;
-      ctx.lineWidth = thickness * 0.85;
-      ctx.globalAlpha = 0.95;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
+      ctx.save(); ctx.lineCap = 'round';
+      ctx.strokeStyle = outerColor; ctx.lineWidth = thickness * 2.1; ctx.globalAlpha = 0.45;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      ctx.strokeStyle = coreColor; ctx.lineWidth = thickness * 0.85; ctx.globalAlpha = 0.95;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
       ctx.restore();
     }
 
@@ -1636,9 +1350,7 @@
       if (ufoCinemaAnimId) { cancelAnimationFrame(ufoCinemaAnimId); ufoCinemaAnimId = null; }
     }
 
-    // ---------------------------------------------------------
-    // STORY SCRIPTS FOR ALL THEMES
-    // ---------------------------------------------------------
+    // STORY SCRIPTS
     const STORY_SCRIPTS = {
       alien_eve: [
         { startSec: 0, act: 'ACT 1 · 미확인 비행물체 추락', speaker: '📡 기상 관측소 경보', ground: '편의점 상공 밤하늘', text: '밤하늘을 가르는 거대한 보라빛 섬광! 초대형 UFO 원반이 편의점 앞 공터로 급강하합니다!', shake: 12, alarm: true },
@@ -1786,7 +1498,7 @@
       };
 
       updateCountdownClock();
-      ufoCountdownInterval = setInterval(updateCountdownClock, 250);
+      ufoCountdownInterval = setInterval(updateCountdownClock, 1000);
 
       setTimeout(() => {
         clearInterval(ufoCountdownInterval);
@@ -1804,1739 +1516,1452 @@
         destroyCinemaCanvas();
         overlay.classList.add('hidden');
         if (typeof onFinished === 'function') onFinished();
-      }, 380);
+      }, 400);
     }
 
-    // ---------------------------------------------------------
-    // THEME MANAGER (ALIEN / CYBER / CHRISTMAS)
-    // ---------------------------------------------------------
-    function listenThemeEveEvent() {
-      db.ref('globalEvent/activeTheme').on('value', snap => {
-        const data = snap.val();
-        if (isInitialThemeLoad) {
-          isInitialThemeLoad = false;
-          if (data) {
-            if (data.id) lastThemeEventId = data.id;
-            applyStoreTheme(data.mode || 'normal');
-          }
-          return;
-        }
-        if (!data || !data.mode || data.mode === 'normal') {
-          applyStoreTheme('normal');
-          initPOSCustomers();
-          return;
-        }
-
-        applyStoreTheme(data.mode);
-
-        if (data.id && data.id !== lastThemeEventId && data.playCutscene) {
-          lastThemeEventId = data.id;
-          playCutsceneSequence(`${data.mode}_eve`, () => {
-            initPOSCustomers();
-            showToast(`🎬 전야제 모드 적용 완료! 손님을 계산해 이벤트 재화를 모으세요!`, 'warning');
-          });
-        }
-      });
-    }
-
-    function applyStoreTheme(mode) {
-      activeThemeMode = mode;
+    // THEME & SEASON MANAGEMENT
+    function applyThemeVisuals(theme) {
+      activeThemeMode = theme || 'normal';
       const banner = document.getElementById('alienOccupationBanner');
-      const posCard = document.getElementById('posRegisterCard');
-      const snowBox = document.getElementById('christmasSnowContainer');
+      const snow = document.getElementById('christmasSnowContainer');
+      const tokenLabel = document.getElementById('statTokenLabel');
 
-      // Reset classes
-      posCard.className = 'bg-gradient-to-b border rounded-3xl p-3.5 shadow-xl relative overflow-hidden ';
-      snowBox.classList.add('hidden');
+      banner.classList.add('hidden');
+      snow.classList.add('hidden');
+      snow.innerHTML = '';
 
-      if (mode === 'alien') {
+      if (activeThemeMode === 'alien') {
         banner.classList.remove('hidden');
         banner.className = 'bg-gradient-to-r from-purple-950 via-fuchsia-950 to-purple-950 border border-purple-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md';
         document.getElementById('occupationBannerIcon').textContent = '👽';
-        document.getElementById('occupationBannerTitle').textContent = '대침공이 다가옵니다.. (🔋 코어 파밍중)';
-        document.getElementById('statTokenLabel').textContent = '🔋 코어';
-        posCard.className += 'from-purple-950/90 to-slate-950 border-purple-500/80';
-      } else if (mode === 'cyber') {
+        document.getElementById('occupationBannerTitle').textContent = currentBannerText || '대침공이 다가옵니다..';
+        tokenLabel.textContent = '🔋 코어';
+      } else if (activeThemeMode === 'cyber') {
         banner.classList.remove('hidden');
-        banner.className = 'bg-gradient-to-r from-cyan-950 via-slate-900 to-cyan-950 border border-cyan-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md';
+        banner.className = 'bg-gradient-to-r from-cyan-950 via-blue-950 to-cyan-950 border border-cyan-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md';
         document.getElementById('occupationBannerIcon').textContent = '💻';
-        document.getElementById('occupationBannerTitle').textContent = 'AI 바이러스 침투 경보! (💾 데이터 칩 파밍중)';
-        document.getElementById('statTokenLabel').textContent = '💾 칩';
-        posCard.className += 'from-cyan-950/90 to-slate-950 border-cyan-500/80';
-      } else if (mode === 'xmas') {
+        document.getElementById('occupationBannerTitle').textContent = currentBannerText || 'AI 메인프레임 결전이 다가옵니다..';
+        tokenLabel.textContent = '💾 칩';
+      } else if (activeThemeMode === 'xmas') {
         banner.classList.remove('hidden');
         banner.className = 'bg-gradient-to-r from-red-950 via-emerald-950 to-red-950 border border-amber-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md';
         document.getElementById('occupationBannerIcon').textContent = '🎅';
-        document.getElementById('occupationBannerTitle').textContent = '화이트 크리스마스 전야제! (🎁 선물 파밍중)';
-        document.getElementById('statTokenLabel').textContent = '🎁 선물';
-        posCard.className += 'from-red-950/80 to-emerald-950/80 border-amber-400/80';
-        renderSnowflakes();
-      } else {
-        banner.classList.add('hidden');
-        document.getElementById('statTokenLabel').textContent = '🔋 재화';
-        posCard.className += 'from-slate-900 to-slate-900/90 border-slate-700/80';
-      }
-      updateHeaderStats();
-    }
-
-    function renderSnowflakes() {
-      const box = document.getElementById('christmasSnowContainer');
-      box.classList.remove('hidden');
-      if (box.children.length === 0) {
-        for (let i = 0; i < 22; i++) {
-          const fl = document.createElement('div');
-          fl.className = 'snow-flake text-sm';
-          fl.textContent = i % 2 === 0 ? '❄️' : '❅';
-          fl.style.left = `${Math.random() * 96}vw`;
-          fl.style.animationDelay = `${Math.random() * 5}s`;
-          box.appendChild(fl);
+        document.getElementById('occupationBannerTitle').textContent = currentBannerText || '크리스마스 대축제가 다가옵니다!';
+        tokenLabel.textContent = '🎁 선물';
+        snow.classList.remove('hidden');
+        for (let i = 0; i < 28; i++) {
+          const flake = document.createElement('div');
+          flake.className = 'snow-flake';
+          flake.textContent = i % 2 === 0 ? '❄️' : '❅';
+          flake.style.left = `${Math.random() * 100}vw`;
+          flake.style.fontSize = `${10 + Math.random() * 12}px`;
+          flake.style.animationDuration = `${4 + Math.random() * 4}s`;
+          flake.style.animationDelay = `${Math.random() * 5}s`;
+          snow.appendChild(flake);
         }
+      } else {
+        tokenLabel.textContent = '🔋 코어';
       }
+      refillWaitingQueue();
+      spawnNextCustomer();
+      updateAllUI();
     }
 
-    function updateLiveInvasionDdayBanner() {
-      const el = document.getElementById('liveInvasionDdayText');
-      if (!el || activeThemeMode === 'normal') return;
+    function updateThemeDdayText() {
+      if (activeThemeMode === 'normal') return;
       const target = THEME_TARGETS[activeThemeMode] || THEME_TARGETS.alien;
       const diff = Math.max(0, target - Date.now());
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
-      const mins = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
-      const secs = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-      el.textContent = days > 0 ? `D-${days} ${hours}:${mins}:${secs}` : `${hours}:${mins}:${secs}`;
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+      const m = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+      const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+      document.getElementById('liveInvasionDdayText').textContent = diff === 0 ? 'D-DAY 진행중!' : `D-${d} ${h}:${m}:${s}`;
     }
 
-    // ---------------------------------------------------------
-    // BOSS RAID SYSTEM (THEME A: ALIEN / THEME B: CYBER + FIREWALL)
-    // ---------------------------------------------------------
-    function listenMothershipRaid() {
-      db.ref('globalEvent/mothershipRaid').on('value', snap => {
-        const data = snap.val();
-        if (isInitialRaidLoad) {
-          isInitialRaidLoad = false;
-          if (data) {
-            if (data.id) lastRaidId = data.id;
-            if (data.winId) lastRaidWinId = data.winId;
-            if (data.active && Date.now() < Number(data.endsAt || 0) && Number(data.hp || 0) > 0) {
-              activeRaidState = data;
-              setupRaidHudForTheme(data.theme || 'alien');
-              document.getElementById('mothershipRaidHud').classList.remove('hidden');
-              updateRaidHudUI();
-            }
+    // AUTH & DATA RECOVERY
+    function scanForRecoverableData() {
+      const savedNick = localStorage.getItem('conv_tycoon_nick');
+      const savedBackup = localStorage.getItem('conv_tycoon_backup');
+      if (savedNick || savedBackup) {
+        try {
+          const parsed = savedBackup ? JSON.parse(savedBackup) : null;
+          detectedRecoveryData = { nickname: savedNick || parsed?.nickname, state: parsed };
+          if (detectedRecoveryData.nickname) {
+            document.getElementById('recoveryBanner').classList.remove('hidden');
+            const moneyStr = parsed?.money ? `${Number(parsed.money).toLocaleString()}원` : '클라우드 기록';
+            document.getElementById('recoverySummaryText').textContent = `사장님 [${detectedRecoveryData.nickname}] · 보유 자금 ${moneyStr}`;
           }
-          return;
-        }
-
-        if (!data) {
-          activeRaidState = null;
-          document.getElementById('mothershipRaidHud').classList.add('hidden');
-          return;
-        }
-
-        const rTheme = data.theme || 'alien';
-
-        // Victory Cutscene
-        if (data.winId && data.winId !== lastRaidWinId) {
-          lastRaidWinId = data.winId;
-          activeRaidState = null;
-          document.getElementById('mothershipRaidHud').classList.add('hidden');
-          playCutsceneSequence(`${rTheme}_raid_win`, () => {
-            const rewardMoney = 150000 * gameState.branchCount;
-            const winMedal = rTheme === 'cyber' ? '💻화이트해커' : '🛸지구방위대';
-            gameState.money += rewardMoney;
-            if (!gameState.medals.includes(winMedal)) gameState.medals.push(winMedal);
-            applyStoreTheme('normal');
-            initPOSCustomers();
-            renderAll();
-            syncCloudSave(true);
-            playGiftFanfare();
-            showToast(`🏆 레이드 승리! +${formatKRW(rewardMoney)} & [${winMedal}] 칭호 획득!`, 'success');
-          });
-          return;
-        }
-
-        // Start Cutscene
-        if (data.id && data.id !== lastRaidId && data.active) {
-          lastRaidId = data.id;
-          activeRaidState = data;
-          setupRaidHudForTheme(rTheme);
-          playCutsceneSequence(`${rTheme}_raid_start`, () => {
-            document.getElementById('mothershipRaidHud').classList.remove('hidden');
-            updateRaidHudUI();
-            showToast('⚔️ 메인 보스전 시작! 총공세를 퍼부으세요!', 'warning');
-          });
-          return;
-        }
-
-        if (data.active && Number(data.hp || 0) > 0 && Date.now() < Number(data.endsAt || 0)) {
-          activeRaidState = data;
-          setupRaidHudForTheme(rTheme);
-          document.getElementById('mothershipRaidHud').classList.remove('hidden');
-          updateRaidHudUI();
-        } else {
-          activeRaidState = null;
-          document.getElementById('mothershipRaidHud').classList.add('hidden');
-        }
-      });
-    }
-
-    function setupRaidHudForTheme(rTheme) {
-      const hud = document.getElementById('mothershipRaidHud');
-      if (rTheme === 'cyber') {
-        hud.className = 'bg-gradient-to-r from-cyan-950 via-slate-900 to-blue-950 border-2 border-cyan-400 rounded-2xl p-2.5 space-y-2 shadow-[0_0_25px_rgba(34,211,238,0.45)]';
-        document.getElementById('raidBossIcon').textContent = '🤖';
-        document.getElementById('raidBossTitle').textContent = 'AI 메인프레임 바이러스 보스전!';
-        document.getElementById('bossHpName').textContent = 'AI 바이러스 코어 무결성';
-        document.getElementById('laserBtnLabel').textContent = '백신 스캔 사격';
-        document.getElementById('coreBtnLabel').textContent = '💾 데이터 칩 포격';
-      } else {
-        hud.className = 'bg-gradient-to-r from-rose-950 via-purple-950 to-rose-950 border-2 border-rose-400 rounded-2xl p-2.5 space-y-2 shadow-[0_0_25px_rgba(244,63,94,0.45)]';
-        document.getElementById('raidBossIcon').textContent = '🛸';
-        document.getElementById('raidBossTitle').textContent = '외계인 모선 총공세 레이드!';
-        document.getElementById('bossHpName').textContent = '모선 에너지 코어 HP';
-        document.getElementById('laserBtnLabel').textContent = '레이저 사격';
-        document.getElementById('coreBtnLabel').textContent = '🔋 코어 포격';
-      }
-    }
-
-    function triggerCyberFirewallPuzzle() {
-      cyberFirewallCode = String(Math.floor(1000 + Math.random() * 9000));
-      cyberFirewallLocked = true;
-      document.getElementById('cyberCodeDisplay').textContent = cyberFirewallCode;
-      document.getElementById('cyberCodeInput').value = '';
-      document.getElementById('cyberFirewallBox').classList.remove('hidden');
-      playUfoAlarm();
-    }
-
-    function submitCyberFirewallCode() {
-      const val = document.getElementById('cyberCodeInput').value.trim();
-      if (val === cyberFirewallCode) {
-        cyberFirewallLocked = false;
-        document.getElementById('cyberFirewallBox').classList.add('hidden');
-        playRegisterComplete();
-        const bonusDmg = getCoreMissileDamage() * 2;
-        applyDamageToMothership(bonusDmg);
-        showToast(`🔓 방화벽 해독 성공! 보너스 치명타 -${bonusDmg.toLocaleString()} DMG!`, 'success');
-      } else {
-        playTone(170, 'sawtooth', 0.2, 0.09);
-        showToast('❌ 보안 암호가 일치하지 않습니다!', 'error');
-      }
-    }
-
-    function getLaserDamage() { return (150 + (gameState.coreWeapons?.hyperLaser || 0) * 100) * gameState.branchCount; }
-    function getCoreMissileDamage() { return (1200 + (gameState.coreWeapons?.hyperLaser || 0) * 500) * gameState.branchCount; }
-    function getAutoTurretDamagePerSec() { return (gameState.coreWeapons?.autoTurret || 0) * 250 * gameState.branchCount; }
-
-    function updateRaidHudUI() {
-      if (!activeRaidState) return;
-      const hp = Math.max(0, Number(activeRaidState.hp || 0));
-      const maxHp = Math.max(1, Number(activeRaidState.maxHp || 100000));
-      document.getElementById('bossHpLabel').textContent = `${hp.toLocaleString()} / ${maxHp.toLocaleString()}`;
-      document.getElementById('bossHpFill').style.width = `${Math.min(100, (hp / maxHp) * 100)}%`;
-      document.getElementById('laserDmgText').textContent = getLaserDamage().toLocaleString();
-      document.getElementById('coreDmgText').textContent = getCoreMissileDamage().toLocaleString();
-    }
-
-    async function attackMothership(type, event) {
-      if (!activeRaidState || !activeRaidState.active) return;
-
-      // In Cyber Raid, randomly trigger firewall lock every ~12 shots
-      if (activeRaidState.theme === 'cyber' && !cyberFirewallLocked && Math.random() < 0.09) {
-        triggerCyberFirewallPuzzle();
-        return;
-      }
-      if (cyberFirewallLocked) {
-        showToast('🔐 먼저 AI 방화벽 4자리 암호를 입력해 해독하세요!', 'warning');
-        return;
-      }
-
-      let dmg = 0;
-      if (type === 'laser') {
-        dmg = getLaserDamage();
-        playBarcodeBeep();
-      } else if (type === 'core') {
-        if ((gameState.energyCores || 0) < 1) {
-          showToast('이벤트 재화(🔋/💾)가 부족합니다! 전야제 매장에서 손님을 계산해 모으세요.', 'error');
-          return;
-        }
-        gameState.energyCores -= 1;
-        dmg = getCoreMissileDamage();
-        playTone(420, 'sawtooth', 0.14, 0.09);
-        updateHeaderStats();
-      }
-
-      if (event && event.clientX) {
-        spawnFloatingText(event.clientX, event.clientY, `💥 -${dmg.toLocaleString()} DMG!`, type === 'core' ? '#fbbf24' : '#34d399');
-      }
-      await applyDamageToMothership(dmg);
-    }
-
-    async function applyDamageToMothership(dmg) {
-      if (!activeRaidState || !activeRaidState.active || dmg <= 0) return;
-      await db.ref('globalEvent/mothershipRaid').transaction(curr => {
-        if (!curr || !curr.active) return curr;
-        curr.hp = Math.max(0, Number(curr.hp || 0) - dmg);
-        if (curr.hp === 0) {
-          curr.active = false;
-          curr.winId = 'win_' + Date.now();
-        }
-        return curr;
-      });
-    }
-
-    // ---------------------------------------------------------
-    // CHRISTMAS TREE CO-OP FESTIVAL (12/25 MAIN EVENT)
-    // ---------------------------------------------------------
-    function listenXmasTreeFestival() {
-      db.ref('globalEvent/xmasTree').on('value', snap => {
-        const data = snap.val();
-        const hud = document.getElementById('xmasTreeHud');
-        if (isInitialXmasLoad) {
-          isInitialXmasLoad = false;
-          if (data) {
-            if (data.winId) lastXmasTreeWinId = data.winId;
-            if (data.active) { activeXmasTreeState = data; hud.classList.remove('hidden'); updateXmasTreeUI(); }
-          }
-          return;
-        }
-        if (!data) {
-          activeXmasTreeState = null;
-          hud.classList.add('hidden');
-          return;
-        }
-
-        if (data.winId && data.winId !== lastXmasTreeWinId) {
-          lastXmasTreeWinId = data.winId;
-          activeXmasTreeState = null;
-          hud.classList.add('hidden');
-          playCutsceneSequence('xmas_win', () => {
-            const rewardMoney = 300000 * gameState.branchCount;
-            gameState.money += rewardMoney;
-            if (!gameState.medals.includes('🎅산타점장')) gameState.medals.push('🎅산타점장');
-            applyStoreTheme('normal');
-            initPOSCustomers();
-            renderAll();
-            syncCloudSave(true);
-            playGiftFanfare();
-            showToast(`🎄 트리 100% 점등 성공! 크리스마스 보너스 +${formatKRW(rewardMoney)} & [🎅산타점장] 칭호!`, 'success');
-          });
-          return;
-        }
-
-        if (data.active) {
-          activeXmasTreeState = data;
-          hud.classList.remove('hidden');
-          updateXmasTreeUI();
-        } else {
-          activeXmasTreeState = null;
-          hud.classList.add('hidden');
-        }
-      });
-    }
-
-    function updateXmasTreeUI() {
-      if (!activeXmasTreeState) return;
-      const pts = Number(activeXmasTreeState.points || 0);
-      const goal = Math.max(1, Number(activeXmasTreeState.goal || 500));
-      const pct = Math.min(100, (pts / goal) * 100);
-      const stage = Math.min(5, Math.floor(pct / 20) + 1);
-      document.getElementById('xmasTreeStageBadge').textContent = `${stage}단계 / 5단계`;
-      document.getElementById('xmasTreeProgressLabel').textContent = `${pts.toLocaleString()} / ${goal.toLocaleString()} 점등 포인트`;
-      document.getElementById('xmasTreeProgressFill').style.width = `${pct}%`;
-    }
-
-    async function donateToXmasTree(type, event) {
-      if (!activeXmasTreeState || !activeXmasTreeState.active) return;
-      let addPts = 0;
-      if (type === 'gift') {
-        if ((gameState.energyCores || 0) < 1) {
-          showToast('🎁 선물 상자가 부족합니다! 손님을 계산해 모으세요.', 'error');
-          return;
-        }
-        gameState.energyCores -= 1;
-        addPts = 10;
-      } else {
-        if (gameState.money < 10000) {
-          showToast('황금 전구 기부 자금(10,000원)이 부족합니다!', 'error');
-          return;
-        }
-        gameState.money -= 10000;
-        addPts = 5;
-      }
-      playRegisterComplete();
-      updateHeaderStats();
-      if (event && event.clientX) spawnFloatingText(event.clientX, event.clientY, `🎄 트리 점등 +${addPts}점!`, '#fde047');
-
-      await db.ref('globalEvent/xmasTree').transaction(curr => {
-        if (!curr || !curr.active) return curr;
-        curr.points = Number(curr.points || 0) + addPts;
-        if (curr.points >= Number(curr.goal || 500)) {
-          curr.active = false;
-          curr.winId = 'xmaswin_' + Date.now();
-        }
-        return curr;
-      });
-    }
-
-    // ---------------------------------------------------------
-    // SEASON CONFIG & HALL OF FAME
-    // ---------------------------------------------------------
-    function listenSeasonConfig() {
-      db.ref('globalEvent/seasonConfig').on('value', snap => {
-        const cfg = snap.val();
-        if (!cfg) return;
-        currentSeasonNumber = Number(cfg.seasonNum || 1);
-        currentBannerText = cfg.bannerText || '대침공이 다가옵니다..';
-        auto30MinRaidEnabled = Boolean(cfg.auto30MinRaid);
-
-        document.getElementById('headerSeasonBadge').textContent = `S${currentSeasonNumber}`;
-        const tag = document.getElementById('adminCurrentSeasonTag');
-        if (tag) tag.textContent = `시즌 ${currentSeasonNumber}`;
-        const autoBadge = document.getElementById('auto30mStatusBadge');
-        if (autoBadge) {
-          autoBadge.textContent = `30분 자동: ${auto30MinRaidEnabled ? 'ON' : 'OFF'}`;
-          autoBadge.className = auto30MinRaidEnabled
-            ? 'px-1.5 py-0.5 rounded bg-emerald-500/30 text-[10px] font-black text-emerald-300'
-            : 'px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-bold text-slate-400';
-        }
-
-        if (isInitialSeasonLoad) {
-          isInitialSeasonLoad = false;
-          if (cfg.resetId) lastSeasonResetId = cfg.resetId;
-          return;
-        }
-
-        if (cfg.resetId && cfg.resetId !== lastSeasonResetId) {
-          lastSeasonResetId = cfg.resetId;
-          const prevMedal = `🏅S${Math.max(1, currentSeasonNumber - 1)}`;
-          if (!gameState.medals.includes(prevMedal)) gameState.medals.push(prevMedal);
-          gameState.branchCount = 1;
-          gameState.money = 30000;
-          gameState.day = 1;
-          gameState.combo = 0;
-          gameState.upgrades = { partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 };
-          applyStoreTheme('normal');
-          initPOSCustomers();
-          renderAll();
-          syncCloudSave(true);
-          playGiftFanfare();
-          showToast(`🎊 시즌 ${currentSeasonNumber} 개막! 이전 시즌 훈장(${prevMedal}) 및 시작 지원금이 지급되었습니다!`, 'warning');
-        }
-      });
-    }
-
-    function listenHallOfFame() {
-      db.ref('hallOfFame').limitToLast(5).on('value', snap => {
-        const data = snap.val();
-        const box = document.getElementById('hallOfFameBox');
-        const list = document.getElementById('hallOfFameList');
-        if (!data) { box.classList.add('hidden'); return; }
-        box.classList.remove('hidden');
-        list.innerHTML = Object.values(data).reverse().map(entry => `
-          <div class="p-2 rounded-xl bg-slate-900/90 border border-amber-500/30 flex items-center justify-between">
-            <span class="font-black text-amber-300">시즌 ${entry.season} 챔피언 · ${entry.champion}</span>
-            <span class="text-[11px] text-slate-300">${entry.branchCount}호점 (${formatKRW(entry.money)})</span>
-          </div>
-        `).join('');
-      });
-    }
-
-    // ---------------------------------------------------------
-    // Legacy Data & Account Auto-Recovery Scanner
-    // ---------------------------------------------------------
-    async function scanForRecoverableData() {
-      let bestMoney = 0, bestNickname = '', bestDay = 1, bestBranch = 1, bestSatisfaction = 85, bestUpgrades = null;
-      try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          const raw = localStorage.getItem(key);
-          if (!raw) continue;
-          if (key.toLowerCase().includes('nick') || key === 'cvs_user') {
-            if (raw.length >= 2 && raw.length <= 12 && !raw.startsWith('{')) bestNickname = raw.trim();
-          }
-          if (raw.startsWith('{')) {
-            try {
-              const parsed = JSON.parse(raw);
-              const candidateMoney = Number(parsed.money ?? parsed.cash ?? parsed.state?.money ?? 0);
-              const candidateNick = parsed.nickname || parsed.userName || parsed.state?.nickname || '';
-              if (candidateMoney > bestMoney) {
-                bestMoney = candidateMoney;
-                bestDay = Number(parsed.day ?? parsed.state?.day ?? 1);
-                bestBranch = Number(parsed.branchCount ?? parsed.state?.branchCount ?? 1);
-                bestSatisfaction = Number(parsed.satisfaction ?? parsed.reputation ?? parsed.state?.satisfaction ?? 85);
-                if (parsed.upgrades || parsed.state?.upgrades) bestUpgrades = parsed.upgrades || parsed.state?.upgrades;
-              }
-              if (candidateNick && !bestNickname) bestNickname = candidateNick;
-            } catch (e) {}
-          }
-        }
-      } catch (e) {}
-
-      if (bestMoney > 15000 || bestNickname) {
-        detectedRecoveryData = { nickname: bestNickname, money: Math.max(15000, bestMoney), day: bestDay, branchCount: bestBranch, satisfaction: bestSatisfaction, upgrades: bestUpgrades };
-        const banner = document.getElementById('recoveryBanner');
-        document.getElementById('recoverySummaryText').textContent = `${bestNickname ? `[${bestNickname}] ` : ''}${bestBranch}호점 · 보유 자금 ${formatKRW(detectedRecoveryData.money)} (DAY ${bestDay}) 기록을 찾았습니다!`;
-        banner.classList.remove('hidden');
-        if (bestNickname && !document.getElementById('loginNickname').value) document.getElementById('loginNickname').value = bestNickname;
+        } catch (e) {}
       }
     }
 
     function applyDetectedRecovery() {
-      if (!detectedRecoveryData) return;
-      if (detectedRecoveryData.nickname) document.getElementById('loginNickname').value = detectedRecoveryData.nickname;
-      gameState.money = Math.max(gameState.money, detectedRecoveryData.money);
-      gameState.day = Math.max(gameState.day, detectedRecoveryData.day || 1);
-      gameState.branchCount = Math.max(gameState.branchCount, detectedRecoveryData.branchCount || 1);
-      gameState.satisfaction = detectedRecoveryData.satisfaction || 85;
-      if (detectedRecoveryData.upgrades) gameState.upgrades = { ...gameState.upgrades, ...detectedRecoveryData.upgrades };
-      showToast(`✅ 복구 데이터(${formatKRW(gameState.money)}) 준비 완료! 4자리 PIN 입력 후 매장 오픈을 누르세요.`, 'success');
-      document.getElementById('loginPin').focus();
+      if (!detectedRecoveryData?.nickname) return;
+      document.getElementById('loginNickname').value = detectedRecoveryData.nickname;
+      showToast('✨ 닉네임이 입력되었습니다! 기존 PIN 4자리를 입력해 접속하세요.');
     }
 
-    // ---------------------------------------------------------
-    // Account Login & Cloud Sync
-    // ---------------------------------------------------------
-    async function handleAccountLogin() {
-      const nick = document.getElementById('loginNickname').value.trim();
-      const pin = document.getElementById('loginPin').value.trim();
-      const errEl = document.getElementById('loginError');
+    function sanitizeKey(str) {
+      return str.replace(/[.#$\[\]\/]/g, '_').trim();
+    }
+
+    function handleAccountLogin() {
+      const nickInput = document.getElementById('loginNickname').value.trim();
+      const pinInput = document.getElementById('loginPin').value.trim();
+      const errBox = document.getElementById('loginError');
+
+      if (nickInput.length < 2 || nickInput.length > 10) {
+        errBox.textContent = '닉네임은 2~10자로 입력해주세요.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+      if (!/^\d{4}$/.test(pinInput)) {
+        errBox.textContent = '보안 PIN은 숫자 4자리여야 합니다.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      errBox.classList.add('hidden');
       const btn = document.getElementById('loginSubmitBtn');
-
-      errEl.classList.add('hidden');
-
-      if (nick.length < 2 || nick.length > 10 || /[.#$\[\]\/]/.test(nick)) {
-        errEl.textContent = '닉네임은 특수문자(. # $ [ ] /) 제외 2~10자로 입력해주세요.';
-        errEl.classList.remove('hidden');
-        return;
-      }
-      if (!/^\d{4}$/.test(pin)) {
-        errEl.textContent = '보안 PIN은 숫자 4자리를 입력해주세요.';
-        errEl.classList.remove('hidden');
-        return;
-      }
-
       btn.disabled = true;
-      btn.textContent = '계정 동기화 중...';
+      btn.textContent = '서버 연결 중...';
 
-      try {
-        const userRef = db.ref(`users/${nick}`);
-        const snap = await userRef.once('value');
+      const userKey = sanitizeKey(nickInput);
+      const userRef = db.ref(`users/${userKey}`);
 
-        if (snap.exists()) {
-          const data = snap.val();
-          if (data.banned) {
-            showBanScreen(data.banReason);
-            btn.disabled = false;
-            btn.textContent = '매장 오픈 & 데이터 연결 🚀';
-            return;
-          }
-          if (data.pin && String(data.pin) !== pin) {
-            errEl.textContent = '❌ 4자리 PIN 번호가 일치하지 않습니다!';
-            errEl.classList.remove('hidden');
-            btn.disabled = false;
-            btn.textContent = '매장 오픈 & 데이터 연결 🚀';
-            return;
-          }
-
-          const serverMoney = Number(data.money ?? data.state?.money ?? 0);
-          const mergedMoney = Math.max(serverMoney, gameState.money);
-
-          if (data.state) {
-            gameState = {
-              ...gameState,
-              ...data.state,
-              money: mergedMoney,
-              energyCores: Number(data.state.energyCores || 0),
-              medals: Array.isArray(data.state.medals) ? data.state.medals : [],
-              branchCount: Math.max(1, Number(data.state.branchCount || data.branchCount || 1)),
-              usedCoupons: data.state.usedCoupons || {},
-              coreWeapons: { ...gameState.coreWeapons, ...(data.state.coreWeapons || {}) },
-              upgrades: { ...gameState.upgrades, ...(data.state.upgrades || {}) }
-            };
-          } else {
-            gameState.money = mergedMoney;
-          }
-
-          await userRef.update({ nickname: nick, pin, money: gameState.money, branchCount: gameState.branchCount, updatedAt: Date.now() });
-          showToast(`환영합니다, ${nick} 사장님! 매장 데이터를 연결했습니다.`, 'success');
-        } else {
-          await userRef.set({
-            nickname: nick,
-            pin,
-            money: gameState.money,
-            branchCount: gameState.branchCount,
-            banned: false,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            state: gameState
-          });
-          showToast(`신규 매장 오픈 완료! 오늘도 대박 매출을 올려보세요 🎉`, 'success');
-        }
-
-        currentUser = { nickname: nick, pin };
-        localStorage.setItem('cvs_last_nickname', nick);
-        document.getElementById('headerNickname').textContent = nick;
-        document.getElementById('loginModal').classList.add('hidden');
-
-        attachRealtimeUserListeners(nick);
-        listenSeasonConfig();
-        listenHallOfFame();
-        listenGlobalNotices();
-        listenLivePoll();
-        listenServerFever();
-        listenServerSurprise();
-        listenThemeEveEvent();
-        listenMothershipRaid();
-        listenXmasTreeFestival();
-        listenShoutbox();
-
-        initPOSCustomers();
-        renderAll();
-        startGameLoops();
-      } catch (e) {
-        console.error(e);
-        errEl.textContent = '서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.';
-        errEl.classList.remove('hidden');
-        btn.disabled = false;
-        btn.textContent = '매장 오픈 & 데이터 연결 🚀';
-      }
-    }
-
-    function showBanScreen(reason) {
-      document.getElementById('banReasonDisplay').textContent =
-        reason && reason.trim() ? `차단 사유: ${reason.trim()}` : '운영 정책 위반으로 인해 관리자에 의해 접근이 제한되었습니다.';
-      document.getElementById('banLockModal').classList.remove('hidden');
-    }
-
-    function attachRealtimeUserListeners(nickname) {
-      db.ref(`users/${nickname}/money`).on('value', snap => {
-        const val = snap.val();
-        if (typeof val === 'number' && !isRemoteMoneySyncing) {
-          const diff = val - gameState.money;
-          if (Math.abs(diff) >= 1) {
-            gameState.money = val;
-            updateHeaderStats();
-            if (diff > 0) {
-              playGiftFanfare();
-              showToast(`🎉 지원금 +${formatKRW(diff)}이 지급되었습니다!`, 'warning');
-            }
-          }
-        }
-      });
-      db.ref(`users/${nickname}`).on('value', snap => {
+      userRef.once('value', snap => {
         const data = snap.val();
-        if (data && data.banned) showBanScreen(data.banReason);
-        else document.getElementById('banLockModal').classList.add('hidden');
+        if (data) {
+          if (String(data.pin) !== pinInput) {
+            errBox.textContent = '이미 등록된 닉네임이며, PIN 번호가 일치하지 않습니다.';
+            errBox.classList.remove('hidden');
+            btn.disabled = false;
+            btn.textContent = '매장 오픈 & 데이터 연결 🚀';
+            return;
+          }
+          if (data.banned) {
+            document.getElementById('banReasonDisplay').textContent = data.banReason || '운영 정책 위반으로 접근이 제한되었습니다.';
+            document.getElementById('banLockModal').classList.remove('hidden');
+            return;
+          }
+          currentUser = { key: userKey, nickname: nickInput, pin: pinInput };
+          Object.assign(gameState, {
+            money: Number(data.money ?? 15000),
+            day: Number(data.day ?? 1),
+            branchCount: Number(data.branchCount ?? 1),
+            satisfaction: Number(data.satisfaction ?? 85),
+            cleanliness: Number(data.cleanliness ?? 100),
+            combo: Number(data.combo ?? 0),
+            totalServed: Number(data.totalServed ?? 0),
+            energyCores: Number(data.energyCores ?? 0),
+            medals: Array.isArray(data.medals) ? data.medals : [],
+            usedCoupons: data.usedCoupons || {},
+            coreWeapons: Object.assign({ hyperLaser: 0, autoTurret: 0 }, data.coreWeapons || {}),
+            upgrades: Object.assign({ partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 }, data.upgrades || {})
+          });
+          finishLoginSetup();
+        } else {
+          currentUser = { key: userKey, nickname: nickInput, pin: pinInput };
+          const initPayload = { nickname: nickInput, pin: pinInput, ...gameState, updatedAt: Date.now() };
+          userRef.set(initPayload).then(() => finishLoginSetup());
+        }
       });
     }
 
-    async function syncCloudSave(silent = true) {
-      if (!currentUser) return;
-      try {
-        isRemoteMoneySyncing = true;
-        const nick = currentUser.nickname;
-        const cleanMoney = Math.floor(gameState.money);
-        await db.ref(`users/${nick}`).update({
-          money: cleanMoney,
-          branchCount: gameState.branchCount,
-          updatedAt: Date.now(),
-          state: { ...gameState, money: cleanMoney }
-        });
-        await db.ref(`leaderboard/${nick}`).set({
-          nickname: nick,
-          money: cleanMoney,
-          branchCount: gameState.branchCount,
-          day: gameState.day,
-          satisfaction: gameState.satisfaction,
-          updatedAt: Date.now()
-        });
-        localStorage.setItem('cvs_backup_save', JSON.stringify({ nickname: nick, ...gameState, money: cleanMoney }));
-        if (!silent) showToast('☁️ 클라우드 서버에 저장되었습니다!', 'success');
-      } catch (e) {
-        if (!silent) showToast('저장 중 오류가 발생했습니다.', 'error');
-      } finally {
-        setTimeout(() => { isRemoteMoneySyncing = false; }, 350);
-      }
+    function finishLoginSetup() {
+      localStorage.setItem('conv_tycoon_nick', currentUser.nickname);
+      localStorage.setItem('conv_tycoon_backup', JSON.stringify({ nickname: currentUser.nickname, ...gameState }));
+      document.getElementById('loginModal').classList.add('hidden');
+      document.getElementById('headerNickname').textContent = currentUser.nickname;
+
+      setupRealtimeListeners();
+      refillWaitingQueue();
+      spawnNextCustomer();
+      renderUpgradeList();
+      renderCoreWeapons();
+      updateAllUI();
+      showToast(`🎉 [${currentUser.nickname}] 사장님, 매장 오픈을 환영합니다!`);
+      setInterval(gameLoopTick, 250);
+      setInterval(saveToCloud, 15000);
     }
 
-    function manualCloudSave() { playTone(720, 'sine', 0.09, 0.06); syncCloudSave(false); }
-
-    // ---------------------------------------------------------
-    // Coupon Redeem System
-    // ---------------------------------------------------------
-    function openCouponModal() { document.getElementById('couponModal').classList.remove('hidden'); document.getElementById('couponCodeInput').focus(); }
-    function closeCouponModal() { document.getElementById('couponModal').classList.add('hidden'); }
-
-    async function redeemCouponCode() {
-      if (!currentUser) return;
-      const normCode = document.getElementById('couponCodeInput').value.trim().toLowerCase();
-      if (!normCode) { showToast('쿠폰 코드를 입력해주세요!', 'warning'); return; }
-      if (gameState.usedCoupons && gameState.usedCoupons[normCode]) { showToast('이미 사용한 쿠폰 코드입니다!', 'error'); return; }
-      if (normCode === LAUNCH_COUPON_CODE) {
-        gameState.usedCoupons[normCode] = Date.now();
-        gameState.money += LAUNCH_COUPON_REWARD;
-        gameState.satisfaction = 100;
-        playGiftFanfare();
-        closeCouponModal();
-        document.getElementById('couponCodeInput').value = '';
-        renderAll();
-        await syncCloudSave(true);
-        showToast(`🎉 출시 기념 쿠폰 적용! +${formatKRW(LAUNCH_COUPON_REWARD)} & 만족도 100% 달성!`, 'success');
-        return;
-      }
-      try {
-        const snap = await db.ref(`coupons/${normCode}`).once('value');
-        if (!snap.exists()) { showToast('❌ 존재하지 않거나 만료된 쿠폰 코드입니다.', 'error'); return; }
-        const reward = Number(snap.val().reward || 0);
-        gameState.usedCoupons[normCode] = Date.now();
-        gameState.money += reward;
-        playGiftFanfare();
-        closeCouponModal();
-        document.getElementById('couponCodeInput').value = '';
-        renderAll();
-        await syncCloudSave(true);
-        showToast(`🎁 쿠폰 보상 +${formatKRW(reward)}이 지급되었습니다!`, 'success');
-      } catch (e) {
-        showToast('쿠폰 확인 중 오류가 발생했습니다.', 'error');
-      }
+    function saveToCloud() {
+      if (!currentUser || isRemoteMoneySyncing) return;
+      localStorage.setItem('conv_tycoon_backup', JSON.stringify({ nickname: currentUser.nickname, ...gameState }));
+      db.ref(`users/${currentUser.key}`).update({
+        money: Math.floor(gameState.money),
+        day: gameState.day,
+        branchCount: gameState.branchCount,
+        satisfaction: gameState.satisfaction,
+        cleanliness: gameState.cleanliness,
+        combo: gameState.combo,
+        totalServed: gameState.totalServed,
+        energyCores: gameState.energyCores,
+        medals: gameState.medals,
+        usedCoupons: gameState.usedCoupons,
+        coreWeapons: gameState.coreWeapons,
+        upgrades: gameState.upgrades,
+        updatedAt: Date.now()
+      });
     }
 
-    // ---------------------------------------------------------
-    // Franchise Expansion & Core Weapons
-    // ---------------------------------------------------------
-    function getNextBranchRequirement() { return 500000 * Math.pow(3, gameState.branchCount - 1); }
-    function getBranchMultiplier() { return 1 + (gameState.branchCount - 1) * 0.5; }
-    function getActiveFeverMultiplier() { return Date.now() < serverFeverUntil ? serverFeverMultiplier : 1.0; }
-    function getTotalRevenueMultiplier() {
-      return getBranchMultiplier() * getComboMultiplier() * (1 + (gameState.upgrades.posScanner || 0) * 0.15) * getActiveFeverMultiplier();
+    function manualCloudSave() {
+      saveToCloud();
+      playCoinTap();
+      showToast('☁️ 매장 데이터가 서버에 안전하게 저장되었습니다!');
     }
 
-    async function expandNewBranch() {
-      const req = getNextBranchRequirement();
-      if (gameState.money < req) { showToast(`점포 확장 자금이 부족합니다! (${formatKRW(req)} 필요)`, 'error'); return; }
-      gameState.branchCount += 1;
-      gameState.money = 20000 * gameState.branchCount;
-      gameState.combo = 0;
-      gameState.upgrades = { partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 };
-      playGiftFanfare();
-      showToast(`🎊 축하합니다! ${gameState.branchCount}호점 오픈 완료! 영구 수익 배율 x${getBranchMultiplier().toFixed(1)} 적용!`, 'success');
-      renderAll();
-      renderUpgradesList();
-      await syncCloudSave(true);
-    }
-
-    function buyCoreWeapon(key) {
-      const def = CORE_WEAPON_DEFS.find(w => w.key === key);
-      if (!def) return;
-      const lv = gameState.coreWeapons?.[key] || 0;
-      if (lv >= def.maxLv) return;
-      const cost = def.baseCoreCost + lv * 2;
-      if ((gameState.energyCores || 0) < cost) { showToast(`이벤트 재화가 부족합니다! (${cost}개 필요)`, 'error'); return; }
-      gameState.energyCores -= cost;
-      gameState.coreWeapons[key] = lv + 1;
-      playGiftFanfare();
-      showToast(`⚔️ ${def.title} Lv.${lv + 1} 강화 완료!`, 'success');
-      renderAll();
-      renderUpgradesList();
-      syncCloudSave(true);
-    }
-
-    // ---------------------------------------------------------
-    // Interactive POS Register
-    // ---------------------------------------------------------
-    function generateCustomerOrder(forceVip = false, itemCountOverride = 0) {
-      const itemPool =
-        activeThemeMode === 'alien' ? ALIEN_STORE_ITEMS :
-        activeThemeMode === 'cyber' ? CYBER_STORE_ITEMS :
-        activeThemeMode === 'xmas' ? XMAS_STORE_ITEMS : STORE_ITEMS;
-
-      if (forceVip) {
-        const items = [];
-        let total = 0;
-        for (let i = 0; i < 4; i++) {
-          const pick = itemPool[Math.floor(Math.random() * itemPool.length)];
-          items.push({ uid: i, id: pick.id, name: pick.name, emoji: pick.emoji, price: pick.price, scanned: false });
-          total += pick.price;
+    // REALTIME FIREBASE LISTENERS
+    function setupRealtimeListeners() {
+      // User live sync (remote admin money grant / ban)
+      db.ref(`users/${currentUser.key}`).on('value', snap => {
+        const val = snap.val();
+        if (!val) return;
+        if (val.banned) {
+          document.getElementById('banReasonDisplay').textContent = val.banReason || '관리자에 의해 이용이 정지되었습니다.';
+          document.getElementById('banLockModal').classList.remove('hidden');
         }
-        return { isIncident: false, isVip: true, emoji: '👑', name: 'VIP 재벌 손님 (매출 10배!)', items, total, paymentType: 'card', cashGiven: 0 };
-      }
-
-      if (activeThemeMode === 'normal' && itemCountOverride === 0 && Math.random() < 0.18) {
-        return {
-          isIncident: true,
-          emoji: '🧢',
-          name: '신분증 미소지 손님',
-          title: '🚨 돌발 상황! 신분증 미소지 주류·담배 구매 시도',
-          desc: '손님이 캔맥주와 담배를 계산대에 올렸지만 신분증이 없다고 합니다! 어떻게 처리할까요?',
-          items: [],
-          total: 9000,
-          paymentType: 'incident'
-        };
-      }
-
-      const pool =
-        activeThemeMode === 'alien' ? ALIEN_PROFILES :
-        activeThemeMode === 'cyber' ? CYBER_PROFILES :
-        activeThemeMode === 'xmas' ? XMAS_PROFILES : CUSTOMER_PROFILES;
-
-      const profile = pool[Math.floor(Math.random() * pool.length)];
-      const itemCount = itemCountOverride > 0 ? itemCountOverride : Math.floor(Math.random() * 3) + 2;
-      const items = [];
-      let total = 0;
-
-      for (let i = 0; i < itemCount; i++) {
-        const pick = itemPool[Math.floor(Math.random() * itemPool.length)];
-        items.push({ uid: i, id: pick.id, name: pick.name, emoji: pick.emoji, price: pick.price, scanned: false });
-        total += pick.price;
-      }
-
-      const isCash = Math.random() < 0.5;
-      let cashGiven = 0;
-      if (isCash) {
-        if (total <= 5000) cashGiven = 5000;
-        else if (total <= 10000) cashGiven = 10000;
-        else if (total <= 15000) cashGiven = 15000;
-        else if (total <= 20000) cashGiven = 20000;
-        else cashGiven = 40000;
-      }
-
-      return { isIncident: false, isVip: false, emoji: profile.emoji, name: profile.name, items, total, paymentType: isCash ? 'cash' : 'card', cashGiven };
-    }
-
-    function initPOSCustomers() {
-      currentCustomer = generateCustomerOrder();
-      waitingQueue = [generateCustomerOrder(), generateCustomerOrder(), generateCustomerOrder()];
-      preparedChange = 0;
-      renderPOSRegister();
-    }
-
-    function getComboMultiplier() {
-      if (gameState.combo >= 15) return 2.0;
-      if (gameState.combo >= 8) return 1.5;
-      if (gameState.combo >= 3) return 1.2;
-      return 1.0;
-    }
-
-    function resolveSpecialIncident(refusedProperly, event) {
-      if (!currentCustomer || !currentCustomer.isIncident) return;
-      if (refusedProperly) {
-        const bonus = Math.round(6000 * getBranchMultiplier() * getActiveFeverMultiplier());
-        gameState.money += bonus;
-        gameState.combo += 1;
-        gameState.satisfaction = Math.min(100, gameState.satisfaction + 4);
-        playRegisterComplete();
-        if (event && event.clientX) spawnFloatingText(event.clientX, event.clientY, `모범업소 포상 +${formatKRW(bonus)}!`, '#34d399');
-        showToast(`👮 청소년 보호 모범 업소 포상금 +${formatKRW(bonus)} 지급!`, 'success');
-      } else {
-        gameState.money = Math.max(0, gameState.money - 5000);
-        gameState.combo = 0;
-        gameState.satisfaction = Math.max(10, gameState.satisfaction - 10);
-        playTone(170, 'sawtooth', 0.25, 0.1);
-        showToast(`🚨 신분증 미확인 판매 적발! 과태료 -5,000원 차감!`, 'error');
-      }
-      currentCustomer = waitingQueue.shift() || generateCustomerOrder();
-      waitingQueue.push(generateCustomerOrder());
-      renderAll();
-    }
-
-    function scanPOSItem(uid, event) {
-      if (!currentCustomer || currentCustomer.isIncident) return;
-      const item = currentCustomer.items.find(it => it.uid === uid);
-      if (!item || item.scanned) return;
-      item.scanned = true;
-      playBarcodeBeep();
-      if (event && event.clientX) spawnFloatingText(event.clientX, event.clientY, `삑! +${formatKRW(item.price)}`, '#34d399');
-      if (currentCustomer.items.every(it => it.scanned)) preparedChange = 0;
-      renderPOSRegister();
-    }
-
-    function addChangeCash(amount) { preparedChange += amount; playCoinTap(); document.getElementById('cashPreparedText').textContent = formatKRW(preparedChange); }
-    function resetChangeCash() { preparedChange = 0; playTone(300, 'sine', 0.08, 0.05); document.getElementById('cashPreparedText').textContent = '0원'; }
-    function completeCardPayment(event) { if (currentCustomer && currentCustomer.paymentType === 'card') finalizeTransaction(true, event); }
-    function completeCashPayment(event) {
-      if (!currentCustomer || currentCustomer.paymentType !== 'cash') return;
-      const expectedChange = currentCustomer.cashGiven - currentCustomer.total;
-      finalizeTransaction(preparedChange === expectedChange, event, expectedChange);
-    }
-
-    function finalizeTransaction(isAccurate, event, expectedChange = 0) {
-      const baseTotal = currentCustomer.total;
-      const totalMult = getTotalRevenueMultiplier();
-      const vipBonus = currentCustomer.isVip ? 10 : 1;
-
-      if (isAccurate) {
-        gameState.combo += 1;
-        const tipBonus = currentCustomer.paymentType === 'cash' ? 1.2 : 1.0;
-        const finalEarned = Math.round(baseTotal * totalMult * tipBonus * vipBonus);
-        gameState.money += finalEarned;
-        gameState.totalServed += 1;
-        gameState.satisfaction = Math.min(100, gameState.satisfaction + 2);
-        gameState.cleanliness = Math.max(20, gameState.cleanliness - 2);
-
-        if (activeThemeMode !== 'normal') gameState.energyCores = (gameState.energyCores || 0) + 1;
-
-        playRegisterComplete();
-        if (event && event.clientX) {
-          const tokenIcon = activeThemeMode === 'alien' ? ' & 🔋+1' : activeThemeMode === 'cyber' ? ' & 💾+1' : activeThemeMode === 'xmas' ? ' & 🎁+1' : '';
-          spawnFloatingText(event.clientX, event.clientY, `정산완료 +${formatKRW(finalEarned)}${tokenIcon}!`, '#fbbf24');
+        if (val.adminSyncFlag && val.adminSyncFlag !== window._lastSyncFlag) {
+          window._lastSyncFlag = val.adminSyncFlag;
+          isRemoteMoneySyncing = true;
+          gameState.money = Number(val.money ?? gameState.money);
+          updateAllUI();
+          showToast('💰 관리자에 의해 자금이 갱신되었습니다!');
+          setTimeout(() => { isRemoteMoneySyncing = false; }, 500);
         }
-      } else {
-        gameState.combo = 0;
-        gameState.money += baseTotal;
-        gameState.satisfaction = Math.max(10, gameState.satisfaction - 6);
-        playTone(190, 'sawtooth', 0.18, 0.09);
-        showToast(`❌ 거스름돈 오차! (정답: ${formatKRW(expectedChange)}) 콤보가 초기화되었습니다.`, 'error');
-      }
+      });
 
-      currentCustomer = waitingQueue.shift() || generateCustomerOrder();
-      waitingQueue.push(generateCustomerOrder());
-      preparedChange = 0;
-      renderAll();
-    }
+      // Global Notice
+      db.ref('global/notice').on('value', snap => {
+        const data = snap.val();
+        const banner = document.getElementById('globalNoticeBanner');
+        if (!data || !data.text) {
+          banner.classList.add('hidden');
+          return;
+        }
+        if (isInitialNoticeLoad) {
+          isInitialNoticeLoad = false;
+          lastNoticeTimestamp = data.timestamp || 0;
+          return;
+        }
+        if (data.timestamp && data.timestamp !== lastNoticeTimestamp) {
+          lastNoticeTimestamp = data.timestamp;
+          document.getElementById('globalNoticeText').textContent = data.text;
+          banner.classList.remove('hidden');
+          playGiftFanfare();
+          clearTimeout(noticeHideTimer);
+          noticeHideTimer = setTimeout(() => banner.classList.add('hidden'), 5000);
+        }
+      });
 
-    function cleanStoreFloor(event) {
-      if (gameState.cleanliness >= 100) { showToast('매장이 이미 최상의 청결 상태입니다 ✨', 'info'); return; }
-      gameState.cleanliness = Math.min(100, gameState.cleanliness + 20);
-      gameState.satisfaction = Math.min(100, gameState.satisfaction + 1);
-      gameState.money += Math.round(300 * getBranchMultiplier());
-      playTone(560, 'sine', 0.09, 0.06);
-      if (event && event.clientX) spawnFloatingText(event.clientX, event.clientY, '🧹 청결 +20%', '#38bdf8');
-      renderAll();
-    }
+      // Notice History
+      db.ref('global/noticeHistory').limitToLast(10).on('value', snap => {
+        const list = document.getElementById('noticeHistoryList');
+        const val = snap.val();
+        if (!val) {
+          list.innerHTML = '<p class="text-slate-400">등록된 공지가 없습니다.</p>';
+          return;
+        }
+        const items = Object.values(val).reverse();
+        list.innerHTML = items.map(n => `
+          <div class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/70">
+            <div class="text-white font-bold">${escapeHtml(n.text)}</div>
+            <div class="text-[10px] text-slate-400 mt-1">${new Date(n.timestamp).toLocaleString('ko-KR')}</div>
+          </div>
+        `).join('');
+      });
 
-    // ---------------------------------------------------------
-    // Upgrades & Passive Revenue
-    // ---------------------------------------------------------
-    function getUpgradeCost(def) { return Math.round(def.baseCost * Math.pow(def.mult, gameState.upgrades[def.key] || 0)); }
-    function getPassiveIncomePerSec() {
-      let total = 0;
-      UPGRADE_DEFS.forEach(def => { total += (gameState.upgrades[def.key] || 0) * def.passivePerLv; });
-      return Math.round(total * getBranchMultiplier() * getActiveFeverMultiplier());
-    }
+      // Global Fever
+      db.ref('global/fever').on('value', snap => {
+        const val = snap.val();
+        serverFeverUntil = val?.until || 0;
+        serverFeverMultiplier = Number(val?.multiplier || 2.0);
+        updateAllUI();
+      });
 
-    function buyUpgrade(key) {
-      const def = UPGRADE_DEFS.find(u => u.key === key);
-      const lv = gameState.upgrades[key] || 0;
-      if (lv >= def.maxLv) return;
-      const cost = getUpgradeCost(def);
-      if (gameState.money < cost) { playTone(190, 'sawtooth', 0.15, 0.08); showToast(`자금이 부족합니다! (${formatKRW(cost)} 필요)`, 'error'); return; }
-      gameState.money -= cost;
-      gameState.upgrades[key] += 1;
-      playGiftFanfare();
-      showToast(`🎉 ${def.title} Lv.${gameState.upgrades[key]} 달성!`, 'success');
-      renderAll();
-      renderUpgradesList();
-      syncCloudSave(true);
-    }
+      // Season & Theme Control
+      db.ref('global/season').on('value', snap => {
+        const val = snap.val() || {};
+        currentSeasonNumber = Number(val.number || 1);
+        currentBannerText = val.bannerText || '대침공이 다가옵니다..';
+        auto30MinRaidEnabled = Boolean(val.auto30m);
 
-    // ---------------------------------------------------------
-    // Rendering Functions
-    // ---------------------------------------------------------
-    function formatKRW(num) { return Math.floor(num).toLocaleString('ko-KR') + '원'; }
+        document.getElementById('headerSeasonBadge').textContent = `S${currentSeasonNumber}`;
+        const adminTag = document.getElementById('adminCurrentSeasonTag');
+        if (adminTag) adminTag.textContent = `시즌 ${currentSeasonNumber}`;
+        const autoBadge = document.getElementById('auto30mStatusBadge');
+        if (autoBadge) autoBadge.textContent = `30분 자동: ${auto30MinRaidEnabled ? 'ON' : 'OFF'}`;
 
-    function updateHeaderStats() {
-      document.getElementById('statMoney').textContent = formatKRW(gameState.money);
-      document.getElementById('statEnergyCores').textContent = `${(gameState.energyCores || 0).toLocaleString()}개`;
-      document.getElementById('statMultiplier').textContent = `x${getTotalRevenueMultiplier().toFixed(1)}`;
-      document.getElementById('headerBranchBadge').textContent = `${gameState.branchCount}호점`;
-      document.getElementById('cleanlinessText').textContent = `${gameState.cleanliness}%`;
-      const armoryEl = document.getElementById('armoryCoreCount');
-      if (armoryEl) armoryEl.textContent = (gameState.energyCores || 0).toLocaleString();
-
-      const medalBadge = document.getElementById('headerTitleMedal');
-      if (gameState.medals && gameState.medals.length > 0) {
-        medalBadge.textContent = gameState.medals[gameState.medals.length - 1];
-        medalBadge.classList.remove('hidden');
-      } else {
-        medalBadge.classList.add('hidden');
-      }
-
-      document.getElementById('passiveIncomeLabel').textContent = `알바 자동매출: +${formatKRW(getPassiveIncomePerSec())}/초`;
-
-      const storeLv = 1 + (gameState.upgrades.storeExpansion || 0);
-      const names = ['동네 편의점', '역세권 편의점', '24시 메가스토어', '플래그십 본점', '전국 1등 편의점'];
-      const themeSuffix =
-        activeThemeMode === 'alien' ? '👽 외계인 점령 기지' :
-        activeThemeMode === 'cyber' ? '💻 사이버 보안 방어선' :
-        activeThemeMode === 'xmas' ? '🎄 화이트 크리스마스 점' :
-        names[Math.min(names.length - 1, storeLv - 1)];
-      document.getElementById('storeGradeBadge').textContent = `${gameState.branchCount}호점 · ${themeSuffix}`;
-
-      const nextReq = getNextBranchRequirement();
-      document.getElementById('nextBranchTitle').textContent = `🏢 ${gameState.branchCount + 1}호점 오픈하기 (영구 매출 +50%)`;
-      document.getElementById('currentBranchMultText').textContent = `현재 ${gameState.branchCount}호점 (x${getBranchMultiplier().toFixed(1)})`;
-      const expandBtn = document.getElementById('expandBranchBtn');
-      if (gameState.money >= nextReq) {
-        expandBtn.textContent = `🚀 지금 ${gameState.branchCount + 1}호점 오픈하기! (비용: ${formatKRW(nextReq)})`;
-        expandBtn.className = 'w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs active:scale-[0.98] transition shadow-lg';
-      } else {
-        expandBtn.textContent = `필요 자금: ${formatKRW(nextReq)} (현재 ${Math.min(99, Math.floor((gameState.money / nextReq) * 100))}%)`;
-        expandBtn.className = 'w-full py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-bold text-xs cursor-not-allowed';
-      }
-    }
-
-    function renderPOSRegister() {
-      if (!currentCustomer) return;
-      document.getElementById('posCustomerTitle').textContent = `${currentCustomer.emoji} ${currentCustomer.name}`;
-      document.getElementById('posComboText').textContent = `${gameState.combo}콤보`;
-
-      const stepBadge = document.getElementById('posStepBadge');
-      const incidentArea = document.getElementById('posSpecialIncidentArea');
-      const step1Area = document.getElementById('posStep1Area');
-      const cardArea = document.getElementById('posStep2CardArea');
-      const cashArea = document.getElementById('posStep2CashArea');
-      const laser = document.getElementById('scannerLaserLine');
-      const isZeroG = Date.now() < zeroGravityUntil;
-
-      if (currentCustomer.isIncident) {
-        stepBadge.textContent = '🚨 돌발 이벤트';
-        laser.classList.add('hidden');
-        incidentArea.classList.remove('hidden');
-        step1Area.classList.add('hidden');
-        cardArea.classList.add('hidden');
-        cashArea.classList.add('hidden');
-        document.getElementById('scanProgressText').textContent = '민증 확인 필요!';
-        document.getElementById('posScannedTotal').textContent = '판매 보류';
-        document.getElementById('incidentTitle').textContent = currentCustomer.title;
-        document.getElementById('incidentDesc').textContent = currentCustomer.desc;
-      } else {
-        incidentArea.classList.add('hidden');
-        const scannedItems = currentCustomer.items.filter(it => it.scanned);
-        const scannedSum = scannedItems.reduce((acc, it) => acc + it.price, 0);
-        const allScanned = scannedItems.length === currentCustomer.items.length;
-
-        document.getElementById('scanProgressText').textContent = `${scannedItems.length} / ${currentCustomer.items.length}개`;
-        document.getElementById('posScannedTotal').textContent = formatKRW(scannedSum);
-
-        if (!allScanned) {
-          stepBadge.textContent = 'STEP 1 · 바코드 스캔';
-          laser.classList.remove('hidden');
-          step1Area.classList.remove('hidden');
-          cardArea.classList.add('hidden');
-          cashArea.classList.add('hidden');
-
-          document.getElementById('posBasketGrid').innerHTML = currentCustomer.items.map(it => {
-            if (it.scanned) {
-              return `
-                <div class="p-2.5 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 flex items-center justify-between opacity-75">
-                  <div class="flex items-center gap-2 min-w-0">
-                    <span class="text-xl shrink-0">${it.emoji}</span>
-                    <div class="min-w-0">
-                      <div class="text-xs font-bold text-emerald-300 truncate line-through">${it.name}</div>
-                      <div class="text-[10px] text-emerald-400 font-extrabold">스캔 완료 ✓</div>
-                    </div>
-                  </div>
-                  <span class="text-xs font-black text-emerald-300 shrink-0">${formatKRW(it.price)}</span>
-                </div>
-              `;
-            }
-            return `
-              <button onclick="scanPOSItem(${it.uid}, event)"
-                class="${isZeroG ? 'zero-gravity-item' : ''} p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-750 border border-amber-400/60 hover:border-amber-300 text-left active:scale-95 transition flex items-center justify-between shadow-md">
-                <div class="flex items-center gap-2 min-w-0">
-                  <span class="text-xl shrink-0">${it.emoji}</span>
-                  <div class="min-w-0">
-                    <div class="text-xs font-black text-white truncate">${it.name}</div>
-                    <div class="text-[10px] text-amber-300 font-bold">터치해 바코드 찍기 🔫</div>
-                  </div>
-                </div>
-                <span class="text-xs font-black text-amber-400 shrink-0 ml-1">${formatKRW(it.price)}</span>
-              </button>
-            `;
-          }).join('');
-        } else {
-          laser.classList.add('hidden');
-          step1Area.classList.add('hidden');
-          if (currentCustomer.paymentType === 'card') {
-            stepBadge.textContent = 'STEP 2 · 카드/페이 결제';
-            cardArea.classList.remove('hidden');
-            cashArea.classList.add('hidden');
-            document.getElementById('cardPayAmountText').textContent = formatKRW(currentCustomer.total);
+        if (val.themeEventId && val.themeEventId !== lastThemeEventId) {
+          lastThemeEventId = val.themeEventId;
+          const nextTheme = val.activeTheme || 'normal';
+          if (isInitialThemeLoad) {
+            isInitialThemeLoad = false;
+            applyThemeVisuals(nextTheme);
           } else {
-            stepBadge.textContent = 'STEP 2 · 현금 거스름돈';
-            cardArea.classList.add('hidden');
-            cashArea.classList.remove('hidden');
-            document.getElementById('cashGivenText').textContent = formatKRW(currentCustomer.cashGiven);
-            document.getElementById('cashTotalText').textContent = formatKRW(currentCustomer.total);
-            document.getElementById('cashPreparedText').textContent = formatKRW(preparedChange);
+            if (val.playCutscene && nextTheme !== 'normal') {
+              playCutsceneSequence(`${nextTheme}_eve`, () => applyThemeVisuals(nextTheme));
+            } else {
+              applyThemeVisuals(nextTheme);
+            }
+          }
+        } else if (isInitialThemeLoad) {
+          isInitialThemeLoad = false;
+          applyThemeVisuals(val.activeTheme || 'normal');
+        }
+
+        if (val.resetId && val.resetId !== lastSeasonResetId) {
+          lastSeasonResetId = val.resetId;
+          if (!isInitialSeasonLoad) {
+            gameState.money = 15000;
+            gameState.day = 1;
+            gameState.branchCount = 1;
+            gameState.energyCores = 0;
+            gameState.upgrades = { partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 };
+            saveToCloud();
+            renderUpgradeList();
+            updateAllUI();
+            showToast(`👑 시즌 ${currentSeasonNumber}이 새롭게 개막했습니다!`);
           }
         }
-      }
+        isInitialSeasonLoad = false;
+      });
 
+      // Boss Raid Sync
+      db.ref('global/raid').on('value', snap => {
+        const raid = snap.val();
+        const hud = document.getElementById('mothershipRaidHud');
+        if (!raid || !raid.active) {
+          hud.classList.add('hidden');
+          if (raid?.winId && raid.winId !== lastRaidWinId) {
+            lastRaidWinId = raid.winId;
+            if (!isInitialRaidLoad) {
+              const rType = raid.type || 'alien';
+              playCutsceneSequence(`${rType}_raid_win`, () => {
+                gameState.money += 250000;
+                if (rType === 'cyber' && !gameState.medals.includes('💻화이트해커')) gameState.medals.push('💻화이트해커');
+                if (rType === 'alien' && !gameState.medals.includes('👽우주수호자')) gameState.medals.push('👽우주수호자');
+                saveToCloud();
+                updateAllUI();
+                showToast('🏆 보스 격퇴 승리 보상 +250,000원 & 특별 칭호 지급!');
+              });
+            }
+          }
+          activeRaidState = null;
+          isInitialRaidLoad = false;
+          return;
+        }
+
+        activeRaidState = raid;
+        hud.classList.remove('hidden');
+        const isCyber = raid.type === 'cyber';
+        document.getElementById('raidBossIcon').textContent = isCyber ? '🤖' : '🛸';
+        document.getElementById('raidBossTitle').textContent = isCyber ? 'AI 메인프레임 바이러스 결전!' : '외계인 모선 총공세 레이드!';
+        document.getElementById('bossHpName').textContent = isCyber ? '메인프레임 코어 무결성' : '모선 에너지 코어 HP';
+        document.getElementById('laserBtnLabel').textContent = isCyber ? '백신 레이저' : '레이저 사격';
+        document.getElementById('coreBtnLabel').textContent = isCyber ? '💾 칩 오버로드' : '🔋 코어 포격';
+
+        const hp = Math.max(0, Number(raid.hp || 0));
+        const maxHp = Math.max(1, Number(raid.maxHp || 100000));
+        document.getElementById('bossHpLabel').textContent = `${hp.toLocaleString()} / ${maxHp.toLocaleString()}`;
+        document.getElementById('bossHpFill').style.width = `${Math.min(100, (hp / maxHp) * 100)}%`;
+
+        if (raid.id && raid.id !== lastRaidId) {
+          lastRaidId = raid.id;
+          if (!isInitialRaidLoad) {
+            playCutsceneSequence(`${raid.type || 'alien'}_raid_start`);
+          }
+          if (isCyber) triggerCyberFirewall();
+        }
+        isInitialRaidLoad = false;
+      });
+
+      // Christmas Tree Co-op Sync
+      db.ref('global/xmasTree').on('value', snap => {
+        const tree = snap.val();
+        const hud = document.getElementById('xmasTreeHud');
+        if (!tree || !tree.active) {
+          hud.classList.add('hidden');
+          if (tree?.winId && tree.winId !== lastXmasTreeWinId) {
+            lastXmasTreeWinId = tree.winId;
+            if (!isInitialXmasLoad) {
+              playCutsceneSequence('xmas_win', () => {
+                gameState.money += 300000;
+                if (!gameState.medals.includes('🎄산타파트너')) gameState.medals.push('🎄산타파트너');
+                saveToCloud();
+                updateAllUI();
+                showToast('🎄 크리스마스 트리 점등 완료! +300,000원 & [🎄산타파트너] 칭호!');
+              });
+            }
+          }
+          activeXmasTreeState = null;
+          isInitialXmasLoad = false;
+          return;
+        }
+
+        activeXmasTreeState = tree;
+        hud.classList.remove('hidden');
+        const pts = Number(tree.points || 0);
+        const goal = Number(tree.goal || 500);
+        const stage = Math.min(5, Math.floor((pts / goal) * 5) + 1);
+        document.getElementById('xmasTreeStageBadge').textContent = `${stage}단계 / 5단계`;
+        document.getElementById('xmasTreeProgressLabel').textContent = `${pts.toLocaleString()} / ${goal.toLocaleString()} 점등 포인트`;
+        document.getElementById('xmasTreeProgressFill').style.width = `${Math.min(100, (pts / goal) * 100)}%`;
+        isInitialXmasLoad = false;
+      });
+
+      // Surprise Events
+      db.ref('global/surprise').on('value', snap => {
+        const ev = snap.val();
+        if (!ev || !ev.id || ev.id === lastSurpriseId) return;
+        const isFirst = !lastSurpriseId;
+        lastSurpriseId = ev.id;
+        if (isFirst && Date.now() - (ev.timestamp || 0) > 10000) return;
+        executeSurpriseClientEffect(ev);
+      });
+
+      // Shoutbox
+      db.ref('global/shoutbox').limitToLast(20).on('value', snap => {
+        const box = document.getElementById('shoutboxList');
+        const val = snap.val();
+        if (!val) {
+          box.innerHTML = '<p class="text-slate-400 text-[11px]">첫 번째 방명록을 남겨보세요!</p>';
+          return;
+        }
+        const entries = Object.values(val).reverse();
+        box.innerHTML = entries.map(m => `
+          <div class="bg-slate-800/70 border border-slate-700/60 rounded-xl px-2.5 py-1.5 flex items-baseline justify-between gap-2">
+            <div class="min-w-0">
+              <span class="font-black text-emerald-300 mr-1.5">${escapeHtml(m.nickname)}</span>
+              <span class="text-slate-200 break-all">${escapeHtml(m.text)}</span>
+            </div>
+            <span class="text-[10px] text-slate-500 shrink-0">${new Date(m.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+        `).join('');
+      });
+
+      // Hall of Fame
+      db.ref('global/hallOfFame').on('value', snap => {
+        const val = snap.val();
+        const box = document.getElementById('hallOfFameBox');
+        const list = document.getElementById('hallOfFameList');
+        if (!val) { box.classList.add('hidden'); return; }
+        box.classList.remove('hidden');
+        list.innerHTML = Object.values(val).reverse().map(h => `
+          <div class="p-2 rounded-xl bg-amber-500/10 border border-amber-400/30 flex items-center justify-between">
+            <span class="font-black text-amber-200">👑 시즌 ${h.season} 챔피언: ${escapeHtml(h.champion)}</span>
+            <span class="text-[11px] font-bold text-amber-300">${h.branchCount}호점 · ${Number(h.money).toLocaleString()}원</span>
+          </div>
+        `).join('');
+      });
+
+      // Poll
+      db.ref('global/poll').on('value', snap => {
+        const poll = snap.val();
+        const container = document.getElementById('pollContainer');
+        if (!poll || !poll.active) {
+          container.innerHTML = '<p class="text-xs text-slate-400">현재 진행 중인 투표가 없습니다.</p>';
+          return;
+        }
+        const v1 = Object.keys(poll.votes1 || {}).length;
+        const v2 = Object.keys(poll.votes2 || {}).length;
+        const total = Math.max(1, v1 + v2);
+        const p1 = Math.round((v1 / total) * 100);
+        const p2 = 100 - p1;
+        const myVote = poll.votes1?.[currentUser.key] ? 1 : poll.votes2?.[currentUser.key] ? 2 : 0;
+
+        container.innerHTML = `
+          <div class="space-y-2">
+            <div class="text-xs font-black text-amber-300">Q. ${escapeHtml(poll.question)}</div>
+            <button onclick="castPollVote(1)" class="w-full p-2.5 rounded-xl border ${myVote === 1 ? 'bg-emerald-500/25 border-emerald-400' : 'bg-slate-800 border-slate-700'} text-left transition">
+              <div class="flex justify-between text-xs font-bold mb-1">
+                <span>${escapeHtml(poll.opt1)} ${myVote === 1 ? '✅' : ''}</span>
+                <span>${v1}표 (${p1}%)</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden"><div class="h-full bg-emerald-400" style="width:${p1}%"></div></div>
+            </button>
+            <button onclick="castPollVote(2)" class="w-full p-2.5 rounded-xl border ${myVote === 2 ? 'bg-sky-500/25 border-sky-400' : 'bg-slate-800 border-slate-700'} text-left transition">
+              <div class="flex justify-between text-xs font-bold mb-1">
+                <span>${escapeHtml(poll.opt2)} ${myVote === 2 ? '✅' : ''}</span>
+                <span>${v2}표 (${p2}%)</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden"><div class="h-full bg-sky-400" style="width:${p2}%"></div></div>
+            </button>
+          </div>
+        `;
+      });
+
+      fetchLeaderboard();
+    }
+
+    // POS GAMEPLAY & CUSTOMER QUEUE
+    function getActiveItemPool() {
+      if (activeThemeMode === 'alien') return ALIEN_STORE_ITEMS;
+      if (activeThemeMode === 'cyber') return CYBER_STORE_ITEMS;
+      if (activeThemeMode === 'xmas') return XMAS_STORE_ITEMS;
+      return STORE_ITEMS;
+    }
+
+    function getActiveCustomerPool() {
+      if (activeThemeMode === 'alien') return ALIEN_PROFILES;
+      if (activeThemeMode === 'cyber') return CYBER_PROFILES;
+      if (activeThemeMode === 'xmas') return XMAS_PROFILES;
+      return CUSTOMER_PROFILES;
+    }
+
+    function createCustomerObject(isVip = false, largeBasket = false) {
+      const profiles = getActiveCustomerPool();
+      const itemsPool = getActiveItemPool();
+      const prof = isVip ? { emoji: '👑', name: '초특급 VIP 재벌 손님 (10배 매출!)' } : profiles[Math.floor(Math.random() * profiles.length)];
+      const count = largeBasket ? 5 : Math.floor(Math.random() * 3) + 2;
+      const basket = [];
+      for (let i = 0; i < count; i++) {
+        const item = itemsPool[Math.floor(Math.random() * itemsPool.length)];
+        basket.push({ ...item, uid: `${Date.now()}_${i}_${Math.random()}`, scanned: false });
+      }
+      const total = basket.reduce((acc, it) => acc + it.price, 0);
+      const isIncident = !isVip && Math.random() < 0.12;
+      const payMethod = Math.random() < 0.55 ? 'card' : 'cash';
+      const cashBills = [5000, 10000, 15000, 20000, 50000];
+      const cashGiven = cashBills.find(b => b >= total) || Math.ceil(total / 10000) * 10000;
+
+      return { profile: prof, basket, total, isVip, isIncident, payMethod, cashGiven };
+    }
+
+    function refillWaitingQueue() {
+      while (waitingQueue.length < 4) {
+        waitingQueue.push(createCustomerObject());
+      }
+      renderWaitingLine();
+    }
+
+    function renderWaitingLine() {
+      const bar = document.getElementById('waitingLineBar');
       document.getElementById('waitingLineCount').textContent = `${waitingQueue.length}명 대기중`;
-      document.getElementById('waitingLineBar').innerHTML = waitingQueue.map((w, idx) => `
-        <div class="shrink-0 px-2.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/70 flex items-center gap-1.5 text-[11px]">
-          <span>${w.emoji}</span>
-          <span class="font-bold text-slate-300">#${idx + 1} (${w.isIncident ? '🚨민증확인' : `${w.items.length}개`})</span>
+      bar.innerHTML = waitingQueue.map(c => `
+        <div class="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs">
+          <span class="text-base">${c.profile.emoji}</span>
+          <span class="font-bold text-slate-300 truncate max-w-[90px]">${c.profile.name}</span>
         </div>
       `).join('');
     }
 
-    function renderUpgradesList() {
-      const armoryBox = document.getElementById('coreWeaponList');
-      if (armoryBox) {
-        armoryBox.innerHTML = CORE_WEAPON_DEFS.map(def => {
-          const lv = gameState.coreWeapons?.[def.key] || 0;
-          const isMax = lv >= def.maxLv;
-          const cost = def.baseCoreCost + lv * 2;
-          return `
-            <div class="p-3 rounded-2xl bg-slate-900/90 border border-purple-500/40 flex items-center justify-between gap-2.5">
-              <div class="min-w-0">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-xs sm:text-sm font-black text-white truncate">${def.title}</span>
-                  <span class="px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-200 text-[10px] font-bold shrink-0">Lv.${lv}/${def.maxLv}</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">${def.desc}</p>
-              </div>
-              <button onclick="buyCoreWeapon('${def.key}')" ${isMax ? 'disabled' : ''}
-                class="shrink-0 px-3 py-2 rounded-xl text-xs font-black whitespace-nowrap transition ${
-                  isMax ? 'bg-slate-700 text-slate-400' : 'bg-purple-500 hover:bg-purple-400 text-white active:scale-95'
-                }">
-                ${isMax ? 'MAX' : `재화 ${cost}개`}
-              </button>
-            </div>
-          `;
-        }).join('');
+    function spawnNextCustomer() {
+      if (waitingQueue.length === 0) refillWaitingQueue();
+      currentCustomer = waitingQueue.shift();
+      refillWaitingQueue();
+      preparedChange = 0;
+
+      document.getElementById('posCustomerTitle').textContent = `${currentCustomer.profile.emoji} ${currentCustomer.profile.name}`;
+      document.getElementById('posSpecialIncidentArea').classList.add('hidden');
+      document.getElementById('posStep1Area').classList.add('hidden');
+      document.getElementById('posStep2CardArea').classList.add('hidden');
+      document.getElementById('posStep2CashArea').classList.add('hidden');
+
+      if (currentCustomer.isIncident) {
+        document.getElementById('posStepBadge').textContent = '⚠️ 돌발 상황 발생';
+        document.getElementById('posSpecialIncidentArea').classList.remove('hidden');
+        document.getElementById('scanProgressText').textContent = '신분증 확인 필요';
+        document.getElementById('posScannedTotal').textContent = '0원';
+        return;
       }
 
-      document.getElementById('upgradeListContainer').innerHTML = UPGRADE_DEFS.map(def => {
-        const lv = gameState.upgrades[def.key] || 0;
-        const isMax = lv >= def.maxLv;
-        const cost = getUpgradeCost(def);
+      document.getElementById('posStepBadge').textContent = 'STEP 1 · 바코드 스캔';
+      document.getElementById('posStep1Area').classList.remove('hidden');
+      renderBasketItems();
+    }
+
+    function renderBasketItems() {
+      if (!currentCustomer) return;
+      const grid = document.getElementById('posBasketGrid');
+      const scannedCount = currentCustomer.basket.filter(i => i.scanned).length;
+      const scannedSum = currentCustomer.basket.filter(i => i.scanned).reduce((a, b) => a + b.price, 0);
+
+      document.getElementById('scanProgressText').textContent = `${scannedCount} / ${currentCustomer.basket.length}개`;
+      document.getElementById('posScannedTotal').textContent = `${scannedSum.toLocaleString()}원`;
+
+      const isZeroG = Date.now() < zeroGravityUntil;
+      grid.innerHTML = currentCustomer.basket.map((item, idx) => `
+        <button onclick="scanBasketItem(${idx}, event)" ${item.scanned ? 'disabled' : ''}
+          class="p-2.5 rounded-2xl border text-left transition flex items-center justify-between ${isZeroG ? 'zero-gravity-item' : ''} ${
+            item.scanned
+              ? 'bg-emerald-950/40 border-emerald-500/40 opacity-55'
+              : 'bg-slate-800 hover:bg-slate-750 border-slate-600 active:scale-95'
+          }">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-xl shrink-0">${item.emoji}</span>
+            <div class="min-w-0">
+              <div class="text-xs font-black text-white truncate">${item.name}</div>
+              <div class="text-[11px] font-bold text-amber-300">${item.price.toLocaleString()}원</div>
+            </div>
+          </div>
+          <span class="text-[10px] font-black px-1.5 py-0.5 rounded ${item.scanned ? 'bg-emerald-500 text-slate-950' : 'bg-slate-700 text-slate-300'}">
+            ${item.scanned ? '완료' : '스캔'}
+          </span>
+        </button>
+      `).join('');
+    }
+
+    function scanBasketItem(idx, ev) {
+      if (!currentCustomer || currentCustomer.isIncident) return;
+      const item = currentCustomer.basket[idx];
+      if (!item || item.scanned) return;
+
+      item.scanned = true;
+      playBarcodeBeep();
+      if (ev) spawnFloatingText(ev.clientX, ev.clientY, `삐빅! +${item.price.toLocaleString()}원`, '#34d399');
+      renderBasketItems();
+
+      if (currentCustomer.basket.every(i => i.scanned)) {
+        proceedToPaymentStep();
+      }
+    }
+
+    function proceedToPaymentStep() {
+      document.getElementById('posStep1Area').classList.add('hidden');
+      if (currentCustomer.payMethod === 'card') {
+        document.getElementById('posStepBadge').textContent = 'STEP 2 · 카드 승인';
+        document.getElementById('posStep2CardArea').classList.remove('hidden');
+        document.getElementById('cardPayAmountText').textContent = `${currentCustomer.total.toLocaleString()}원`;
+      } else {
+        document.getElementById('posStepBadge').textContent = 'STEP 2 · 현금 거스름돈';
+        document.getElementById('posStep2CashArea').classList.remove('hidden');
+        document.getElementById('cashGivenText').textContent = `${currentCustomer.cashGiven.toLocaleString()}원`;
+        document.getElementById('cashTotalText').textContent = `${currentCustomer.total.toLocaleString()}원`;
+        document.getElementById('cashPreparedText').textContent = '0원';
+      }
+    }
+
+    function addChangeCash(amount) {
+      preparedChange += amount;
+      playCoinTap();
+      document.getElementById('cashPreparedText').textContent = `${preparedChange.toLocaleString()}원`;
+    }
+
+    function resetChangeCash() {
+      preparedChange = 0;
+      playCoinTap();
+      document.getElementById('cashPreparedText').textContent = '0원';
+    }
+
+    function completeCardPayment(ev) {
+      finalizeCustomerSale(1.0, ev);
+    }
+
+    function completeCashPayment(ev) {
+      const exactChange = currentCustomer.cashGiven - currentCustomer.total;
+      if (preparedChange !== exactChange) {
+        showToast(`⚠️ 거스름돈이 맞지 않습니다! (필요 거스름돈: ${exactChange.toLocaleString()}원)`, 'rose');
+        gameState.combo = 0;
+        updateAllUI();
+        return;
+      }
+      finalizeCustomerSale(1.2, ev);
+    }
+
+    function resolveSpecialIncident(refused, ev) {
+      if (refused) {
+        const reward = Math.floor(8000 * getCurrentMultiplier());
+        gameState.money += reward;
+        gameState.combo += 1;
+        playRegisterComplete();
+        if (ev) spawnFloatingText(ev.clientX, ev.clientY, `모범 업소 포상금 +${reward.toLocaleString()}원!`, '#fbbf24');
+        showToast(`🛡️ 청소년 보호 모범 업소 포상금 +${reward.toLocaleString()}원!`);
+      } else {
+        const fine = 5000;
+        gameState.money = Math.max(0, gameState.money - fine);
+        gameState.combo = 0;
+        showToast('🚨 단속 적발! 과태료 -5,000원이 부과되었습니다.', 'rose');
+      }
+      spawnNextCustomer();
+      updateAllUI();
+    }
+
+    function finalizeCustomerSale(bonusFactor = 1.0, ev = null) {
+      const mult = getCurrentMultiplier();
+      const vipMult = currentCustomer.isVip ? 10 : 1;
+      const earned = Math.floor(currentCustomer.total * mult * bonusFactor * vipMult);
+
+      gameState.money += earned;
+      gameState.combo += 1;
+      gameState.totalServed += 1;
+      gameState.cleanliness = Math.max(20, gameState.cleanliness - 2);
+
+      let coreMsg = '';
+      if (activeThemeMode !== 'normal') {
+        const gainedCore = currentCustomer.isVip ? 5 : 1;
+        gameState.energyCores += gainedCore;
+        const unitName = activeThemeMode === 'cyber' ? '💾 칩' : activeThemeMode === 'xmas' ? '🎁 선물' : '🔋 코어';
+        coreMsg = ` · ${unitName} +${gainedCore}`;
+      }
+
+      playRegisterComplete();
+      if (ev) spawnFloatingText(ev.clientX, ev.clientY, `+${earned.toLocaleString()}원${coreMsg}`, '#fbbf24');
+      spawnNextCustomer();
+      updateAllUI();
+    }
+
+    function cleanStoreFloor(ev) {
+      gameState.cleanliness = 100;
+      const tip = Math.floor(1500 * getCurrentMultiplier());
+      gameState.money += tip;
+      playGiftFanfare();
+      if (ev) spawnFloatingText(ev.clientX, ev.clientY, `반짝반짝! +${tip.toLocaleString()}원`, '#38bdf8');
+      updateAllUI();
+    }
+
+    // MULTIPLIERS, UPGRADES & BRANCH EXPANSION
+    function getCurrentMultiplier() {
+      const branchMult = 1 + (gameState.branchCount - 1) * 0.5;
+      const scannerMult = 1 + (gameState.upgrades.posScanner || 0) * 0.15;
+      const cleanMult = gameState.cleanliness >= 80 ? 1.1 : gameState.cleanliness < 40 ? 0.8 : 1.0;
+      const feverMult = Date.now() < serverFeverUntil ? serverFeverMultiplier : 1.0;
+      return Number((branchMult * scannerMult * cleanMult * feverMult).toFixed(2));
+    }
+
+    function getPassiveIncomePerSec() {
+      let base = 0;
+      UPGRADE_DEFS.forEach(u => {
+        base += (gameState.upgrades[u.key] || 0) * u.passivePerLv;
+      });
+      return Math.floor(base * getCurrentMultiplier());
+    }
+
+    function renderUpgradeList() {
+      const container = document.getElementById('upgradeListContainer');
+      container.innerHTML = UPGRADE_DEFS.map(u => {
+        const lv = gameState.upgrades[u.key] || 0;
+        const cost = Math.floor(u.baseCost * Math.pow(u.mult, lv));
+        const isMax = lv >= u.maxLv;
         return `
-          <div class="p-3 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-between gap-2.5">
+          <div class="p-3 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-between gap-2">
             <div class="min-w-0">
               <div class="flex items-center gap-1.5">
-                <span class="text-xs sm:text-sm font-black text-white truncate">${def.title}</span>
-                <span class="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold shrink-0">Lv.${lv}/${def.maxLv}</span>
+                <span class="text-xs font-black text-white truncate">${u.title}</span>
+                <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-black shrink-0">Lv.${lv}/${u.maxLv}</span>
               </div>
-              <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">${def.desc}</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">${u.desc}</p>
             </div>
-            <button onclick="buyUpgrade('${def.key}')" ${isMax ? 'disabled' : ''}
-              class="shrink-0 px-3 py-2 rounded-xl text-xs font-black whitespace-nowrap transition ${
-                isMax ? 'bg-slate-700 text-slate-400' : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 active:scale-95'
-              }">
-              ${isMax ? 'MAX' : formatKRW(cost)}
+            <button onclick="buyUpgrade('${u.key}')" ${isMax ? 'disabled' : ''}
+              class="shrink-0 px-3 py-2 rounded-xl ${isMax ? 'bg-slate-700 text-slate-400' : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 active:scale-95'} font-black text-xs transition">
+              ${isMax ? 'MAX' : `${cost.toLocaleString()}원`}
             </button>
           </div>
         `;
       }).join('');
     }
 
-    function renderAll() { updateHeaderStats(); renderPOSRegister(); }
-
-    // ---------------------------------------------------------
-    // 12 SURPRISE EVENTS EXECUTOR
-    // ---------------------------------------------------------
-    function listenServerFever() {
-      db.ref('globalEvent').on('value', snap => {
-        const data = snap.val() || {};
-        serverFeverUntil = Number(data.feverUntil || 0);
-        serverFeverMultiplier = Math.max(0.5, Number(data.feverMult || 2.0));
-        document.getElementById('globalFeverLabel').textContent = `🔥 전체 서버 피버 타임! (모든 매출 ${serverFeverMultiplier}배!)`;
-      });
+    function buyUpgrade(key) {
+      const def = UPGRADE_DEFS.find(u => u.key === key);
+      if (!def) return;
+      const lv = gameState.upgrades[key] || 0;
+      if (lv >= def.maxLv) return;
+      const cost = Math.floor(def.baseCost * Math.pow(def.mult, lv));
+      if (gameState.money < cost) {
+        showToast('💸 자금이 부족합니다!', 'rose');
+        return;
+      }
+      gameState.money -= cost;
+      gameState.upgrades[key] = lv + 1;
+      playRegisterComplete();
+      renderUpgradeList();
+      updateAllUI();
+      saveToCloud();
     }
 
-    function listenServerSurprise() {
-      db.ref('globalEvent/surprise').on('value', snap => {
-        const data = snap.val();
-        if (!data || !data.id || data.id === lastSurpriseId) return;
-        if (Date.now() - Number(data.createdAt || 0) > 10000) return;
-        lastSurpriseId = data.id;
-        executeSurpriseEffect(data.type, data);
-      });
+    function renderCoreWeapons() {
+      const list = document.getElementById('coreWeaponList');
+      list.innerHTML = CORE_WEAPON_DEFS.map(w => {
+        const lv = gameState.coreWeapons[w.key] || 0;
+        const cost = w.baseCoreCost + lv * 2;
+        const isMax = lv >= w.maxLv;
+        return `
+          <div class="p-2.5 rounded-xl bg-slate-950/70 border border-purple-500/40 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="text-xs font-black text-white">${w.title} <span class="text-purple-300">(Lv.${lv})</span></div>
+              <div class="text-[11px] text-slate-400">${w.desc}</div>
+            </div>
+            <button onclick="buyCoreWeapon('${w.key}')" ${isMax ? 'disabled' : ''}
+              class="shrink-0 px-3 py-1.5 rounded-xl ${isMax ? 'bg-slate-800 text-slate-500' : 'bg-purple-500 hover:bg-purple-400 text-white active:scale-95'} font-black text-xs">
+              ${isMax ? 'MAX' : `${cost}개 강화`}
+            </button>
+          </div>
+        `;
+      }).join('');
     }
 
-    function executeSurpriseEffect(type, payload = {}) {
-      if (type === 'money_rain') {
+    function buyCoreWeapon(key) {
+      const def = CORE_WEAPON_DEFS.find(w => w.key === key);
+      if (!def) return;
+      const lv = gameState.coreWeapons[key] || 0;
+      if (lv >= def.maxLv) return;
+      const cost = def.baseCoreCost + lv * 2;
+      if (gameState.energyCores < cost) {
+        showToast('🔋 이벤트 재화가 부족합니다!', 'rose');
+        return;
+      }
+      gameState.energyCores -= cost;
+      gameState.coreWeapons[key] = lv + 1;
+      playGiftFanfare();
+      renderCoreWeapons();
+      updateAllUI();
+      saveToCloud();
+    }
+
+    function getNextBranchCost() {
+      return Math.floor(500000 * Math.pow(2.5, gameState.branchCount - 1));
+    }
+
+    function expandNewBranch() {
+      const cost = getNextBranchCost();
+      if (gameState.money < cost) {
+        showToast(`🏢 ${gameState.branchCount + 1}호점 오픈에는 ${cost.toLocaleString()}원이 필요합니다!`, 'rose');
+        return;
+      }
+      gameState.branchCount += 1;
+      gameState.money = 20000;
+      gameState.upgrades = { partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 };
+      playGiftFanfare();
+      renderUpgradeList();
+      updateAllUI();
+      saveToCloud();
+      showToast(`🎊 축하합니다! ${gameState.branchCount}호점이 개업했습니다! (영구 배율 상승)`);
+    }
+
+    // BOSS RAID & CHRISTMAS TREE INTERACTIONS
+    function triggerCyberFirewall() {
+      cyberFirewallCode = String(Math.floor(1000 + Math.random() * 9000));
+      cyberFirewallLocked = true;
+      document.getElementById('cyberCodeDisplay').textContent = cyberFirewallCode;
+      document.getElementById('cyberCodeInput').value = '';
+      document.getElementById('cyberFirewallBox').classList.remove('hidden');
+    }
+
+    function submitCyberFirewallCode() {
+      const input = document.getElementById('cyberCodeInput').value.trim();
+      if (input === cyberFirewallCode) {
+        cyberFirewallLocked = false;
+        document.getElementById('cyberFirewallBox').classList.add('hidden');
         playGiftFanfare();
-        gameState.money += 30000;
-        renderAll();
-        showToast('💸 하늘에서 운영자 지원금 돈비가 내립니다! (+30,000원)', 'warning');
-        for (let i = 0; i < 24; i++) {
-          const el = document.createElement('div');
-          el.className = 'money-rain-item';
-          el.textContent = i % 2 === 0 ? '💸' : '🪙';
-          el.style.left = `${Math.random() * 92}vw`;
-          el.style.animationDelay = `${Math.random() * 0.8}s`;
-          document.body.appendChild(el);
-          setTimeout(() => el.remove(), 3600);
-        }
-      } else if (type === 'core_drop') {
-        playGiftFanfare();
-        gameState.energyCores = (gameState.energyCores || 0) + 15;
-        renderAll();
-        showToast('🔋 이벤트 재화 긴급 폭격! (+15개 지급)', 'success');
-      } else if (type === 'server_lotto') {
-        playGiftFanfare();
-        if (currentUser && payload.winner === currentUser.nickname) {
-          gameState.money += 500000;
-          renderAll();
-          syncCloudSave(true);
-          showToast('🎰 축하합니다!! 전 서버 로또 당첨! (+500,000원)', 'warning');
-        } else {
-          showToast(`🎰 전 서버 로또 당첨자: [${payload.winner || '행운의 사장님'}] (+500,000원)!`, 'info');
-        }
-      } else if (type === 'vip_spawn') {
-        playGiftFanfare();
-        currentCustomer = generateCustomerOrder(true);
-        renderPOSRegister();
-        showToast('👑 운영자가 VIP 재벌 손님(매출 10배)을 소환했습니다!', 'warning');
-      } else if (type === 'golden_broom') {
-        playGiftFanfare();
-        gameState.cleanliness = 100;
-        gameState.money += 10000 * gameState.branchCount;
-        renderAll();
-        showToast(`🧹 황금 빗자루 타임! 청결도 100% 회복 + 보너스 ${formatKRW(10000 * gameState.branchCount)}!`, 'success');
-      } else if (type === 'flip_psycho') {
-        playTone(660, 'sawtooth', 0.25, 0.08);
-        showToast('🙃 운영자가 장난을 쳤습니다! (5초간 화면 반전)', 'warning');
-        document.body.classList.add('admin-flip', 'admin-psycho');
-        setTimeout(() => document.body.classList.remove('admin-flip', 'admin-psycho'), 5000);
-      } else if (type === 'zero_gravity') {
-        playTone(540, 'sine', 0.25, 0.08);
-        zeroGravityUntil = Date.now() + 7000;
-        renderPOSRegister();
-        showToast('🛸 무중력 둥둥 모드 발동! (7초간 상품 버튼 부유)', 'warning');
-        setTimeout(() => renderPOSRegister(), 7200);
-      } else if (type === 'alien_slime') {
-        playUfoAlarm();
-        showToast('🧪 화면에 점액/버그가 묻었습니다! 터치해서 닦아내세요!', 'warning');
-        const box = document.getElementById('slimeOverlay');
-        box.innerHTML = '';
-        box.classList.remove('hidden');
-        for (let i = 0; i < 6; i++) {
-          const splat = document.createElement('button');
-          splat.textContent = activeThemeMode === 'cyber' ? '👾' : '🦠';
-          splat.className = 'pointer-events-auto fixed text-5xl sm:text-6xl drop-shadow-[0_0_15px_rgba(163,230,53,0.9)] active:scale-75 transition';
-          splat.style.left = `${12 + Math.random() * 72}vw`;
-          splat.style.top = `${18 + Math.random() * 60}vh`;
-          splat.onclick = () => { playCoinTap(); splat.remove(); if (box.children.length === 0) box.classList.add('hidden'); };
-          box.appendChild(splat);
-        }
-      } else if (type === 'megaphone') {
-        playUfoAlarm();
-        document.body.classList.add('admin-shake');
-        const banner = document.getElementById('megaphoneBanner');
-        document.getElementById('megaphoneText').textContent = payload.msg || '총괄 운영자가 지켜보고 있습니다!! 👀';
-        banner.classList.remove('hidden');
-        setTimeout(() => { document.body.classList.remove('admin-shake'); banner.classList.add('hidden'); }, 4000);
-      } else if (type === 'blackout') {
-        playTone(140, 'sawtooth', 0.4, 0.1);
-        const bo = document.getElementById('blackoutOverlay');
-        bo.classList.remove('hidden');
-        showToast('⚡ 깜짝 정전 사태! (5초 후 복구됩니다)', 'warning');
-        setTimeout(() => bo.classList.add('hidden'), 5000);
-      } else if (type === 'rush_queue') {
-        playGiftFanfare();
-        currentCustomer = generateCustomerOrder(false, 5);
-        waitingQueue = [generateCustomerOrder(false, 5), generateCustomerOrder(false, 5), generateCustomerOrder(false, 5)];
-        renderPOSRegister();
-        showToast('🏃 대량 구매 손님 러시! 장바구니 5개씩 가득 찼습니다!', 'warning');
-      } else if (type === 'auto_rush') {
-        playGiftFanfare();
-        autoRushUntil = Date.now() + 10000;
-        showToast('🚀 10초간 초고속 자동 정산 러시 발동!', 'warning');
+        showToast('🔓 AI 방화벽 해독 완료! 보스에게 3배 데미지가 들어갑니다!');
+      } else {
+        showToast('❌ 보안 암호가 틀렸습니다! 화면의 4자리 숫자를 정확히 입력하세요.', 'rose');
       }
     }
 
-    // ---------------------------------------------------------
-    // Main Game Loops
-    // ---------------------------------------------------------
-    function startGameLoops() {
-      setInterval(() => {
-        const now = Date.now();
-        const dt = (now - lastTick) / 1000;
-        lastTick = now;
+    function attackMothership(mode, ev) {
+      if (!activeRaidState || !activeRaidState.active) return;
+      const laserLv = gameState.coreWeapons.hyperLaser || 0;
+      let dmg = 150 + laserLv * 100;
 
-        if (activeThemeMode !== 'normal') updateLiveInvasionDdayBanner();
-
-        if (auto30MinRaidEnabled && (!activeRaidState || !activeRaidState.active)) {
-          const d = new Date();
-          const min = d.getMinutes();
-          const sec = d.getSeconds();
-          if ((min === 0 || min === 30) && sec < 3) {
-            const slotKey = `${d.getHours()}:${min}`;
-            if (slotKey !== lastAuto30MinSlot) {
-              lastAuto30MinSlot = slotKey;
-              adminLaunchBossRaid(activeThemeMode === 'cyber' ? 'cyber' : 'alien');
-            }
-          }
+      if (mode === 'core') {
+        if (gameState.energyCores < 1) {
+          showToast('🔋 이벤트 재화가 부족합니다!', 'rose');
+          return;
         }
+        gameState.energyCores -= 1;
+        dmg = 1200 + laserLv * 350;
+      }
 
-        if (activeRaidState && activeRaidState.active) {
-          const remSec = Math.max(0, Math.ceil((Number(activeRaidState.endsAt || 0) - now) / 1000));
-          document.getElementById('raidTimerBadge').textContent = `${String(Math.floor(remSec / 60)).padStart(2, '0')}:${String(remSec % 60).padStart(2, '0')}`;
-          const turretDmg = Math.round(getAutoTurretDamagePerSec() * dt);
-          if (turretDmg > 0 && !cyberFirewallLocked) applyDamageToMothership(turretDmg);
+      if (activeRaidState.type === 'cyber' && !cyberFirewallLocked) dmg *= 3;
+
+      playBarcodeBeep();
+      if (ev) spawnFloatingText(ev.clientX, ev.clientY, `-${dmg.toLocaleString()} DMG!`, '#f43f5e');
+      updateAllUI();
+
+      db.ref('global/raid').transaction(r => {
+        if (!r || !r.active) return r;
+        r.hp = Math.max(0, (r.hp || 0) - dmg);
+        if (r.hp === 0) {
+          r.active = false;
+          r.winId = `win_${Date.now()}`;
         }
-
-        const feverBanner = document.getElementById('globalFeverBanner');
-        if (now < serverFeverUntil) {
-          const remSec = Math.ceil((serverFeverUntil - now) / 1000);
-          document.getElementById('globalFeverTimer').textContent = `${String(Math.floor(remSec / 60)).padStart(2, '0')}:${String(remSec % 60).padStart(2, '0')}`;
-          feverBanner.classList.remove('hidden');
-        } else {
-          feverBanner.classList.add('hidden');
-        }
-
-        if (now < autoRushUntil && currentCustomer) {
-          const earned = Math.round(currentCustomer.total * getTotalRevenueMultiplier());
-          gameState.money += earned;
-          gameState.totalServed += 1;
-          currentCustomer = waitingQueue.shift() || generateCustomerOrder();
-          waitingQueue.push(generateCustomerOrder());
-          renderPOSRegister();
-        }
-
-        dayTimer += dt;
-        if (dayTimer >= DAY_DURATION_SEC) {
-          dayTimer = 0;
-          gameState.day += 1;
-          const settlementBonus = Math.round((3000 + (gameState.upgrades.storeExpansion || 0) * 2000) * getBranchMultiplier());
-          gameState.money += settlementBonus;
-          syncCloudSave(true);
-        }
-        document.getElementById('dayProgressBar').style.width = `${(dayTimer / DAY_DURATION_SEC) * 100}%`;
-
-        const passivePerSec = getPassiveIncomePerSec();
-        if (passivePerSec > 0) gameState.money += passivePerSec * dt;
-
-        updateHeaderStats();
-      }, 500);
-
-      setInterval(() => syncCloudSave(true), 20000);
+        return r;
+      });
     }
 
-    // ---------------------------------------------------------
-    // Tab Navigation, Toast & Floating Text
-    // ---------------------------------------------------------
+    function donateToXmasTree(type, ev) {
+      if (!activeXmasTreeState || !activeXmasTreeState.active) return;
+      let pts = 0;
+      if (type === 'gift') {
+        if (gameState.energyCores < 1) {
+          showToast('🎁 선물 상자가 부족합니다! 손님 계산을 완료해 모으세요!', 'rose');
+          return;
+        }
+        gameState.energyCores -= 1;
+        pts = 10;
+      } else {
+        if (gameState.money < 10000) {
+          showToast('💸 보유 자금이 부족합니다!', 'rose');
+          return;
+        }
+        gameState.money -= 10000;
+        pts = 5;
+      }
+
+      playGiftFanfare();
+      if (ev) spawnFloatingText(ev.clientX, ev.clientY, `🎄 +${pts} 점등 포인트!`, '#fde047');
+      updateAllUI();
+
+      db.ref('global/xmasTree').transaction(t => {
+        if (!t || !t.active) return t;
+        t.points = (t.points || 0) + pts;
+        if (t.points >= (t.goal || 500)) {
+          t.active = false;
+          t.winId = `xmas_win_${Date.now()}`;
+        }
+        return t;
+      });
+    }
+
+    // MAIN GAME LOOP
+    function gameLoopTick() {
+      const now = Date.now();
+      const dt = (now - lastTick) / 1000;
+      lastTick = now;
+
+      // Passive income
+      const passive = getPassiveIncomePerSec();
+      if (passive > 0) gameState.money += passive * dt;
+
+      // Day progression
+      dayTimer += dt;
+      if (dayTimer >= DAY_DURATION_SEC) {
+        dayTimer = 0;
+        gameState.day += 1;
+      }
+      document.getElementById('dayProgressBar').style.width = `${Math.min(100, (dayTimer / DAY_DURATION_SEC) * 100)}%`;
+
+      // Auto rush event
+      if (now < autoRushUntil && currentCustomer) {
+        finalizeCustomerSale(1.0);
+      }
+
+      // Auto turret damage during active boss raid
+      if (activeRaidState && activeRaidState.active && (gameState.coreWeapons.autoTurret || 0) > 0) {
+        window._turretAccum = (window._turretAccum || 0) + dt;
+        if (window._turretAccum >= 1.0) {
+          window._turretAccum = 0;
+          const turretDmg = gameState.coreWeapons.autoTurret * 250;
+          db.ref('global/raid/hp').transaction(hp => Math.max(0, (hp || 0) - turretDmg));
+        }
+      }
+
+      // Fever timer display
+      const feverBanner = document.getElementById('globalFeverBanner');
+      if (now < serverFeverUntil) {
+        feverBanner.classList.remove('hidden');
+        const rem = Math.ceil((serverFeverUntil - now) / 1000);
+        const mm = String(Math.floor(rem / 60)).padStart(2, '0');
+        const ss = String(rem % 60).padStart(2, '0');
+        document.getElementById('globalFeverLabel').textContent = `🔥 전체 서버 피버 타임! (모든 매출 ${serverFeverMultiplier}배!)`;
+        document.getElementById('globalFeverTimer').textContent = `${mm}:${ss}`;
+      } else {
+        feverBanner.classList.add('hidden');
+      }
+
+      // Raid timer display
+      if (activeRaidState && activeRaidState.active && activeRaidState.endsAt) {
+        const rem = Math.max(0, Math.ceil((activeRaidState.endsAt - now) / 1000));
+        const mm = String(Math.floor(rem / 60)).padStart(2, '0');
+        const ss = String(rem % 60).padStart(2, '0');
+        document.getElementById('raidTimerBadge').textContent = `${mm}:${ss}`;
+      }
+
+      // 30-min auto raid scheduler
+      if (auto30MinRaidEnabled) {
+        const d = new Date();
+        const slot = `${d.getHours()}_${d.getMinutes() < 30 ? '00' : '30'}`;
+        if ((d.getMinutes() === 0 || d.getMinutes() === 30) && slot !== lastAuto30MinSlot) {
+          lastAuto30MinSlot = slot;
+          adminLaunchBossRaid(activeThemeMode === 'cyber' ? 'cyber' : 'alien');
+        }
+      }
+
+      updateThemeDdayText();
+      updateAllUI();
+    }
+
+    function updateAllUI() {
+      document.getElementById('statMoney').textContent = `${Math.floor(gameState.money).toLocaleString()}원`;
+      document.getElementById('statEnergyCores').textContent = `${gameState.energyCores.toLocaleString()}개`;
+      document.getElementById('statMultiplier').textContent = `x${getCurrentMultiplier().toFixed(1)}`;
+      document.getElementById('headerBranchBadge').textContent = `${gameState.branchCount}호점`;
+      document.getElementById('storeGradeBadge').textContent = `${gameState.branchCount}호점 · Day ${gameState.day}`;
+      document.getElementById('passiveIncomeLabel').textContent = `알바 자동매출: ${getPassiveIncomePerSec().toLocaleString()}원/초`;
+      document.getElementById('cleanlinessText').textContent = `${gameState.cleanliness}%`;
+      document.getElementById('posComboText').textContent = `${gameState.combo}콤보`;
+      document.getElementById('armoryCoreCount').textContent = gameState.energyCores;
+
+      const laserLv = gameState.coreWeapons.hyperLaser || 0;
+      document.getElementById('laserDmgText').textContent = (150 + laserLv * 100).toLocaleString();
+      document.getElementById('coreDmgText').textContent = (1200 + laserLv * 350).toLocaleString();
+
+      const nextCost = getNextBranchCost();
+      document.getElementById('nextBranchTitle').textContent = `🏢 ${gameState.branchCount + 1}호점 오픈하기 (영구 매출 +50%)`;
+      document.getElementById('currentBranchMultText').textContent = `현재 ${gameState.branchCount}호점 (x${(1 + (gameState.branchCount - 1) * 0.5).toFixed(1)})`;
+      document.getElementById('expandBranchBtn').textContent = `필요 자금: ${nextCost.toLocaleString()}원 달성 시 오픈 가능`;
+
+      const medalBadge = document.getElementById('headerTitleMedal');
+      if (gameState.medals && gameState.medals.length > 0) {
+        medalBadge.classList.remove('hidden');
+        medalBadge.textContent = gameState.medals[gameState.medals.length - 1];
+      }
+    }
+
+    // NAVIGATION & COMMUNITY
     function switchTab(tabName) {
       ['store', 'upgrade', 'ranking', 'community'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
-        document.getElementById(`nav-${t}`).className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition';
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
+        const btn = document.getElementById(`nav-${t}`);
+        if (t === tabName) {
+          btn.className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition';
+        } else {
+          btn.className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition';
+        }
       });
-      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-      document.getElementById(`nav-${tabName}`).className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition';
-
-      if (tabName === 'upgrade') renderUpgradesList();
       if (tabName === 'ranking') fetchLeaderboard();
-      if (tabName === 'community') loadNoticeHistory();
     }
 
-    function showToast(msg, type = 'info') {
-      const box = document.getElementById('toastContainer');
-      const el = document.createElement('div');
-      const styles = {
-        info: 'bg-slate-800/95 border-slate-600 text-white',
-        success: 'bg-emerald-950/95 border-emerald-500 text-emerald-200',
-        warning: 'bg-amber-950/95 border-amber-500 text-amber-200',
-        error: 'bg-rose-950/95 border-rose-500 text-rose-200'
+    function fetchLeaderboard() {
+      db.ref('users').once('value', snap => {
+        const val = snap.val();
+        const list = document.getElementById('leaderboardList');
+        if (!val) {
+          list.innerHTML = '<div class="text-center text-xs text-slate-400 py-6">등록된 사장님이 없습니다.</div>';
+          return;
+        }
+        const sorted = Object.values(val)
+          .filter(u => !u.banned)
+          .sort((a, b) => (b.branchCount || 1) - (a.branchCount || 1) || (b.money || 0) - (a.money || 0))
+          .slice(0, 30);
+
+        list.innerHTML = sorted.map((u, idx) => {
+          const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}위`;
+          const isMe = currentUser && u.nickname === currentUser.nickname;
+          return `
+            <div class="p-2.5 rounded-2xl border ${isMe ? 'bg-emerald-500/15 border-emerald-400' : 'bg-slate-800/70 border-slate-700/70'} flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="font-black text-xs w-7 text-center shrink-0">${rankIcon}</span>
+                <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-black shrink-0">${u.branchCount || 1}호점</span>
+                <span class="font-black text-xs text-white truncate">${escapeHtml(u.nickname)}</span>
+              </div>
+              <span class="font-black text-xs text-emerald-300 shrink-0">${Number(u.money || 0).toLocaleString()}원</span>
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    function postShoutboxMessage() {
+      const input = document.getElementById('shoutboxInput');
+      const text = input.value.trim();
+      if (!text || !currentUser) return;
+      input.value = '';
+      db.ref('global/shoutbox').push({ nickname: currentUser.nickname, text, timestamp: Date.now() });
+    }
+
+    function castPollVote(optNum) {
+      if (!currentUser) return;
+      const updates = {};
+      updates[`global/poll/votes1/${currentUser.key}`] = optNum === 1 ? true : null;
+      updates[`global/poll/votes2/${currentUser.key}`] = optNum === 2 ? true : null;
+      db.ref().update(updates);
+      playCoinTap();
+    }
+
+    function submitFeedback() {
+      const input = document.getElementById('feedbackInput');
+      const text = input.value.trim();
+      if (!text || !currentUser) return;
+      input.value = '';
+      db.ref('global/feedbacks').push({ nickname: currentUser.nickname, text, timestamp: Date.now() });
+      showToast('📨 관리자에게 소중한 의견이 전달되었습니다!');
+    }
+
+    // COUPONS
+    function openCouponModal() { document.getElementById('couponModal').classList.remove('hidden'); }
+    function closeCouponModal() { document.getElementById('couponModal').classList.add('hidden'); }
+
+    function redeemCouponCode() {
+      const raw = document.getElementById('couponCodeInput').value.trim();
+      if (!raw) return;
+      const code = raw.toLowerCase();
+
+      if (gameState.usedCoupons[code]) {
+        showToast('⚠️ 이미 사용한 쿠폰 코드입니다!', 'rose');
+        return;
+      }
+
+      if (code === LAUNCH_COUPON_CODE) {
+        gameState.usedCoupons[code] = true;
+        gameState.money += LAUNCH_COUPON_REWARD;
+        saveToCloud();
+        updateAllUI();
+        closeCouponModal();
+        playGiftFanfare();
+        showToast(`🎉 오픈 기념 쿠폰 보상 +${LAUNCH_COUPON_REWARD.toLocaleString()}원 지급!`);
+        return;
+      }
+
+      db.ref(`global/coupons/${sanitizeKey(code)}`).once('value', snap => {
+        const cData = snap.val();
+        if (!cData || !cData.reward) {
+          showToast('❌ 존재하지 않거나 만료된 쿠폰입니다.', 'rose');
+          return;
+        }
+        gameState.usedCoupons[code] = true;
+        gameState.money += Number(cData.reward);
+        saveToCloud();
+        updateAllUI();
+        closeCouponModal();
+        playGiftFanfare();
+        showToast(`🎁 쿠폰 보상 +${Number(cData.reward).toLocaleString()}원 수령 완료!`);
+      });
+    }
+
+    // ADMIN CONTROLS
+    function openAdminModal() { document.getElementById('adminModal').classList.remove('hidden'); }
+    function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
+
+    function verifyAdminPass() {
+      const val = document.getElementById('adminPassInput').value.trim();
+      if (val === ADMIN_SECRET) {
+        document.getElementById('adminAuthGate').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        loadAdminUserList();
+        loadAdminFeedbacks();
+        db.ref('meta/totalVisits').once('value', s => {
+          document.getElementById('adminTotalVisits').textContent = `${Number(s.val() || 0).toLocaleString()}회`;
+        });
+      } else {
+        document.getElementById('adminAuthError').classList.remove('hidden');
+      }
+    }
+
+    function saveSeasonConfig() {
+      const num = Number(document.getElementById('adminSeasonNumInput').value || 1);
+      const bannerText = document.getElementById('adminBannerMsgInput').value.trim() || '대침공이 다가옵니다..';
+      db.ref('global/season').update({ number: num, bannerText });
+      showToast('💾 시즌 번호 및 배너 문구가 전 서버에 반영되었습니다!');
+    }
+
+    function launchThemeEve(themeKey) {
+      const defaultMsgs = {
+        alien: '대침공이 다가옵니다..',
+        cyber: 'AI 메인프레임 결전이 다가옵니다..',
+        xmas: '크리스마스 대축제가 다가옵니다!'
       };
-      el.className = `px-3.5 py-2 rounded-2xl border shadow-xl text-xs font-bold text-center animate-pop ${styles[type] || styles.info}`;
+      db.ref('global/season').update({
+        activeTheme: themeKey,
+        bannerText: defaultMsgs[themeKey] || currentBannerText,
+        playCutscene: true,
+        themeEventId: `eve_${themeKey}_${Date.now()}`
+      });
+      showToast(`🎬 [${themeKey.toUpperCase()}] 전야제 컷씬 & 테마가 전 서버에 발동되었습니다!`);
+    }
+
+    function adminLaunchBossRaid(type) {
+      db.ref('global/raid').set({
+        active: true,
+        type,
+        id: `raid_${type}_${Date.now()}`,
+        hp: type === 'cyber' ? 150000 : 100000,
+        maxHp: type === 'cyber' ? 150000 : 100000,
+        endsAt: Date.now() + 180000
+      });
+      showToast(`⚔️ [${type.toUpperCase()}] 보스 레이드가 시작되었습니다!`);
+    }
+
+    function adminLaunchXmasTreeFestival() {
+      db.ref('global/xmasTree').set({
+        active: true,
+        points: 0,
+        goal: 500
+      });
+      showToast('🎄 전 서버 크리스마스 트리 점등 축제가 개막했습니다!');
+    }
+
+    function toggleAuto30MinRaid() {
+      db.ref('global/season/auto30m').set(!auto30MinRaidEnabled);
+      showToast(`🕒 30분 주기 자동 보스전이 ${!auto30MinRaidEnabled ? '활성화' : '비활성화'}되었습니다.`);
+    }
+
+    function adminForceWinCurrentEvent() {
+      if (activeRaidState && activeRaidState.active) {
+        db.ref('global/raid').update({ active: false, hp: 0, winId: `win_${Date.now()}` });
+      }
+      if (activeXmasTreeState && activeXmasTreeState.active) {
+        db.ref('global/xmasTree').update({ active: false, winId: `xmas_win_${Date.now()}` });
+      }
+      showToast('🏆 현재 진행 중인 이벤트의 승리 컷씬을 발동했습니다!');
+    }
+
+    function resetAllThemeEvents() {
+      db.ref('global/season').update({ activeTheme: 'normal', playCutscene: false, themeEventId: `norm_${Date.now()}` });
+      db.ref('global/raid').set({ active: false });
+      db.ref('global/xmasTree').set({ active: false });
+      showToast('🔄 모든 테마 이벤트가 종료되고 일반 매장으로 복구되었습니다.');
+    }
+
+    function adminEndSeasonAndAdvance() {
+      db.ref('users').once('value', snap => {
+        const val = snap.val() || {};
+        const top = Object.values(val).filter(u => !u.banned).sort((a, b) => (b.branchCount || 1) - (a.branchCount || 1) || (b.money || 0) - (a.money || 0))[0];
+        if (top) {
+          db.ref('global/hallOfFame').push({
+            season: currentSeasonNumber,
+            champion: top.nickname,
+            branchCount: top.branchCount || 1,
+            money: top.money || 0,
+            endedAt: Date.now()
+          });
+        }
+        db.ref('global/season').update({
+          number: currentSeasonNumber + 1,
+          activeTheme: 'normal',
+          resetId: `reset_${Date.now()}`
+        });
+        showToast(`👑 시즌 ${currentSeasonNumber} 챔피언 박제 완료! 시즌 ${currentSeasonNumber + 1}이 시작됩니다!`);
+      });
+    }
+
+    function triggerAdminSurprise(type) {
+      const msg = document.getElementById('adminMegaphoneInput').value.trim();
+      db.ref('global/surprise').set({ id: `surp_${Date.now()}`, type, text: msg, timestamp: Date.now() });
+      showToast(`🎪 깜짝 이벤트 [${type}] 발송 완료!`);
+    }
+
+    function executeSurpriseClientEffect(ev) {
+      switch (ev.type) {
+        case 'money_rain':
+          gameState.money += 30000;
+          for (let i = 0; i < 24; i++) {
+            const el = document.createElement('div');
+            el.className = 'money-rain-item';
+            el.textContent = i % 2 === 0 ? '💵' : '💰';
+            el.style.left = `${Math.random() * 95}vw`;
+            el.style.animationDelay = `${Math.random() * 1.2}s`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 3500);
+          }
+          showToast('💸 하늘에서 돈비가 내립니다! 전원 +30,000원!');
+          break;
+        case 'core_drop':
+          gameState.energyCores += 15;
+          showToast('🔋 이벤트 재화 보급 투하! +15개 지급!');
+          break;
+        case 'auto_rush':
+          autoRushUntil = Date.now() + 10000;
+          showToast('🚀 10초간 초고속 자동 정산 러시 발동!');
+          break;
+        case 'server_lotto':
+          if (Math.random() < 0.35) {
+            gameState.money += 500000;
+            showToast('🎰 대박!! 전 서버 로또에 당첨되어 +500,000원을 획득했습니다!');
+          } else {
+            showToast('🎰 전 서버 로또 추첨이 진행되었습니다! 다음 기회에!');
+          }
+          break;
+        case 'vip_spawn':
+          waitingQueue.unshift(createCustomerObject(true, false));
+          renderWaitingLine();
+          showToast('👑 초특급 VIP 재벌 손님이 대기줄 맨 앞에 도착했습니다!');
+          break;
+        case 'golden_broom':
+          gameState.cleanliness = 100;
+          gameState.money += 20000;
+          showToast('🧹 황금 빗자루 타임! 청결도 100% + 보너스 20,000원!');
+          break;
+        case 'flip_psycho':
+          document.body.classList.add('admin-flip', 'admin-psycho');
+          setTimeout(() => document.body.classList.remove('admin-flip', 'admin-psycho'), 5000);
+          showToast('🙃 운영자의 장난! 5초간 화면이 뒤집힙니다!');
+          break;
+        case 'zero_gravity':
+          zeroGravityUntil = Date.now() + 7000;
+          renderBasketItems();
+          showToast('🛸 7초간 매장 내부가 무중력 상태가 됩니다!');
+          break;
+        case 'alien_slime': {
+          const slime = document.getElementById('slimeOverlay');
+          slime.classList.remove('hidden');
+          slime.classList.remove('pointer-events-none');
+          slime.innerHTML = Array.from({ length: 12 }, () => `
+            <div onclick="this.remove()" style="position:fixed;left:${10 + Math.random() * 75}vw;top:${15 + Math.random() * 65}vh;font-size:54px;cursor:pointer;">🧪</div>
+          `).join('');
+          setTimeout(() => { slime.innerHTML = ''; slime.classList.add('hidden', 'pointer-events-none'); }, 8000);
+          showToast('🧪 화면에 묻은 점액을 터치해서 닦아내세요!');
+          break;
+        }
+        case 'megaphone': {
+          const banner = document.getElementById('megaphoneBanner');
+          document.getElementById('megaphoneText').textContent = ev.text || '장사 잘 되고 있나 사장님들?!';
+          banner.classList.remove('hidden');
+          document.body.classList.add('admin-shake');
+          setTimeout(() => { banner.classList.add('hidden'); document.body.classList.remove('admin-shake'); }, 4500);
+          break;
+        }
+        case 'blackout': {
+          const bo = document.getElementById('blackoutOverlay');
+          bo.classList.remove('hidden');
+          setTimeout(() => bo.classList.add('hidden'), 5000);
+          showToast('⚡ 깜짝 정전! 5초 뒤 비상 발전기가 가동됩니다!');
+          break;
+        }
+        case 'rush_queue':
+          waitingQueue.unshift(createCustomerObject(false, true), createCustomerObject(false, true));
+          renderWaitingLine();
+          showToast('🏃 대량 구매 손님 러시! 장바구니 폭탄 손님 등장!');
+          break;
+      }
+      updateAllUI();
+    }
+
+    function postGlobalNotice() {
+      const text = document.getElementById('adminNoticeInput').value.trim();
+      if (!text) return;
+      document.getElementById('adminNoticeInput').value = '';
+      const payload = { text, timestamp: Date.now() };
+      db.ref('global/notice').set(payload);
+      db.ref('global/noticeHistory').push(payload);
+      showToast('📢 전체 긴급 공지가 발송되었습니다!');
+    }
+
+    function clearGlobalNotice() {
+      db.ref('global/notice').remove();
+    }
+
+    function triggerServerFever(minutes, mult) {
+      db.ref('global/fever').set({ until: Date.now() + minutes * 60 * 1000, multiplier: mult });
+      showToast(`🔥 ${minutes}분간 전체 서버 ${mult}배 피버 타임 발동!`);
+    }
+
+    function triggerCustomFever() {
+      const mult = Number(document.getElementById('adminFeverMultInput').value || 2);
+      const mins = Number(document.getElementById('adminFeverMinInput').value || 5);
+      triggerServerFever(mins, mult);
+    }
+
+    function stopServerFever() {
+      db.ref('global/fever').remove();
+      showToast('피버 타임이 종료되었습니다.');
+    }
+
+    function loadAdminUserList() {
+      db.ref('users').once('value', snap => {
+        const val = snap.val() || {};
+        const users = Object.values(val);
+        document.getElementById('adminTotalUsers').textContent = `${users.length}명`;
+
+        const sel = document.getElementById('adminUserSelect');
+        sel.innerHTML = '<option value="">-- 가입 유저 선택 --</option>' + users.map(u => `<option value="${escapeHtml(u.nickname)}">${escapeHtml(u.nickname)} (${Number(u.money || 0).toLocaleString()}원)</option>`).join('');
+
+        const statusList = document.getElementById('adminUserStatusList');
+        statusList.innerHTML = users.map(u => `
+          <div class="flex items-center justify-between px-2 py-1 rounded bg-slate-900 border border-slate-700">
+            <span class="${u.banned ? 'text-rose-400 line-through' : 'text-slate-200'} font-bold">${escapeHtml(u.nickname)}</span>
+            <span class="text-slate-400">${u.banned ? '🚫 차단됨' : `${Number(u.money || 0).toLocaleString()}원`}</span>
+          </div>
+        `).join('');
+      });
+    }
+
+    function syncSelectedUserToInput() {
+      const v = document.getElementById('adminUserSelect').value;
+      if (v) document.getElementById('adminTargetNickname').value = v;
+    }
+
+    function setAdminAmountPreset(amt) {
+      document.getElementById('adminMoneyAmount').value = amt;
+    }
+
+    function adminModifyUserMoney(mode) {
+      const target = document.getElementById('adminTargetNickname').value.trim();
+      const amount = Number(document.getElementById('adminMoneyAmount').value || 0);
+      if (!target) return;
+      const key = sanitizeKey(target);
+      db.ref(`users/${key}`).once('value', snap => {
+        const u = snap.val();
+        if (!u) { showToast('해당 닉네임을 찾을 수 없습니다.', 'rose'); return; }
+        const nextMoney = mode === 'add' ? Number(u.money || 0) + amount : amount;
+        db.ref(`users/${key}`).update({ money: nextMoney, adminSyncFlag: `sync_${Date.now()}` });
+        showToast(`💸 [${target}] 님의 자금이 ${nextMoney.toLocaleString()}원으로 반영되었습니다.`);
+        loadAdminUserList();
+      });
+    }
+
+    function adminSetUserBan(banned) {
+      const target = document.getElementById('adminBanTargetInput').value.trim();
+      const reason = document.getElementById('adminBanReasonInput').value.trim();
+      if (!target) return;
+      const key = sanitizeKey(target);
+      db.ref(`users/${key}`).update({ banned, banReason: reason || '운영 정책 위반' });
+      showToast(banned ? `🚫 [${target}] 계정이 차단되었습니다.` : `✅ [${target}] 차단이 해제되었습니다.`);
+      loadAdminUserList();
+    }
+
+    function createAdminCoupon() {
+      const code = document.getElementById('adminNewCouponCode').value.trim().toLowerCase();
+      const reward = Number(document.getElementById('adminNewCouponReward').value || 0);
+      if (!code || reward <= 0) return;
+      db.ref(`global/coupons/${sanitizeKey(code)}`).set({ reward, createdAt: Date.now() });
+      document.getElementById('adminNewCouponCode').value = '';
+      showToast(`🎁 새 쿠폰 [${code}] (${reward.toLocaleString()}원) 발행 완료!`);
+    }
+
+    function createAdminPoll() {
+      const q = document.getElementById('adminPollQuestion').value.trim();
+      const o1 = document.getElementById('adminPollOpt1').value.trim();
+      const o2 = document.getElementById('adminPollOpt2').value.trim();
+      if (!q || !o1 || !o2) return;
+      db.ref('global/poll').set({ active: true, question: q, opt1: o1, opt2: o2, votes1: {}, votes2: {} });
+      showToast('🗳️ 실시간 유저 투표가 시작되었습니다!');
+    }
+
+    function closeAdminPoll() {
+      db.ref('global/poll/active').set(false);
+      showToast('투표가 종료되었습니다.');
+    }
+
+    function loadAdminFeedbacks() {
+      db.ref('global/feedbacks').limitToLast(20).once('value', snap => {
+        const val = snap.val();
+        const box = document.getElementById('adminFeedbackList');
+        if (!val) { box.innerHTML = '<p class="text-slate-400 text-[11px]">제보 내역이 없습니다.</p>'; return; }
+        box.innerHTML = Object.values(val).reverse().map(f => `
+          <div class="p-2 rounded-xl bg-slate-900 border border-slate-700">
+            <div class="font-black text-emerald-300">${escapeHtml(f.nickname)}</div>
+            <div class="text-slate-200 mt-0.5">${escapeHtml(f.text)}</div>
+          </div>
+        `).join('');
+      });
+    }
+
+    // UI HELPERS
+    function showToast(msg, color = 'emerald') {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      const border = color === 'rose' ? 'border-rose-400 bg-rose-950/95 text-rose-100' : 'border-emerald-400 bg-slate-900/95 text-white';
+      el.className = `px-3.5 py-2 rounded-2xl border ${border} text-xs font-black shadow-xl animate-pop text-center`;
       el.textContent = msg;
-      box.appendChild(el);
-      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.25s'; setTimeout(() => el.remove(), 260); }, 3000);
+      container.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 300); }, 2600);
     }
 
     function spawnFloatingText(x, y, text, color = '#fbbf24') {
       const el = document.createElement('div');
       el.className = 'floating-text text-xs sm:text-sm';
-      el.style.left = `${Math.min(window.innerWidth - 100, Math.max(14, x - 35))}px`;
-      el.style.top = `${Math.max(55, y - 22)}px`;
+      el.style.left = `${Math.min(window.innerWidth - 120, Math.max(10, x - 30))}px`;
+      el.style.top = `${Math.max(20, y - 20)}px`;
       el.style.color = color;
       el.textContent = text;
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 900);
     }
 
-    // ---------------------------------------------------------
-    // Leaderboard, Shoutbox & Community
-    // ---------------------------------------------------------
-    function listenShoutbox() {
-      db.ref('shoutbox').limitToLast(20).on('value', snap => {
-        const data = snap.val();
-        const box = document.getElementById('shoutboxList');
-        if (!data) { box.innerHTML = `<p class="text-slate-400 text-[11px]">첫 번째 방명록을 남겨보세요!</p>`; return; }
-        box.innerHTML = Object.values(data).map(item => `
-          <div class="px-2.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-baseline justify-between gap-2">
-            <div class="min-w-0">
-              <span class="font-black text-emerald-300">[${item.branch || 1}호점] ${item.nickname}:</span>
-              <span class="text-slate-200 break-words ml-1">${item.text}</span>
-            </div>
-            <span class="text-[9px] text-slate-500 shrink-0">${new Date(item.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
-          </div>
-        `).join('');
-        box.scrollTop = box.scrollHeight;
-      });
-    }
-
-    async function postShoutboxMessage() {
-      if (!currentUser) return;
-      const input = document.getElementById('shoutboxInput');
-      const text = input.value.trim();
-      if (!text) return;
-      await db.ref('shoutbox').push({ nickname: currentUser.nickname, branch: gameState.branchCount, text, createdAt: Date.now() });
-      input.value = '';
-    }
-
-    async function fetchLeaderboard() {
-      const listEl = document.getElementById('leaderboardList');
-      listEl.innerHTML = `<div class="text-center text-xs text-slate-400 py-6">실시간 순위 집계 중...</div>`;
-      try {
-        const snap = await db.ref('users').once('value');
-        const usersObj = snap.val() || {};
-        const arr = Object.values(usersObj).filter(u => !u.banned).map(u => ({
-          nickname: u.nickname || '사장님',
-          money: Number(u.money ?? u.state?.money ?? 0),
-          branchCount: Number(u.branchCount ?? u.state?.branchCount ?? 1)
-        }));
-        arr.sort((a, b) => b.branchCount !== a.branchCount ? b.branchCount - a.branchCount : b.money - a.money);
-
-        if (arr.length === 0) { listEl.innerHTML = `<div class="text-center text-xs text-slate-400 py-6">아직 등록된 사장님이 없습니다.</div>`; return; }
-        listEl.innerHTML = arr.slice(0, 30).map((item, idx) => {
-          const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}위`;
-          const isMe = currentUser && item.nickname === currentUser.nickname;
-          return `
-            <div class="p-2.5 rounded-xl border ${isMe ? 'bg-emerald-950/50 border-emerald-500/60' : 'bg-slate-800/75 border-slate-700/70'} flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2 min-w-0">
-                <span class="w-7 text-center font-black text-xs ${idx < 3 ? 'text-base' : 'text-slate-400'} shrink-0">${rankIcon}</span>
-                <div class="min-w-0">
-                  <div class="text-xs font-extrabold text-white truncate flex items-center gap-1">
-                    <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] shrink-0">${item.branchCount}호점</span>
-                    <span class="truncate">${item.nickname}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="text-xs font-black text-amber-400 shrink-0">${formatKRW(item.money)}</div>
-            </div>
-          `;
-        }).join('');
-      } catch (e) {
-        listEl.innerHTML = `<div class="text-center text-xs text-rose-400 py-6">랭킹 불러오기 오류</div>`;
-      }
-    }
-
-    function listenGlobalNotices() {
-      db.ref('notices/active').on('value', snap => {
-        const val = snap.val();
-        const banner = document.getElementById('globalNoticeBanner');
-        if (isInitialNoticeLoad) { isInitialNoticeLoad = false; if (val && val.createdAt) lastNoticeTimestamp = Number(val.createdAt); return; }
-        if (val && val.text) {
-          const created = Number(val.createdAt || 0);
-          if (created && created === lastNoticeTimestamp) return;
-          lastNoticeTimestamp = created;
-          document.getElementById('globalNoticeText').textContent = val.text;
-          banner.classList.remove('hidden');
-          clearTimeout(noticeHideTimer);
-          noticeHideTimer = setTimeout(() => banner.classList.add('hidden'), 3500);
-        } else {
-          banner.classList.add('hidden');
-        }
-      });
-    }
-
-    function listenLivePoll() {
-      db.ref('poll/active').on('value', snap => {
-        const poll = snap.val();
-        const box = document.getElementById('pollContainer');
-        if (!poll || !poll.question) { box.innerHTML = `<p class="text-xs text-slate-400">현재 진행 중인 투표가 없습니다.</p>`; return; }
-        const v1 = poll.votes1 || 0, v2 = poll.votes2 || 0, total = v1 + v2;
-        const p1 = total > 0 ? Math.round((v1 / total) * 100) : 0, p2 = total > 0 ? Math.round((v2 / total) * 100) : 0;
-        const voted = currentUser && poll.voters && poll.voters[currentUser.nickname];
-        box.innerHTML = `
-          <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-3 space-y-2">
-            <div class="text-xs font-black text-amber-300">Q. ${poll.question}</div>
-            <div class="space-y-1.5">
-              <button onclick="castPollVote(1)" ${voted ? 'disabled' : ''} class="w-full p-2 rounded-lg bg-slate-900 border ${voted === 1 ? 'border-emerald-400' : 'border-slate-700'} text-left relative overflow-hidden">
-                <div class="absolute inset-y-0 left-0 bg-emerald-500/20" style="width: ${p1}%"></div>
-                <div class="relative flex justify-between text-xs font-bold"><span>1. ${poll.opt1}</span><span class="text-emerald-300">${v1}표 (${p1}%)</span></div>
-              </button>
-              <button onclick="castPollVote(2)" ${voted ? 'disabled' : ''} class="w-full p-2 rounded-lg bg-slate-900 border ${voted === 2 ? 'border-sky-400' : 'border-slate-700'} text-left relative overflow-hidden">
-                <div class="absolute inset-y-0 left-0 bg-sky-500/20" style="width: ${p2}%"></div>
-                <div class="relative flex justify-between text-xs font-bold"><span>2. ${poll.opt2}</span><span class="text-sky-300">${v2}표 (${p2}%)</span></div>
-              </button>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    async function castPollVote(opt) {
-      if (!currentUser) return;
-      await db.ref('poll/active').transaction(poll => {
-        if (!poll) return poll;
-        if (!poll.voters) poll.voters = {};
-        if (poll.voters[currentUser.nickname]) return poll;
-        poll.voters[currentUser.nickname] = opt;
-        if (opt === 1) poll.votes1 = (poll.votes1 || 0) + 1;
-        if (opt === 2) poll.votes2 = (poll.votes2 || 0) + 1;
-        return poll;
-      });
-      showToast('🗳️ 투표가 완료되었습니다!', 'success');
-    }
-
-    async function loadNoticeHistory() {
-      const snap = await db.ref('notices/history').limitToLast(5).once('value');
-      const hist = snap.val();
-      const el = document.getElementById('noticeHistoryList');
-      if (!hist) { el.innerHTML = `<p class="text-slate-400">등록된 공지가 없습니다.</p>`; return; }
-      el.innerHTML = Object.values(hist).reverse().map(n => `<div class="p-2 rounded-lg bg-slate-800/70 border border-slate-700/70"><div class="text-slate-200">${n.text}</div></div>`).join('');
-    }
-
-    async function submitFeedback() {
-      if (!currentUser) return;
-      const input = document.getElementById('feedbackInput');
-      const text = input.value.trim();
-      if (!text) return;
-      await db.ref('feedbacks').push({ nickname: currentUser.nickname, message: text, createdAt: Date.now() });
-      input.value = '';
-      showToast('📨 관리자에게 비공개 전송되었습니다!', 'success');
-    }
-
-    // ---------------------------------------------------------
-    // ALL-IN-ONE ADMIN PANEL ACTIONS
-    // ---------------------------------------------------------
-    let isAdminUnlocked = false;
-
-    function openAdminModal() { document.getElementById('adminModal').classList.remove('hidden'); if (isAdminUnlocked) loadAdminDashboardData(); }
-    function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
-
-    function verifyAdminPass() {
-      const pass = document.getElementById('adminPassInput').value.trim();
-      const err = document.getElementById('adminAuthError');
-      if (pass === ADMIN_SECRET) {
-        isAdminUnlocked = true;
-        err.classList.add('hidden');
-        document.getElementById('adminAuthGate').classList.add('hidden');
-        document.getElementById('adminDashboard').classList.remove('hidden');
-        loadAdminDashboardData();
-        showToast('🛡️ 관리자 마스터 패널이 열렸습니다.', 'success');
-      } else {
-        err.classList.remove('hidden');
-      }
-    }
-
-    async function loadAdminDashboardData() {
-      const vSnap = await db.ref('meta/totalVisits').once('value');
-      document.getElementById('adminTotalVisits').textContent = `${(vSnap.val() || 0).toLocaleString()}회`;
-      document.getElementById('adminSeasonNumInput').value = currentSeasonNumber;
-      document.getElementById('adminBannerMsgInput').value = currentBannerText;
-      await loadAdminUserList();
-      await loadAdminFeedbacks();
-    }
-
-    async function saveSeasonConfig() {
-      const sNum = Math.max(1, Number(document.getElementById('adminSeasonNumInput').value || 1));
-      const bText = document.getElementById('adminBannerMsgInput').value.trim() || '대침공이 다가옵니다..';
-      await db.ref('globalEvent/seasonConfig').update({ seasonNum: sNum, bannerText: bText });
-      showToast(`✅ 시즌 ${sNum} 설정이 반영되었습니다!`, 'success');
-    }
-
-    async function launchThemeEve(mode) {
-      await db.ref('globalEvent/activeTheme').set({
-        id: `${mode}_eve_${Date.now()}`,
-        mode,
-        playCutscene: true,
-        createdAt: Date.now()
-      });
-      closeAdminModal();
-      showToast(`🎬 [${mode.toUpperCase()}] 전야제 컷씬 및 테마를 전 서버에 송출했습니다!`, 'warning');
-    }
-
-    async function adminLaunchBossRaid(theme = 'alien') {
-      const userSnap = await db.ref('users').once('value');
-      const count = Math.max(1, Object.keys(userSnap.val() || {}).length);
-      const scaledHp = 50000 * count;
-      await db.ref('globalEvent/mothershipRaid').set({
-        id: 'raid_' + Date.now(),
-        theme,
-        active: true,
-        hp: scaledHp,
-        maxHp: scaledHp,
-        endsAt: Date.now() + 3 * 60 * 1000
-      });
-      closeAdminModal();
-      showToast(`⚔️ [${theme.toUpperCase()}] 메인 보스전을 발동했습니다!`, 'warning');
-    }
-
-    async function adminLaunchXmasTreeFestival() {
-      const userSnap = await db.ref('users').once('value');
-      const count = Math.max(1, Object.keys(userSnap.val() || {}).length);
-      await db.ref('globalEvent/xmasTree').set({
-        active: true,
-        points: 0,
-        goal: 200 * count,
-        createdAt: Date.now()
-      });
-      closeAdminModal();
-      showToast('🎄 전 서버 크리스마스 트리 5단계 점등 대작전을 시작했습니다!', 'warning');
-    }
-
-    async function toggleAuto30MinRaid() {
-      const nextState = !auto30MinRaidEnabled;
-      await db.ref('globalEvent/seasonConfig').update({ auto30MinRaid: nextState });
-      showToast(nextState ? '🕒 매시 00분·30분 자동 레이드 ON' : '⏸️ 30분 자동 레이드 OFF', 'info');
-    }
-
-    async function adminForceWinCurrentEvent() {
-      if (activeRaidState && activeRaidState.active) {
-        await db.ref('globalEvent/mothershipRaid').update({ active: false, hp: 0, winId: 'win_' + Date.now() });
-      } else if (activeXmasTreeState && activeXmasTreeState.active) {
-        await db.ref('globalEvent/xmasTree').update({ active: false, winId: 'xmaswin_' + Date.now() });
-      } else {
-        showToast('현재 진행 중인 메인 레이드나 트리 축제가 없습니다.', 'info');
-        return;
-      }
-      closeAdminModal();
-    }
-
-    async function resetAllThemeEvents() {
-      await db.ref('globalEvent/activeTheme').remove();
-      await db.ref('globalEvent/mothershipRaid').remove();
-      await db.ref('globalEvent/xmasTree').remove();
-      applyStoreTheme('normal');
-      initPOSCustomers();
-      showToast('🔄 모든 이벤트를 종료하고 일반 편의점 모드로 복구했습니다.', 'info');
-    }
-
-    async function adminEndSeasonAndAdvance() {
-      const snap = await db.ref('users').once('value');
-      const users = Object.values(snap.val() || {}).filter(u => !u.banned);
-      users.sort((a, b) => (b.branchCount || 1) - (a.branchCount || 1) || (b.money || 0) - (a.money || 0));
-      const topUser = users[0] || { nickname: '전설의점장', branchCount: 1, money: 0 };
-
-      await db.ref('hallOfFame').push({
-        season: currentSeasonNumber,
-        champion: topUser.nickname,
-        branchCount: topUser.branchCount || 1,
-        money: topUser.money || 0,
-        endedAt: Date.now()
-      });
-
-      const nextSeason = currentSeasonNumber + 1;
-      await db.ref('globalEvent/activeTheme').remove();
-      await db.ref('globalEvent/mothershipRaid').remove();
-      await db.ref('globalEvent/xmasTree').remove();
-      await db.ref('globalEvent/seasonConfig').set({
-        seasonNum: nextSeason,
-        bannerText: `시즌 ${nextSeason} 오픈!`,
-        auto30MinRaid: false,
-        resetId: 'reset_' + Date.now()
-      });
-
-      closeAdminModal();
-      showToast(`👑 시즌 ${currentSeasonNumber} 결산 완료! 시즌 ${nextSeason}이 시작되었습니다!`, 'warning');
-    }
-
-    async function triggerAdminSurprise(type) {
-      let extra = {};
-      if (type === 'server_lotto') {
-        const snap = await db.ref('users').once('value');
-        const names = Object.keys(snap.val() || {});
-        extra.winner = names.length > 0 ? names[Math.floor(Math.random() * names.length)] : (currentUser?.nickname || '사장님');
-      } else if (type === 'megaphone') {
-        extra.msg = document.getElementById('adminMegaphoneInput').value.trim() || '총괄 운영자가 지켜보고 있습니다!! 👀';
-      }
-      await db.ref('globalEvent/surprise').set({ id: 'sp_' + Date.now(), type, ...extra, createdAt: Date.now() });
-      showToast('🎪 전체 접속자 화면에 깜짝 이벤트를 발동했습니다!', 'warning');
-    }
-
-    async function loadAdminUserList() {
-      const snap = await db.ref('users').once('value');
-      const users = snap.val() || {};
-      const keys = Object.keys(users).sort();
-      document.getElementById('adminTotalUsers').textContent = `${keys.length}명`;
-      document.getElementById('adminUserSelect').innerHTML = `<option value="">-- 가입 유저 선택 (${keys.length}명) --</option>` +
-        keys.map(nick => `<option value="${nick}">${nick} (보유: ${formatKRW(Number(users[nick].money ?? 0))})</option>`).join('');
-      document.getElementById('adminUserStatusList').innerHTML = keys.map(nick => {
-        const isBanned = Boolean(users[nick].banned);
-        return `
-          <div class="flex items-center justify-between px-2 py-1 rounded bg-slate-900 border border-slate-700/70">
-            <span class="truncate font-bold ${isBanned ? 'text-rose-400 line-through' : 'text-slate-200'}">${nick}</span>
-            <button onclick="quickFillBanTarget('${nick}')" class="px-1.5 py-0.5 rounded bg-slate-700 text-[10px] text-white">선택</button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function quickFillBanTarget(nick) { document.getElementById('adminBanTargetInput').value = nick; document.getElementById('adminTargetNickname').value = nick; }
-
-    async function adminSetUserBan(shouldBan) {
-      const targetNick = document.getElementById('adminBanTargetInput').value.trim();
-      const reason = document.getElementById('adminBanReasonInput').value.trim();
-      if (!targetNick) return;
-      await db.ref(`users/${targetNick}`).update({ banned: shouldBan, banReason: shouldBan ? (reason || '관리자 직권 이용 정지') : '', updatedAt: Date.now() });
-      showToast(shouldBan ? `🚫 '${targetNick}' 차단 완료` : `✅ '${targetNick}' 차단 해제`, 'success');
-      await loadAdminUserList();
-    }
-
-    async function triggerServerFever(minutes, mult = 2) {
-      await db.ref('globalEvent').update({ feverUntil: Date.now() + minutes * 60 * 1000, feverMult: mult });
-      showToast(`🔥 전체 서버 ${minutes}분간 매출 ${mult}배 피버 발동!`, 'warning');
-    }
-    function triggerCustomFever() {
-      triggerServerFever(Math.max(1, Number(document.getElementById('adminFeverMinInput').value || 5)), Math.max(0.5, Number(document.getElementById('adminFeverMultInput').value || 2)));
-    }
-    async function stopServerFever() { await db.ref('globalEvent').update({ feverUntil: 0, feverMult: 1 }); showToast('피버 이벤트를 종료했습니다.', 'info'); }
-
-    async function createAdminCoupon() {
-      const code = document.getElementById('adminNewCouponCode').value.trim().toLowerCase();
-      const reward = Number(document.getElementById('adminNewCouponReward').value);
-      if (!code || isNaN(reward) || reward <= 0) return;
-      await db.ref(`coupons/${code}`).set({ code, reward, createdAt: Date.now() });
-      document.getElementById('adminNewCouponCode').value = '';
-      showToast(`🎁 새 쿠폰 '${code}' (${formatKRW(reward)}) 발행 완료!`, 'success');
-    }
-
-    function syncSelectedUserToInput() { const val = document.getElementById('adminUserSelect').value; if (val) document.getElementById('adminTargetNickname').value = val; }
-    function setAdminAmountPreset(amount) { document.getElementById('adminMoneyAmount').value = amount; }
-
-    async function adminModifyUserMoney(mode) {
-      const targetNick = document.getElementById('adminTargetNickname').value.trim();
-      const amount = Number(document.getElementById('adminMoneyAmount').value);
-      if (!targetNick || isNaN(amount)) return;
-      const ref = db.ref(`users/${targetNick}`);
-      const snap = await ref.once('value');
-      if (!snap.exists()) return;
-      const cur = Number(snap.val().money ?? 0);
-      const nextMoney = mode === 'add' ? Math.max(0, cur + amount) : Math.max(0, amount);
-      await ref.update({ money: nextMoney, 'state/money': nextMoney, updatedAt: Date.now() });
-      showToast(`✅ '${targetNick}'님의 자금이 ${formatKRW(nextMoney)}으로 반영되었습니다!`, 'success');
-      await loadAdminUserList();
-    }
-
-    async function postGlobalNotice() {
-      const input = document.getElementById('adminNoticeInput');
-      const text = input.value.trim();
-      if (!text) return;
-      await db.ref('notices/active').set({ text, createdAt: Date.now() });
-      input.value = '';
-      showToast('📢 상단 긴급 공지가 발송되었습니다!', 'success');
-    }
-    async function clearGlobalNotice() { await db.ref('notices/active').remove(); showToast('상단 공지 배너를 내렸습니다.', 'info'); }
-
-    async function createAdminPoll() {
-      const q = document.getElementById('adminPollQuestion').value.trim();
-      const o1 = document.getElementById('adminPollOpt1').value.trim();
-      const o2 = document.getElementById('adminPollOpt2').value.trim();
-      if (!q || !o1 || !o2) return;
-      await db.ref('poll/active').set({ question: q, opt1: o1, opt2: o2, votes1: 0, votes2: 0, voters: {}, createdAt: Date.now() });
-      showToast('🗳️ 실시간 투표가 시작되었습니다!', 'success');
-    }
-    async function closeAdminPoll() { await db.ref('poll/active').remove(); showToast('투표를 종료했습니다.', 'info'); }
-
-    async function loadAdminFeedbacks() {
-      const snap = await db.ref('feedbacks').limitToLast(20).once('value');
-      const data = snap.val();
-      const box = document.getElementById('adminFeedbackList');
-      if (!data) { box.innerHTML = `<p class="text-slate-400 text-[11px]">제보 내역이 없습니다.</p>`; return; }
-      box.innerHTML = Object.values(data).reverse().map(f => `
-        <div class="p-2 rounded-lg bg-slate-900 border border-slate-700">
-          <div class="text-[10px] text-amber-300 font-bold">보낸이: ${f.nickname}</div>
-          <div class="text-slate-200 text-xs">${f.message}</div>
-        </div>
-      `).join('');
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -3545,175 +2970,6 @@
         if (!err && snap) document.getElementById('loginVisitorCount').textContent = `누적 방문 ${(snap.val() || 1).toLocaleString()}회`;
       });
       scanForRecoverableData();
-    });
-  </script>
-</body>
-</html>
-    function triggerCustomFever() {
-      const mult = parseFloat(document.getElementById('adminFeverMultInput').value) || 2;
-      const min = parseInt(document.getElementById('adminFeverMinInput').value) || 5;
-      triggerServerFever(min, mult);
-    }
-
-    function stopServerFever() {
-      db.ref('serverState/fever').remove();
-      showToast('피버 타임이 종료되었습니다.');
-    }
-
-    async function loadAdminUserList() {
-      try {
-        const snap = await db.ref('users').once('value');
-        const usersObj = snap.val() || {};
-        const users = Object.entries(usersObj).map(([key, val]) => ({ key, ...val }));
-
-        document.getElementById('adminTotalUsers').textContent = `${users.length}명`;
-
-        const select = document.getElementById('adminUserSelect');
-        select.innerHTML = '<option value="">-- 가입 유저 선택 --</option>' +
-          users.map(u => `<option value="${escapeHtml(u.nickname)}">${escapeHtml(u.nickname)} (${u.state?.branchCount || 1}호점 · ${formatMoney(u.state?.money || 0)})</option>`).join('');
-
-        const statusList = document.getElementById('adminUserStatusList');
-        statusList.innerHTML = users.map(u => `
-          <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700/70">
-            <span class="font-bold ${u.banned ? 'text-rose-400 line-through' : 'text-slate-200'}">
-              ${escapeHtml(u.nickname)} (${u.state?.branchCount || 1}호점)
-            </span>
-            <span class="text-[10px] font-black ${u.banned ? 'text-rose-400' : 'text-emerald-400'}">
-              ${u.banned ? '🚫 차단됨' : '정상'}
-            </span>
-          </div>
-        `).join('');
-      } catch (e) {}
-    }
-
-    function syncSelectedUserToInput() {
-      const val = document.getElementById('adminUserSelect').value;
-      if (val) {
-        document.getElementById('adminTargetNickname').value = val;
-        document.getElementById('adminBanTargetInput').value = val;
-      }
-    }
-
-    async function adminSetUserBan(isBan) {
-      const nick = document.getElementById('adminBanTargetInput').value.trim();
-      const reason = document.getElementById('adminBanReasonInput').value.trim();
-      if (!nick) {
-        showToast('❌ 대상 닉네임을 입력해주세요.');
-        return;
-      }
-      const safeKey = encodeURIComponent(nick).replace(/\./g, '%2E');
-      const snap = await db.ref(`users/${safeKey}`).once('value');
-      if (!snap.exists()) {
-        showToast('❌ 존재하지 않는 닉네임입니다.');
-        return;
-      }
-      await db.ref(`users/${safeKey}`).update({
-        banned: isBan,
-        banReason: isBan ? (reason || '운영 정책 위반으로 접근이 제한되었습니다.') : ''
-      });
-      showToast(isBan ? `🚫 [${nick}] 유저를 즉시 차단했습니다.` : `✅ [${nick}] 유저의 차단을 해제했습니다.`);
-      loadAdminUserList();
-    }
-
-    function setAdminAmountPreset(amt) {
-      document.getElementById('adminMoneyAmount').value = amt;
-    }
-
-    async function adminModifyUserMoney(mode) {
-      const nick = document.getElementById('adminTargetNickname').value.trim();
-      const amt = Number(document.getElementById('adminMoneyAmount').value) || 0;
-      if (!nick) {
-        showToast('❌ 대상 닉네임을 선택하거나 입력해주세요.');
-        return;
-      }
-      const safeKey = encodeURIComponent(nick).replace(/\./g, '%2E');
-      const snap = await db.ref(`users/${safeKey}`).once('value');
-      if (!snap.exists()) {
-        showToast('❌ 존재하지 않는 닉네임입니다.');
-        return;
-      }
-      const userData = snap.val();
-      const currentMoney = (userData.state && userData.state.money) || 0;
-      const updatedMoney = mode === 'set' ? amt : currentMoney + amt;
-
-      await db.ref(`users/${safeKey}`).update({
-        'state/money': updatedMoney,
-        adminGrantMoney: amt,
-        adminGrantMode: mode,
-        adminGrantId: 'grant_' + Date.now()
-      });
-      showToast(`💸 [${nick}] 유저 자금 반영 완료! (${formatMoney(updatedMoney)})`);
-      loadAdminUserList();
-    }
-
-    async function createAdminCoupon() {
-      const code = document.getElementById('adminNewCouponCode').value.trim().toLowerCase();
-      const reward = Number(document.getElementById('adminNewCouponReward').value) || 100000;
-      if (!code) {
-        showToast('❌ 쿠폰 코드를 입력해주세요.');
-        return;
-      }
-      await db.ref(`coupons/${encodeURIComponent(code)}`).set({
-        active: true,
-        reward,
-        createdAt: Date.now()
-      });
-      document.getElementById('adminNewCouponCode').value = '';
-      showToast(`🎁 새 쿠폰 [${code}] (${formatMoney(reward)}) 발행 완료!`);
-    }
-
-    function createAdminPoll() {
-      const question = document.getElementById('adminPollQuestion').value.trim();
-      const opt1 = document.getElementById('adminPollOpt1').value.trim();
-      const opt2 = document.getElementById('adminPollOpt2').value.trim();
-      if (!question || !opt1 || !opt2) {
-        showToast('❌ 투표 질문과 선택지 2개를 모두 입력해주세요.');
-        return;
-      }
-      db.ref('serverState/poll').set({
-        active: true,
-        question,
-        opt1,
-        opt2,
-        votes1: 0,
-        votes2: 0,
-        voters: {}
-      });
-      showToast('🗳️ 실시간 투표가 시작되었습니다!');
-    }
-
-    function closeAdminPoll() {
-      db.ref('serverState/poll/active').set(false);
-      showToast('투표를 종료했습니다.');
-    }
-
-    async function loadAdminFeedbacks() {
-      const list = document.getElementById('adminFeedbackList');
-      const snap = await db.ref('feedbacks').limitToLast(20).once('value');
-      const val = snap.val();
-      if (!val) {
-        list.innerHTML = '<p class="text-slate-400 text-[11px]">제보 내역이 없습니다.</p>';
-        return;
-      }
-      const items = Object.values(val).reverse();
-      list.innerHTML = items.map(f => `
-        <div class="p-2 rounded-xl bg-slate-900 border border-slate-700">
-          <div class="flex justify-between text-[10px] text-amber-300 font-bold">
-            <span>${escapeHtml(f.nickname)}</span>
-            <span class="text-slate-400">${new Date(f.ts).toLocaleString('ko-KR')}</span>
-          </div>
-          <p class="text-slate-200 mt-0.5 break-all">${escapeHtml(f.text)}</p>
-        </div>
-      `).join('');
-    }
-
-    // ---------------------------------------------------------
-    // INITIALIZE ON PAGE LOAD
-    // ---------------------------------------------------------
-    window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      checkLocalRecovery();
-      initServerListeners();
     });
   </script>
 </body>
