@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>편의점 타이쿤 - 그랜드 오픈 에디션</title>
+  <title>편의점 타이쿤 - 시즌 & 메인 레이드 에디션</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
@@ -36,6 +36,22 @@
     }
     body.admin-psycho {
       animation: rainbowHue 0.5s infinite linear;
+    }
+    body.admin-shake {
+      animation: screenShake 0.45s infinite ease-in-out;
+    }
+    @keyframes screenShake {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(-6px, 4px); }
+      50% { transform: translate(6px, -4px); }
+      75% { transform: translate(-4px, -4px); }
+    }
+    @keyframes zeroGravity {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-9px) rotate(2deg); }
+    }
+    .zero-gravity-item {
+      animation: zeroGravity 1.2s infinite ease-in-out;
     }
     @keyframes rainbowHue {
       0% { filter: hue-rotate(0deg) saturate(1.7); }
@@ -121,12 +137,10 @@
 </head>
 <body class="flex flex-col min-h-screen bg-[#080c14] text-slate-100">
 
-  <!-- ==================== 60FPS HIGH-QUALITY UFO INVASION 1:30 CUTSCENE + 3S COUNTDOWN ==================== -->
+  <!-- ==================== 60FPS MULTI-MODE CINEMA CUTSCENE OVERLAY ==================== -->
+  <!-- Modes: 'invasion' (90s+3s), 'raid_start' (15s), 'raid_win' (20s) -->
   <div id="ufoCutsceneOverlay" class="hidden fixed inset-0 z-[130] flex flex-col justify-between bg-[#03050a] overflow-hidden">
-    <!-- Ultra-Smooth 60FPS Cinema Canvas -->
     <canvas id="ufoCinemaCanvas" class="absolute inset-0 w-full h-full z-0 block"></canvas>
-
-    <!-- Subtle Vignette & Ambient Glow -->
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(2,4,10,0.85)_100%)] pointer-events-none z-[1]"></div>
     <div id="ufoSirenGlow" class="absolute inset-0 bg-gradient-to-b from-purple-600/15 via-transparent to-rose-600/15 animate-siren pointer-events-none z-[1]"></div>
 
@@ -142,9 +156,8 @@
       </div>
     </div>
 
-    <!-- MAIN HUD & SUBTITLE STAGE (1:30 STORY) -->
+    <!-- MAIN HUD & SUBTITLE STAGE -->
     <div id="ufoMainStage" class="relative flex-1 flex flex-col justify-between p-3.5 sm:p-5 z-10 max-w-2xl mx-auto w-full pointer-events-none">
-      <!-- Top Floating Battle HP Bars (Visible during Act 3 Fight) -->
       <div class="w-full flex flex-col items-center">
         <div id="ufoBattleHud" class="hidden w-full flex items-center justify-between gap-3 bg-slate-950/85 backdrop-blur-md border border-purple-400/60 rounded-2xl px-4 py-2.5 shadow-[0_0_25px_rgba(168,85,247,0.35)]">
           <div class="flex-1 text-left">
@@ -160,7 +173,7 @@
           <div class="flex-1 text-right">
             <div class="flex justify-between text-[11px] font-black text-purple-300 mb-1">
               <span id="alienHpText">100%</span>
-              <span>👽 외계인 사령관</span>
+              <span>👽 외계인 군단</span>
             </div>
             <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
               <div id="alienHpBar" class="h-full bg-gradient-to-l from-purple-500 to-fuchsia-400 transition-all duration-300" style="width: 100%"></div>
@@ -169,7 +182,6 @@
         </div>
       </div>
 
-      <!-- Bottom Cinema Subtitle Box -->
       <div class="w-full bg-slate-950/88 backdrop-blur-md border border-purple-400/70 rounded-2xl p-4 text-left shadow-[0_10px_35px_rgba(0,0,0,0.85)]">
         <div class="flex items-center justify-between text-[11px] font-black text-purple-300 mb-1.5 border-b border-purple-500/30 pb-1">
           <span id="ufoSpeakerName">📡 긴급 속보</span>
@@ -187,7 +199,7 @@
       <h2 class="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2 drop-shadow-[0_0_20px_rgba(192,132,252,0.9)]">
         대침공이 다가옵니다..
       </h2>
-      <p class="text-xs sm:text-sm font-bold text-amber-300 mb-6">
+      <p id="finaleTargetDesc" class="text-xs sm:text-sm font-bold text-amber-300 mb-6">
         2026년 11월 28일 (토) 오전 11:00 (한국시간 KST)
       </p>
 
@@ -222,6 +234,14 @@
     </div>
   </div>
 
+  <!-- ==================== SURPRISE OVERLAYS (SLIME, BLACKOUT, MEGAPHONE) ==================== -->
+  <div id="slimeOverlay" class="hidden fixed inset-0 z-[85] pointer-events-none"></div>
+  <div id="blackoutOverlay" class="hidden fixed inset-0 z-[84] pointer-events-none bg-black/95 transition-opacity duration-300"></div>
+  <div id="megaphoneBanner" class="hidden fixed inset-x-4 top-24 z-[95] bg-gradient-to-r from-rose-600 via-amber-500 to-rose-600 border-2 border-white rounded-2xl p-4 text-center shadow-2xl animate-pop pointer-events-none">
+    <div class="text-xs font-black text-slate-950 tracking-wider">📢 총괄 운영자 긴급 확성기</div>
+    <div id="megaphoneText" class="text-base sm:text-lg font-black text-white mt-1 drop-shadow">장사 잘 되고 있나 사장님들?!</div>
+  </div>
+
   <!-- ==================== 0. FULL-SCREEN BAN LOCK MODAL ==================== -->
   <div id="banLockModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/98 backdrop-blur-lg p-4">
     <div class="w-full max-w-sm bg-rose-950/90 border-2 border-rose-500 rounded-3xl p-6 text-center shadow-2xl space-y-3 animate-pop">
@@ -242,7 +262,7 @@
           🏪
         </div>
         <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">편의점 타이쿤</h1>
-        <p class="text-xs text-slate-400 mt-0.5">리얼 POS 계산 · 다점포 확장 · 실시간 랭킹</p>
+        <p class="text-xs text-slate-400 mt-0.5">월간 시즌제 · 실시간 레이드 · 다점포 확장</p>
       </div>
 
       <div id="recoveryBanner" class="hidden mb-3.5 p-3 rounded-2xl bg-amber-500/15 border border-amber-400/60 space-y-2">
@@ -294,12 +314,15 @@
     <div class="max-w-3xl mx-auto flex flex-col gap-1.5">
       <div class="flex items-center justify-between gap-1 min-w-0">
         <div class="flex items-center gap-1.5 min-w-0">
+          <span id="headerSeasonBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-purple-500/25 border border-purple-400/50 text-[10px] font-black text-purple-200 whitespace-nowrap">
+            S1
+          </span>
           <span id="headerBranchBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[10px] font-black text-amber-300 whitespace-nowrap">
             1호점
           </span>
-          <span id="headerNickname" class="font-black text-xs sm:text-sm text-white truncate max-w-[82px] sm:max-w-[150px]">로딩중</span>
-          <span id="headerDayBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-[10px] font-extrabold text-emerald-400 whitespace-nowrap">
-            D-1
+          <span id="headerNickname" class="font-black text-xs sm:text-sm text-white truncate max-w-[75px] sm:max-w-[140px]">로딩중</span>
+          <span id="headerTitleMedal" class="hidden shrink-0 px-1.5 py-0.5 rounded-md bg-rose-500/20 border border-rose-400/50 text-[10px] font-black text-rose-200 whitespace-nowrap">
+            🏅
           </span>
         </div>
 
@@ -329,8 +352,8 @@
           <span id="statMoney" class="text-[11px] sm:text-xs font-black text-amber-400 truncate ml-1">0원</span>
         </div>
         <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-2 py-1 flex items-center justify-between min-w-0">
-          <span class="text-[10px] text-slate-400 shrink-0">😊 만족</span>
-          <span id="statSatisfaction" class="text-[11px] sm:text-xs font-black text-sky-400 truncate ml-1">85%</span>
+          <span class="text-[10px] text-slate-400 shrink-0">🔋 코어</span>
+          <span id="statEnergyCores" class="text-[11px] sm:text-xs font-black text-emerald-300 truncate ml-1">0개</span>
         </div>
         <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-2 py-1 flex items-center justify-between min-w-0">
           <span class="text-[10px] text-slate-400 shrink-0">🔥 배율</span>
@@ -338,18 +361,49 @@
         </div>
       </div>
 
-      <!-- Alien Occupation Live Countdown Banner (11/28 11:00 KST) -->
+      <!-- Alien Occupation Live Countdown Banner -->
       <div id="alienOccupationBanner" class="hidden bg-gradient-to-r from-purple-950 via-fuchsia-950 to-purple-950 border border-purple-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md">
         <div class="flex items-center gap-1.5 min-w-0">
           <span class="shrink-0">👽</span>
-          <span class="font-black text-purple-200 truncate">대침공이 다가옵니다..</span>
-          <span class="shrink-0 px-1.5 py-0.2 rounded bg-purple-500/30 border border-purple-400/40 text-[10px] font-black text-emerald-300">
-            🔋 코어 <span id="energyCoreCountText">0</span>개
-          </span>
+          <span id="occupationBannerTitle" class="font-black text-purple-200 truncate">대침공이 다가옵니다..</span>
         </div>
         <span id="liveInvasionDdayText" class="shrink-0 font-black text-amber-300 bg-black/50 px-2 py-0.5 rounded-lg border border-purple-500/40 text-[10px]">
           D-7 00:00:00
         </span>
+      </div>
+
+      <!-- ACTIVE MOTHERSHIP BOSS RAID HUD (Triggered by Admin or 30m Auto Switch) -->
+      <div id="mothershipRaidHud" class="hidden bg-gradient-to-r from-rose-950 via-purple-950 to-rose-950 border-2 border-rose-400 rounded-2xl p-2.5 space-y-2 shadow-[0_0_25px_rgba(244,63,94,0.45)] animate-pop">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="text-base animate-bounce">🛸</span>
+            <span class="text-xs font-black text-white truncate">외계인 모선 총공세 레이드!</span>
+          </div>
+          <span id="raidTimerBadge" class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black shrink-0">03:00</span>
+        </div>
+
+        <!-- Boss HP Bar -->
+        <div>
+          <div class="flex justify-between text-[10px] font-black text-rose-200 mb-0.5">
+            <span>모선 에너지 코어 HP</span>
+            <span id="bossHpLabel">100,000 / 100,000</span>
+          </div>
+          <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-rose-500/50">
+            <div id="bossHpFill" class="h-full bg-gradient-to-r from-rose-500 via-fuchsia-500 to-amber-400 transition-all duration-200" style="width: 100%"></div>
+          </div>
+        </div>
+
+        <!-- Direct Attack Actions -->
+        <div class="grid grid-cols-2 gap-1.5">
+          <button onclick="attackMothership('laser', event)"
+            class="py-2 px-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-[11px] active:scale-95 transition shadow">
+            🔫 바코드 레이저 사격 (<span id="laserDmgText">150</span> DMG)
+          </button>
+          <button onclick="attackMothership('core', event)"
+            class="py-2 px-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-[11px] active:scale-95 transition shadow">
+            🔋 에너지 코어 포격 (-1코어 · <span id="coreDmgText">1,200</span> DMG)
+          </button>
+        </div>
       </div>
 
       <div id="globalFeverBanner" class="hidden bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-amber-500/25 border border-amber-400 rounded-lg px-2.5 py-1 flex items-center justify-between text-[11px] text-amber-200 fever-pulse">
@@ -490,8 +544,26 @@
       </div>
     </section>
 
-    <!-- TAB 2: 알바 및 다점포 확장 -->
+    <!-- TAB 2: 알바, 다점포 확장 & 코어 반격 병기 -->
     <section id="tab-upgrade" class="hidden space-y-3">
+      <!-- Core Weapon Armory (Uses Energy Cores farmed during Occupation) -->
+      <div class="bg-gradient-to-br from-purple-950/80 via-slate-900 to-slate-900 border border-purple-500/60 rounded-2xl p-3.5 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="px-2 py-0.5 rounded bg-purple-500 text-white text-[10px] font-black">대침공 반격 병기창</span>
+            <h2 class="text-sm font-black text-white mt-1">🔋 에너지 코어 무기 강화</h2>
+          </div>
+          <span class="text-xs font-black text-emerald-300 bg-purple-950 px-2.5 py-1 rounded-xl border border-purple-400/50">
+            보유 코어: <span id="armoryCoreCount">0</span>개
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-300">
+          외계인 점령 기간 동안 모은 <strong class="text-emerald-300">에너지 코어(🔋)</strong>로 레이드 무기를 미리 강화해 두세요!
+        </p>
+        <div id="coreWeaponList" class="space-y-2"></div>
+      </div>
+
+      <!-- Franchise Expansion -->
       <div class="bg-gradient-to-br from-amber-950/60 via-slate-900 to-slate-900 border border-amber-500/50 rounded-2xl p-3.5 space-y-2">
         <div class="flex items-center justify-between">
           <div>
@@ -511,6 +583,7 @@
         </button>
       </div>
 
+      <!-- Staff & Store Upgrades -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
         <h2 class="text-sm font-black text-white mb-1">👥 아르바이트 고용 & POS 시설 업그레이드</h2>
         <p class="text-xs text-slate-400 mb-3">알바생을 고용하면 계산대를 보지 않을 때도 초당 자동 수익이 쌓입니다!</p>
@@ -518,7 +591,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: 실시간 글로벌 랭킹 & 한줄 방명록 -->
+    <!-- TAB 3: 실시간 글로벌 랭킹 & 명예의 전당 -->
     <section id="tab-ranking" class="hidden space-y-3">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
         <div class="flex items-center justify-between">
@@ -538,10 +611,16 @@
         </div>
       </div>
 
+      <!-- Season Hall of Fame -->
+      <div id="hallOfFameBox" class="hidden bg-gradient-to-br from-amber-950/60 to-slate-900 border border-amber-500/40 rounded-2xl p-3.5 space-y-2">
+        <h2 class="text-sm font-black text-amber-300">👑 역대 시즌 명예의 전당</h2>
+        <div id="hallOfFameList" class="space-y-1.5 text-xs"></div>
+      </div>
+
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
         <div class="flex items-center justify-between mb-3">
           <div>
-            <h2 class="text-sm font-black text-white">🏆 실시간 편의점 재벌 랭킹</h2>
+            <h2 class="text-sm font-black text-white">🏆 현 시즌 편의점 재벌 랭킹</h2>
             <p class="text-[11px] text-slate-400">다점포 수 및 보유 자산 기준 실시간 순위</p>
           </div>
           <button onclick="fetchLeaderboard()"
@@ -607,12 +686,12 @@
       <button onclick="switchTab('upgrade')" id="nav-upgrade"
         class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition">
         <span class="text-base leading-none mb-0.5">🏢</span>
-        <span class="text-[11px] font-extrabold whitespace-nowrap">알바/점포확장</span>
+        <span class="text-[11px] font-extrabold whitespace-nowrap">알바/병기/확장</span>
       </button>
       <button onclick="switchTab('ranking')" id="nav-ranking"
         class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition">
         <span class="text-base leading-none mb-0.5">🏆</span>
-        <span class="text-[11px] font-extrabold whitespace-nowrap">랭킹/방명록</span>
+        <span class="text-[11px] font-extrabold whitespace-nowrap">랭킹/전당</span>
       </button>
       <button onclick="switchTab('community')" id="nav-community"
         class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition">
@@ -641,13 +720,13 @@
     </div>
   </div>
 
-  <!-- ==================== 7. ADMIN MODAL (landers_0724_jaeha) ==================== -->
+  <!-- ==================== 7. ADMIN ALL-IN-ONE MASTER MODAL ==================== -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-3">
-    <div class="w-full max-w-lg max-h-[90vh] flex flex-col bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-pop">
+    <div class="w-full max-w-lg max-h-[92vh] flex flex-col bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-pop">
       <div class="px-4 py-3 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2">
           <span class="text-lg">🛡️</span>
-          <h3 class="text-sm font-black text-white">총괄 관리자 패널</h3>
+          <h3 class="text-sm font-black text-white">총괄 관리자 올인원 마스터 패널</h3>
         </div>
         <button onclick="closeAdminModal()" class="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-bold text-slate-200">
           닫기 ✕
@@ -679,28 +758,138 @@
           </div>
         </div>
 
-        <!-- HIGH-QUALITY 60FPS UFO INVASION CUTSCENE (1:30 + 3S COUNTDOWN) -->
-        <div class="bg-gradient-to-br from-purple-950/90 via-slate-900 to-rose-950/80 border-2 border-purple-400/80 rounded-2xl p-3.5 space-y-2.5 shadow-lg">
+        <!-- 1. ALL-IN-ONE SEASON & EVENT CONTROLLER -->
+        <div class="bg-gradient-to-br from-purple-950/90 via-slate-900 to-rose-950/80 border-2 border-purple-400/80 rounded-2xl p-3.5 space-y-3 shadow-lg">
           <div class="flex items-center justify-between">
-            <h4 class="text-xs font-black text-purple-200">🛸 UFO 침공 시네마틱 컷씬 (60fps 고화질 · 1분 33초)</h4>
-            <span class="px-1.5 py-0.5 rounded bg-purple-500/30 text-[10px] font-black text-purple-200">LIVE</span>
+            <h4 class="text-xs font-black text-purple-200">🎛️ 시즌 & 메인 이벤트 마스터 컨트롤러</h4>
+            <span id="adminCurrentSeasonTag" class="px-2 py-0.5 rounded bg-purple-500/40 text-[10px] font-black text-white">시즌 1</span>
           </div>
-          <p class="text-[11px] text-slate-300 leading-relaxed">
-            버벅임 없는 60fps 고화질 그래픽으로 <strong>UFO 추락 → 외계인 조우 → 레이저 격돌 → 패배 및 편의점 점령(1분 30초)</strong> 후, 마지막 <strong>3초간 “대침공이 다가옵니다..” (11/28 오전 11:00 KST)</strong> 카운트다운이 송출됩니다!
-          </p>
-          <div class="flex gap-1.5">
-            <button type="button" onclick="launchUfoInvasionCutscene()"
-              class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 via-fuchsia-500 to-rose-500 hover:opacity-95 text-white font-black text-xs active:scale-95 transition shadow-lg">
-              🎬 UFO 침공 시네마틱 발동하기!
-            </button>
-            <button type="button" onclick="resetAlienOccupation()"
-              class="px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-600 text-slate-300 font-bold text-[11px]">
-              점령 해제
+
+          <!-- Season Number & Banner Customizer -->
+          <div class="grid grid-cols-3 gap-1.5">
+            <input id="adminSeasonNumInput" type="number" min="1" max="99" value="1" placeholder="시즌 번호"
+              class="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-bold text-amber-300" />
+            <input id="adminBannerMsgInput" type="text" value="대침공이 다가옵니다.." placeholder="상단 배너 문구"
+              class="col-span-2 px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white" />
+          </div>
+          <button type="button" onclick="saveSeasonConfig()"
+            class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs active:scale-95 transition">
+            💾 시즌 번호 & 배너 문구 즉시 반영
+          </button>
+
+          <!-- Step 1: Eve Invasion Cutscene -->
+          <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
+            <div class="text-[11px] font-black text-purple-300">1단계 · 전야제 (1분 33초 침공 컷씬 + 점령 모드)</div>
+            <div class="flex gap-1.5">
+              <button type="button" onclick="launchUfoInvasionCutscene()"
+                class="flex-1 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white font-black text-xs active:scale-95 transition">
+                🎬 전야제 침공 컷씬 송출!
+              </button>
+              <button type="button" onclick="resetAlienOccupation()"
+                class="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-300 font-bold text-[11px]">
+                일반 매장 복구
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Main Event Raid (Admin-Only Trigger + 30m Auto Switch) -->
+          <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-black text-rose-300">2단계 · 11/28 메인 레이드 (관리자 전용 발동)</span>
+              <span id="auto30mStatusBadge" class="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-bold text-slate-400">30분 자동: OFF</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+              <button type="button" onclick="adminLaunchMothershipRaid()"
+                class="py-2.5 px-2 rounded-xl bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 text-slate-950 font-black text-xs active:scale-95 transition shadow-lg">
+                ⚔️ 지금 모선 레이드 발동!
+              </button>
+              <button type="button" onclick="toggleAuto30MinRaid()"
+                class="py-2.5 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-400/50 text-amber-300 font-black text-xs active:scale-95 transition">
+                🕒 30분 자동 스위치 전환
+              </button>
+            </div>
+            <div class="flex gap-1.5">
+              <button type="button" onclick="adminForceWinRaid()"
+                class="flex-1 py-1.5 rounded-lg bg-emerald-600/30 border border-emerald-400/50 text-emerald-200 font-bold text-[11px]">
+                🏆 즉시 승리 컷씬 테스트
+              </button>
+              <button type="button" onclick="adminStopRaid()"
+                class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-600 text-slate-300 font-bold text-[11px]">
+                레이드 강제 종료
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Season End & Reset -->
+          <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
+            <div class="text-[11px] font-black text-amber-300">3단계 · 월간 시즌 종료 & 명예의 전당 정산</div>
+            <button type="button" onclick="adminEndSeasonAndAdvance()"
+              class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-xs active:scale-95 transition shadow">
+              👑 현 시즌 종료 → 명예의 전당 박제 & 다음 시즌 시작
             </button>
           </div>
         </div>
 
-        <!-- Global Notice Control -->
+        <!-- 2. EXPANDED 12 SURPRISE EVENTS PACK -->
+        <div class="bg-gradient-to-r from-purple-950/70 to-fuchsia-950/70 border border-purple-500/50 rounded-2xl p-3 space-y-2">
+          <h4 class="text-xs font-black text-purple-300">🎪 즉시 발동 깜짝 이벤트 12종 확장팩</h4>
+          <div class="flex gap-1.5 mb-1">
+            <input id="adminMegaphoneInput" type="text" placeholder="확성기 이벤트용 멘트 입력 (선택)"
+              class="flex-1 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+            <button onclick="triggerAdminSurprise('money_rain')" class="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-emerald-300">💸 하늘에서 돈비</div>
+              <div class="text-[9px] text-slate-300">전원 +30,000원</div>
+            </button>
+            <button onclick="triggerAdminSurprise('core_drop')" class="p-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 border border-teal-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-teal-300">🔋 에너지 코어 폭격</div>
+              <div class="text-[9px] text-slate-300">전원 +15 코어 지급</div>
+            </button>
+            <button onclick="triggerAdminSurprise('auto_rush')" class="p-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-sky-300">🚀 10초 초고속 러시</div>
+              <div class="text-[9px] text-slate-300">손님 즉시 자동정산</div>
+            </button>
+            <button onclick="triggerAdminSurprise('server_lotto')" class="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-amber-300">🎰 전 서버 로또 추첨</div>
+              <div class="text-[9px] text-slate-300">1명 +500,000원</div>
+            </button>
+            <button onclick="triggerAdminSurprise('vip_spawn')" class="p-2 rounded-xl bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-yellow-300">👑 VIP 재벌 소환</div>
+              <div class="text-[9px] text-slate-300">매출 10배 손님 등장</div>
+            </button>
+            <button onclick="triggerAdminSurprise('golden_broom')" class="p-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-cyan-300">🧹 황금 빗자루 타임</div>
+              <div class="text-[9px] text-slate-300">청결 100%+보너스</div>
+            </button>
+            <button onclick="triggerAdminSurprise('flip_psycho')" class="p-2 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-pink-300">🙃 화면 뒤집기 장난</div>
+              <div class="text-[9px] text-slate-300">5초간 반전+무지개</div>
+            </button>
+            <button onclick="triggerAdminSurprise('zero_gravity')" class="p-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-indigo-300">🛸 무중력 둥둥 모드</div>
+              <div class="text-[9px] text-slate-300">7초간 상품 버튼 부유</div>
+            </button>
+            <button onclick="triggerAdminSurprise('alien_slime')" class="p-2 rounded-xl bg-lime-500/20 hover:bg-lime-500/30 border border-lime-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-lime-300">🧪 외계 점액 묻히기</div>
+              <div class="text-[9px] text-slate-300">터치해 닦아내기</div>
+            </button>
+            <button onclick="triggerAdminSurprise('megaphone')" class="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-rose-300">📢 운영자 확성기</div>
+              <div class="text-[9px] text-slate-300">화면 흔들림+중앙팝업</div>
+            </button>
+            <button onclick="triggerAdminSurprise('blackout')" class="p-2 rounded-xl bg-slate-700/60 hover:bg-slate-700 border border-slate-500 text-left active:scale-95">
+              <div class="text-[11px] font-black text-slate-200">⚡ 깜짝 정전 사태</div>
+              <div class="text-[9px] text-slate-400">6초간 암전 서프라이즈</div>
+            </button>
+            <button onclick="triggerAdminSurprise('rush_queue')" class="p-2 rounded-xl bg-orange-500/20 hover:bg-orange-500/30 border border-orange-400/50 text-left active:scale-95">
+              <div class="text-[11px] font-black text-orange-300">🏃 대량 구매 손님 러시</div>
+              <div class="text-[9px] text-slate-300">5개씩 장바구니 폭탄</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Global Notice Control -->
         <div class="bg-slate-800/60 border border-indigo-500/50 rounded-2xl p-3 space-y-2">
           <h4 class="text-xs font-black text-indigo-300">📢 전체 긴급 공지 발송 (모든 접속자 상단 3.5초 표시)</h4>
           <div class="flex gap-1.5">
@@ -714,34 +903,7 @@
           <button type="button" onclick="clearGlobalNotice()" class="text-[11px] text-rose-400 hover:underline">상단 공지 배너 즉시 내리기</button>
         </div>
 
-        <!-- ADMIN SURPRISE EVENTS -->
-        <div class="bg-gradient-to-r from-purple-950/70 to-fuchsia-950/70 border border-purple-500/50 rounded-2xl p-3 space-y-2">
-          <h4 class="text-xs font-black text-purple-300">🎪 즉시 발동 깜짝 이벤트</h4>
-          <div class="grid grid-cols-2 gap-1.5">
-            <button onclick="triggerAdminSurprise('money_rain')"
-              class="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-left active:scale-95">
-              <div class="text-xs font-black text-emerald-300">💸 하늘에서 돈비</div>
-              <div class="text-[10px] text-slate-300">전원 +30,000원 지급</div>
-            </button>
-            <button onclick="triggerAdminSurprise('vip_spawn')"
-              class="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-left active:scale-95">
-              <div class="text-xs font-black text-amber-300">👑 VIP 재벌 소환</div>
-              <div class="text-[10px] text-slate-300">매출 10배 손님 등장</div>
-            </button>
-            <button onclick="triggerAdminSurprise('flip_psycho')"
-              class="p-2 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/50 text-left active:scale-95">
-              <div class="text-xs font-black text-pink-300">🙃 화면 뒤집기 장난</div>
-              <div class="text-[10px] text-slate-300">5초간 화면 반전+무지개</div>
-            </button>
-            <button onclick="triggerAdminSurprise('auto_rush')"
-              class="p-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/50 text-left active:scale-95">
-              <div class="text-xs font-black text-sky-300">🚀 10초 초고속 러시</div>
-              <div class="text-[10px] text-slate-300">손님 즉시 자동정산</div>
-            </button>
-          </div>
-        </div>
-
-        <!-- GLOBAL FEVER EVENT TRIGGER -->
+        <!-- 4. GLOBAL FEVER EVENT TRIGGER -->
         <div class="bg-gradient-to-r from-amber-950/60 to-orange-950/60 border border-amber-500/50 rounded-2xl p-3 space-y-2">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-black text-amber-300">🔥 전체 서버 피버 이벤트 (매출 배수 조절)</h4>
@@ -768,7 +930,7 @@
           </div>
         </div>
 
-        <!-- USER BAN & UNBAN CONTROL -->
+        <!-- 5. USER BAN & UNBAN CONTROL -->
         <div class="bg-slate-800/60 border border-rose-500/40 rounded-2xl p-3 space-y-2.5">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-black text-rose-300">🚫 유저 차단(밴) 및 해제 관리</h4>
@@ -793,7 +955,7 @@
           <div id="adminUserStatusList" class="max-h-32 overflow-y-auto space-y-1 pt-1 text-[11px]"></div>
         </div>
 
-        <!-- USER MONEY GRANT & EDIT -->
+        <!-- 6. USER MONEY GRANT & EDIT -->
         <div class="bg-slate-800/60 border border-amber-500/40 rounded-2xl p-3 space-y-2.5">
           <h4 class="text-xs font-black text-amber-300">💸 유저 자금 지급 및 수정</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -827,7 +989,7 @@
           </div>
         </div>
 
-        <!-- COUPON GENERATOR -->
+        <!-- 7. COUPON GENERATOR -->
         <div class="bg-slate-800/60 border border-emerald-500/40 rounded-2xl p-3 space-y-2">
           <h4 class="text-xs font-black text-emerald-300">🎁 새 쿠폰 코드 발행</h4>
           <div class="grid grid-cols-2 gap-1.5">
@@ -842,7 +1004,7 @@
           </button>
         </div>
 
-        <!-- Poll Creation -->
+        <!-- 8. Poll Creation -->
         <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-3 space-y-2">
           <h4 class="text-xs font-black text-white">🗳️ 실시간 투표 시작 (0표 시작)</h4>
           <input id="adminPollQuestion" type="text" placeholder="투표 질문 입력"
@@ -865,7 +1027,7 @@
           </div>
         </div>
 
-        <!-- Bug / Suggestion Inbox -->
+        <!-- 9. Bug / Suggestion Inbox -->
         <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-3 space-y-2">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-black text-white">🐞 버그신고 & 개선사항 수신함</h4>
@@ -908,25 +1070,17 @@
       } catch (e) {}
     }
 
-    function playBarcodeBeep() {
-      playTone(1760, 'square', 0.075, 0.05);
-    }
-
+    function playBarcodeBeep() { playTone(1760, 'square', 0.075, 0.05); }
     function playRegisterComplete() {
       playTone(987.77, 'triangle', 0.08, 0.09);
       setTimeout(() => playTone(1318.51, 'triangle', 0.16, 0.09), 65);
     }
-
-    function playCoinTap() {
-      playTone(1150, 'sine', 0.05, 0.05);
-    }
-
+    function playCoinTap() { playTone(1150, 'sine', 0.05, 0.05); }
     function playGiftFanfare() {
       [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
         setTimeout(() => playTone(f, 'triangle', 0.18, 0.1), i * 70);
       });
     }
-
     function playUfoAlarm() {
       playTone(165, 'sawtooth', 0.35, 0.11);
       setTimeout(() => playTone(295, 'sawtooth', 0.35, 0.11), 210);
@@ -981,6 +1135,23 @@
       { emoji: '🧬', name: '은하계 연구원 외계인' }
     ];
 
+    const CORE_WEAPON_DEFS = [
+      {
+        key: 'hyperLaser',
+        title: '🔫 초고출력 바코드 레이저 개조',
+        desc: '모선 레이드 시 기본 사격 데미지가 레벨당 +100 증가합니다.',
+        baseCoreCost: 3,
+        maxLv: 15
+      },
+      {
+        key: 'autoTurret',
+        title: '🛰️ 자동 플라즈마 방어 포탑',
+        desc: '모선 레이드 시 매초 자동으로 +250 데미지를 입힙니다.',
+        baseCoreCost: 5,
+        maxLv: 10
+      }
+    ];
+
     const UPGRADE_DEFS = [
       {
         key: 'partTimer',
@@ -1026,18 +1197,32 @@
     let serverFeverUntil = 0;
     let serverFeverMultiplier = 2.0;
     let autoRushUntil = 0;
+    let zeroGravityUntil = 0;
     let lastNoticeTimestamp = 0;
     let isInitialNoticeLoad = true;
     let noticeHideTimer = null;
     let lastSurpriseId = '';
 
-    // High-Quality 60FPS UFO Invasion Cutscene State
+    // Season & Event State
+    let currentSeasonNumber = 1;
+    let currentBannerText = '대침공이 다가옵니다..';
+    let lastSeasonResetId = '';
+    let isInitialSeasonLoad = true;
+
+    // Cutscene & Raid State
     let lastUfoEventId = '';
     let isInitialUfoLoad = true;
     let isAlienOccupied = false;
     let ufoCutsceneInterval = null;
     let ufoCountdownInterval = null;
     let ufoCinemaAnimId = null;
+
+    let activeRaidState = null;
+    let lastRaidId = '';
+    let lastRaidWinId = '';
+    let isInitialRaidLoad = true;
+    let auto30MinRaidEnabled = false;
+    let lastAuto30MinSlot = '';
 
     let gameState = {
       money: 15000,
@@ -1048,7 +1233,12 @@
       combo: 0,
       totalServed: 0,
       energyCores: 0,
+      medals: [],
       usedCoupons: {},
+      coreWeapons: {
+        hyperLaser: 0,
+        autoTurret: 0
+      },
       upgrades: {
         partTimer: 0,
         posScanner: 0,
@@ -1064,17 +1254,17 @@
     let lastTick = Date.now();
 
     // ---------------------------------------------------------
-    // 60FPS ULTRA-SMOOTH HIGH-QUALITY CINEMA CANVAS ENGINE
+    // 60FPS MULTI-MODE HIGH-QUALITY CINEMA CANVAS ENGINE
     // ---------------------------------------------------------
     let cinemaState = {
+      mode: 'invasion', // 'invasion' | 'raid_start' | 'raid_win'
       elapsedSec: 0,
       shakePower: 0,
       stars: [],
-      particles: [],
-      shockwaves: []
+      particles: []
     };
 
-    function initCinemaCanvas() {
+    function initCinemaCanvas(mode = 'invasion') {
       const canvas = document.getElementById('ufoCinemaCanvas');
       const ctx = canvas.getContext('2d');
 
@@ -1087,6 +1277,7 @@
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
+      cinemaState.mode = mode;
       cinemaState.stars = Array.from({ length: 110 }, () => ({
         x: Math.random(),
         y: Math.random() * 0.65,
@@ -1094,7 +1285,6 @@
         twinkle: Math.random() * Math.PI * 2
       }));
       cinemaState.particles = [];
-      cinemaState.shockwaves = [];
       cinemaState.elapsedSec = 0;
       cinemaState.shakePower = 0;
 
@@ -1104,20 +1294,22 @@
         const h = window.innerHeight;
         const t = performance.now() * 0.001;
         const sec = cinemaState.elapsedSec;
+        const cMode = cinemaState.mode;
 
         ctx.save();
 
-        // Camera Shake
         if (cinemaState.shakePower > 0.2) {
-          const sx = (Math.random() - 0.5) * cinemaState.shakePower;
-          const sy = (Math.random() - 0.5) * cinemaState.shakePower;
-          ctx.translate(sx, sy);
+          ctx.translate(
+            (Math.random() - 0.5) * cinemaState.shakePower,
+            (Math.random() - 0.5) * cinemaState.shakePower
+          );
           cinemaState.shakePower *= 0.91;
         }
 
-        // 1. Deep Atmospheric Night Sky Gradient
+        // Sky
         const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.76);
-        if (sec >= 72) {
+        const isPurpleSky = (cMode === 'invasion' && sec >= 72) || cMode === 'raid_start' || (cMode === 'raid_win' && sec < 12);
+        if (isPurpleSky) {
           skyGrad.addColorStop(0, '#090314');
           skyGrad.addColorStop(0.55, '#1e0b36');
           skyGrad.addColorStop(1, '#3b0764');
@@ -1129,7 +1321,6 @@
         ctx.fillStyle = skyGrad;
         ctx.fillRect(0, 0, w, h);
 
-        // 2. Twinkling Stars & Nebula Glow
         cinemaState.stars.forEach(s => {
           const alpha = 0.35 + 0.65 * Math.abs(Math.sin(t * 2.2 + s.twinkle));
           ctx.fillStyle = `rgba(226, 232, 240, ${alpha})`;
@@ -1138,29 +1329,15 @@
           ctx.fill();
         });
 
-        // Moon / Cosmic Halo
-        const moonX = w * 0.82;
-        const moonY = h * 0.18;
-        const moonGlow = ctx.createRadialGradient(moonX, moonY, 6, moonX, moonY, 95);
-        moonGlow.addColorStop(0, sec >= 72 ? 'rgba(216,180,254,0.85)' : 'rgba(254,249,195,0.85)');
-        moonGlow.addColorStop(0.3, sec >= 72 ? 'rgba(168,85,247,0.22)' : 'rgba(148,163,184,0.16)');
-        moonGlow.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = moonGlow;
-        ctx.beginPath();
-        ctx.arc(moonX, moonY, 95, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 3. Distant City Skyline Silhouette
+        // Skyline & Ground
         ctx.fillStyle = '#070b14';
-        const bCount = 12;
-        for (let i = 0; i < bCount; i++) {
-          const bx = (w / bCount) * i;
-          const bw = w / bCount + 4;
+        for (let i = 0; i < 12; i++) {
+          const bx = (w / 12) * i;
+          const bw = w / 12 + 4;
           const bh = 55 + ((i * 37) % 65);
           ctx.fillRect(bx, h * 0.73 - bh, bw, bh);
         }
 
-        // 4. Asphalt Ground & Neon Street Reflection
         const groundY = h * 0.73;
         const groundGrad = ctx.createLinearGradient(0, groundY, 0, h);
         groundGrad.addColorStop(0, '#0f172a');
@@ -1168,212 +1345,51 @@
         ctx.fillStyle = groundGrad;
         ctx.fillRect(0, groundY, w, h - groundY);
 
-        // Road Line
-        ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([18, 16]);
-        ctx.beginPath();
-        ctx.moveTo(0, groundY + (h - groundY) * 0.45);
-        ctx.lineTo(w, groundY + (h - groundY) * 0.45);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // 5. Detailed High-Res Convenience Store (Left Side)
-        const storeW = Math.min(220, w * 0.36);
-        const storeH = Math.min(135, h * 0.22);
+        // Convenience Store
+        const storeW = Math.min(210, w * 0.35);
+        const storeH = Math.min(130, h * 0.21);
         const storeX = Math.max(16, w * 0.06);
         const storeY = groundY - storeH;
-        const isOccupiedVisual = sec >= 72;
+        const isOccupiedVisual = isPurpleSky;
 
-        // Ambient Store Light Pool on Ground
-        const storePool = ctx.createRadialGradient(
-          storeX + storeW * 0.5, groundY, 10,
-          storeX + storeW * 0.5, groundY, storeW * 0.95
-        );
-        storePool.addColorStop(0, isOccupiedVisual ? 'rgba(192,132,252,0.4)' : 'rgba(52,211,153,0.35)');
-        storePool.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = storePool;
-        ctx.fillRect(storeX - 40, groundY - 20, storeW + 80, 90);
-
-        // Store Body
         ctx.fillStyle = '#1e293b';
         ctx.beginPath();
         ctx.roundRect(storeX, storeY, storeW, storeH, [8, 8, 0, 0]);
         ctx.fill();
 
-        // Neon Roof Signboard
-        const signH = 26;
         ctx.fillStyle = '#090d16';
-        ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, signH);
-
+        ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, 26);
         ctx.fillStyle = isOccupiedVisual ? '#a855f7' : '#10b981';
         ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, 5);
         ctx.fillStyle = isOccupiedVisual ? '#f43f5e' : '#f59e0b';
-        ctx.fillRect(storeX - 4, storeY + signH - 11, storeW + 8, 5);
+        ctx.fillRect(storeX - 4, storeY + 15, storeW + 8, 5);
 
         ctx.fillStyle = '#ffffff';
         ctx.font = '900 11px "Noto Sans KR", sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(isOccupiedVisual ? 'ALIEN OUTPOST 24' : '24H 편의점', storeX + storeW * 0.5, storeY + 12);
 
-        // Bright Glass Windows
         const winGrad = ctx.createLinearGradient(0, storeY + 26, 0, groundY - 6);
-        if (isOccupiedVisual) {
-          winGrad.addColorStop(0, '#581c87');
-          winGrad.addColorStop(1, '#3b0764');
-        } else {
-          winGrad.addColorStop(0, '#a7f3d0');
-          winGrad.addColorStop(1, '#059669');
-        }
+        winGrad.addColorStop(0, isOccupiedVisual ? '#581c87' : '#a7f3d0');
+        winGrad.addColorStop(1, isOccupiedVisual ? '#3b0764' : '#059669');
         ctx.fillStyle = winGrad;
         ctx.fillRect(storeX + 12, storeY + 26, storeW - 24, storeH - 32);
 
-        // Window Frame Mullions
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(storeX + 12, storeY + 26, storeW - 24, storeH - 32);
-        ctx.beginPath();
-        ctx.moveTo(storeX + storeW * 0.5, storeY + 26);
-        ctx.lineTo(storeX + storeW * 0.5, groundY - 6);
-        ctx.stroke();
-
-        // 6. Compute UFO Coordinates & Motion
-        let ufoX = w * 0.72;
-        let ufoY = h * 0.2;
-        let ufoScale = 1.0;
-        let ufoTilt = 0;
-
-        if (sec < 12) {
-          const p = Math.min(1, sec / 11);
-          const ease = 1 - Math.pow(1 - p, 2.2);
-          ufoX = w * (0.85 - ease * 0.13);
-          ufoY = h * (0.1 + ease * 0.45);
-          ufoTilt = Math.sin(t * 14) * (1 - p) * 0.25;
-          // Fire trail particles during crash descent
-          if (Math.random() < 0.7) {
-            cinemaState.particles.push({
-              x: ufoX + (Math.random() - 0.5) * 30,
-              y: ufoY - 10,
-              vx: (Math.random() - 0.5) * 2,
-              vy: -Math.random() * 3 - 1,
-              size: Math.random() * 8 + 4,
-              color: Math.random() < 0.5 ? '#f97316' : '#facc15',
-              life: 1
-            });
-          }
-        } else if (sec < 72) {
-          ufoX = w * 0.72;
-          ufoY = groundY - 82 + Math.sin(t * 3) * 6;
-          ufoTilt = sec < 18 ? 0.12 : Math.sin(t * 2) * 0.04;
-        } else {
-          // Moves above the convenience store in Act 4
-          ufoX = storeX + storeW * 0.5;
-          ufoY = storeY - 62 + Math.sin(t * 3) * 5;
-          ufoScale = 1.15;
+        // Mode-specific Visuals
+        if (cMode === 'invasion') {
+          renderInvasionScene(ctx, w, h, groundY, storeX, storeW, storeY, sec, t);
+        } else if (cMode === 'raid_start') {
+          renderRaidStartScene(ctx, w, h, groundY, storeX, storeW, sec, t);
+        } else if (cMode === 'raid_win') {
+          renderRaidWinScene(ctx, w, h, groundY, storeX, storeW, sec, t);
         }
 
-        // Tractor Beam (Act 2 & Act 4)
-        if ((sec >= 22 && sec < 36) || sec >= 72) {
-          const beamTargetY = sec >= 72 ? groundY : groundY;
-          const beamTopW = 36 * ufoScale;
-          const beamBotW = sec >= 72 ? storeW * 0.85 : 95;
-          const beamGrad = ctx.createLinearGradient(0, ufoY, 0, beamTargetY);
-          beamGrad.addColorStop(0, 'rgba(216, 180, 254, 0.55)');
-          beamGrad.addColorStop(1, 'rgba(168, 85, 247, 0.05)');
-          ctx.fillStyle = beamGrad;
-          ctx.beginPath();
-          ctx.moveTo(ufoX - beamTopW, ufoY + 10);
-          ctx.lineTo(ufoX + beamTopW, ufoY + 10);
-          ctx.lineTo(ufoX + beamBotW, beamTargetY);
-          ctx.lineTo(ufoX - beamBotW, beamTargetY);
-          ctx.closePath();
-          ctx.fill();
-        }
-
-        // Draw Sleek Metallic UFO Saucer
-        drawSleekUFO(ctx, ufoX, ufoY, ufoScale, ufoTilt, t);
-
-        // Extra Fleet UFOs in Act 4
-        if (sec >= 72) {
-          drawSleekUFO(ctx, storeX - 25, storeY - 95 + Math.cos(t * 2.6) * 5, 0.55, -0.06, t + 1);
-          drawSleekUFO(ctx, storeX + storeW + 35, storeY - 90 + Math.sin(t * 2.8) * 5, 0.6, 0.06, t + 2);
-        }
-
-        // 7. Characters: Store Manager (Hero) & Alien Commander
-        let heroX = storeX + storeW + 28;
-        let heroY = groundY;
-        let heroKnocked = false;
-
-        if (sec >= 18 && sec < 36) {
-          const walkP = Math.min(1, (sec - 18) / 6);
-          heroX = (storeX + storeW + 28) + walkP * (w * 0.14);
-          heroY = groundY - Math.abs(Math.sin(t * 10)) * (walkP < 1 ? 5 : 0);
-        } else if (sec >= 36 && sec < 66) {
-          heroX = w * 0.34;
-        } else if (sec >= 66) {
-          heroX = w * 0.25;
-          heroKnocked = true;
-        }
-
-        drawHeroCharacter(ctx, heroX, heroY, heroKnocked, sec >= 36 && sec < 66);
-
-        if (sec >= 24) {
-          const alienX = w * 0.68;
-          const alienY = groundY + Math.sin(t * 3.5) * 3;
-          drawAlienCommander(ctx, alienX, alienY, sec >= 36 && sec < 66, t);
-
-          // 8. Act 3 (36~66s): High-Energy Laser Beam Clash!
-          if (sec >= 36 && sec < 66) {
-            let clashRatio = 0.5;
-            if (sec >= 42 && sec < 48) clashRatio = 0.68; // Hero pushes alien back
-            if (sec >= 48 && sec < 60) clashRatio = 0.36; // Alien pushes hero back
-            if (sec >= 60) clashRatio = 0.16; // Alien mega beam overwhelms
-
-            const startX = heroX + 26;
-            const endX = alienX - 26;
-            const beamY = groundY - 46;
-            const clashX = startX + (endX - startX) * clashRatio;
-
-            // Hero Emerald Scanner Beam
-            drawEnergyBeam(ctx, startX, beamY, clashX, beamY, 8, '#10b981', '#a7f3d0');
-
-            // Alien Purple Plasma Beam
-            const alienWidth = sec >= 60 ? 22 : 11;
-            drawEnergyBeam(ctx, endX, beamY, clashX, beamY, alienWidth, '#c026d3', '#f5d0fe');
-
-            // Glowing Clash Core Orb
-            const coreR = (sec >= 60 ? 26 : 16) + Math.sin(t * 35) * 5;
-            const coreGrad = ctx.createRadialGradient(clashX, beamY, 2, clashX, beamY, coreR * 1.8);
-            coreGrad.addColorStop(0, '#ffffff');
-            coreGrad.addColorStop(0.35, '#fef08a');
-            coreGrad.addColorStop(0.7, '#d946ef');
-            coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = coreGrad;
-            ctx.beginPath();
-            ctx.arc(clashX, beamY, coreR * 1.8, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Clash Sparks
-            for (let i = 0; i < 3; i++) {
-              cinemaState.particles.push({
-                x: clashX,
-                y: beamY,
-                vx: (Math.random() - 0.5) * 9,
-                vy: (Math.random() - 0.5) * 9,
-                size: Math.random() * 3.5 + 1.5,
-                color: Math.random() < 0.5 ? '#fde047' : '#e879f9',
-                life: 1
-              });
-            }
-          }
-        }
-
-        // 9. Update & Draw Particles
+        // Particles
         for (let i = cinemaState.particles.length - 1; i >= 0; i--) {
           const p = cinemaState.particles[i];
           p.x += p.vx;
           p.y += p.vy;
-          p.life -= 0.035;
+          p.life -= 0.032;
           if (p.life <= 0) {
             cinemaState.particles.splice(i, 1);
             continue;
@@ -1385,11 +1401,170 @@
           ctx.fill();
         }
         ctx.globalAlpha = 1;
-
         ctx.restore();
       };
 
       renderFrame();
+    }
+
+    function renderInvasionScene(ctx, w, h, groundY, storeX, storeW, storeY, sec, t) {
+      let ufoX = w * 0.72;
+      let ufoY = h * 0.2;
+      let ufoScale = 1.0;
+      let ufoTilt = 0;
+
+      if (sec < 12) {
+        const p = Math.min(1, sec / 11);
+        const ease = 1 - Math.pow(1 - p, 2.2);
+        ufoX = w * (0.85 - ease * 0.13);
+        ufoY = h * (0.1 + ease * 0.45);
+        ufoTilt = Math.sin(t * 14) * (1 - p) * 0.25;
+        if (Math.random() < 0.7) {
+          cinemaState.particles.push({
+            x: ufoX + (Math.random() - 0.5) * 30,
+            y: ufoY - 10,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -Math.random() * 3 - 1,
+            size: Math.random() * 8 + 4,
+            color: Math.random() < 0.5 ? '#f97316' : '#facc15',
+            life: 1
+          });
+        }
+      } else if (sec < 72) {
+        ufoX = w * 0.72;
+        ufoY = groundY - 82 + Math.sin(t * 3) * 6;
+        ufoTilt = Math.sin(t * 2) * 0.04;
+      } else {
+        ufoX = storeX + storeW * 0.5;
+        ufoY = storeY - 62 + Math.sin(t * 3) * 5;
+        ufoScale = 1.15;
+      }
+
+      if ((sec >= 22 && sec < 36) || sec >= 72) {
+        const beamTopW = 36 * ufoScale;
+        const beamBotW = sec >= 72 ? storeW * 0.85 : 95;
+        const beamGrad = ctx.createLinearGradient(0, ufoY, 0, groundY);
+        beamGrad.addColorStop(0, 'rgba(216, 180, 254, 0.55)');
+        beamGrad.addColorStop(1, 'rgba(168, 85, 247, 0.05)');
+        ctx.fillStyle = beamGrad;
+        ctx.beginPath();
+        ctx.moveTo(ufoX - beamTopW, ufoY + 10);
+        ctx.lineTo(ufoX + beamTopW, ufoY + 10);
+        ctx.lineTo(ufoX + beamBotW, groundY);
+        ctx.lineTo(ufoX - beamBotW, groundY);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      drawSleekUFO(ctx, ufoX, ufoY, ufoScale, ufoTilt, t);
+
+      let heroX = storeX + storeW + 28;
+      let heroY = groundY;
+      let heroKnocked = false;
+
+      if (sec >= 18 && sec < 36) {
+        const walkP = Math.min(1, (sec - 18) / 6);
+        heroX = (storeX + storeW + 28) + walkP * (w * 0.14);
+        heroY = groundY - Math.abs(Math.sin(t * 10)) * (walkP < 1 ? 5 : 0);
+      } else if (sec >= 36 && sec < 66) {
+        heroX = w * 0.34;
+      } else if (sec >= 66) {
+        heroX = w * 0.25;
+        heroKnocked = true;
+      }
+
+      drawHeroCharacter(ctx, heroX, heroY, heroKnocked, sec >= 36 && sec < 66);
+
+      if (sec >= 24) {
+        const alienX = w * 0.68;
+        const alienY = groundY + Math.sin(t * 3.5) * 3;
+        drawAlienCommander(ctx, alienX, alienY, sec >= 36 && sec < 66, t);
+
+        if (sec >= 36 && sec < 66) {
+          let clashRatio = 0.5;
+          if (sec >= 42 && sec < 48) clashRatio = 0.68;
+          if (sec >= 48 && sec < 60) clashRatio = 0.36;
+          if (sec >= 60) clashRatio = 0.16;
+
+          const startX = heroX + 26;
+          const endX = alienX - 26;
+          const beamY = groundY - 46;
+          const clashX = startX + (endX - startX) * clashRatio;
+
+          drawEnergyBeam(ctx, startX, beamY, clashX, beamY, 8, '#10b981', '#a7f3d0');
+          drawEnergyBeam(ctx, endX, beamY, clashX, beamY, sec >= 60 ? 22 : 11, '#c026d3', '#f5d0fe');
+
+          const coreR = (sec >= 60 ? 26 : 16) + Math.sin(t * 35) * 5;
+          const coreGrad = ctx.createRadialGradient(clashX, beamY, 2, clashX, beamY, coreR * 1.8);
+          coreGrad.addColorStop(0, '#ffffff');
+          coreGrad.addColorStop(0.35, '#fef08a');
+          coreGrad.addColorStop(0.7, '#d946ef');
+          coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = coreGrad;
+          ctx.beginPath();
+          ctx.arc(clashX, beamY, coreR * 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    function renderRaidStartScene(ctx, w, h, groundY, storeX, storeW, sec, t) {
+      // Giant Mothership descending from sky
+      const p = Math.min(1, sec / 8);
+      const motherX = w * 0.65;
+      const motherY = h * (0.05 + p * 0.22) + Math.sin(t * 2.5) * 6;
+      drawSleekUFO(ctx, motherX, motherY, 1.95, Math.sin(t * 1.5) * 0.03, t);
+
+      // Red Shield Dome around Mothership
+      if (sec >= 5) {
+        ctx.strokeStyle = 'rgba(244, 63, 94, 0.7)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(motherX, motherY, 155 + Math.sin(t * 8) * 5, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Hero powering up with Emerald Energy Core aura
+      const heroX = storeX + storeW + 45;
+      drawHeroCharacter(ctx, heroX, groundY, false, true);
+      if (sec >= 8) {
+        const aura = ctx.createRadialGradient(heroX, groundY - 40, 4, heroX, groundY - 40, 65);
+        aura.addColorStop(0, 'rgba(52, 211, 153, 0.65)');
+        aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = aura;
+        ctx.beginPath();
+        ctx.arc(heroX, groundY - 40, 65, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function renderRaidWinScene(ctx, w, h, groundY, storeX, storeW, sec, t) {
+      const heroX = storeX + storeW + 45;
+      const motherX = w * 0.68;
+      const motherY = h * 0.25;
+
+      drawHeroCharacter(ctx, heroX, groundY, false, sec < 12);
+
+      if (sec < 12) {
+        // Mothership still there, getting blasted by mega hyper beam!
+        drawSleekUFO(ctx, motherX + (Math.random() - 0.5) * 14, motherY + (Math.random() - 0.5) * 14, 1.85, 0.14, t);
+        drawEnergyBeam(ctx, heroX + 24, groundY - 46, motherX, motherY, 24, '#10b981', '#fef08a');
+
+        // Explosion sparks on Mothership
+        for (let i = 0; i < 6; i++) {
+          cinemaState.particles.push({
+            x: motherX + (Math.random() - 0.5) * 120,
+            y: motherY + (Math.random() - 0.5) * 50,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10,
+            size: Math.random() * 9 + 4,
+            color: Math.random() < 0.5 ? '#facc15' : '#f97316',
+            life: 1
+          });
+        }
+      } else if (sec === 12) {
+        cinemaState.shakePower = 26;
+      }
     }
 
     function drawSleekUFO(ctx, x, y, scale, tilt, t) {
@@ -1398,7 +1573,6 @@
       ctx.rotate(tilt);
       ctx.scale(scale, scale);
 
-      // Ambient Glow under UFO
       const aura = ctx.createRadialGradient(0, 6, 8, 0, 6, 95);
       aura.addColorStop(0, 'rgba(217, 70, 239, 0.45)');
       aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
@@ -1407,7 +1581,6 @@
       ctx.arc(0, 6, 95, 0, Math.PI * 2);
       ctx.fill();
 
-      // Glass Cockpit Dome
       const domeGrad = ctx.createLinearGradient(0, -34, 0, 0);
       domeGrad.addColorStop(0, '#f0abfc');
       domeGrad.addColorStop(1, '#7e22ce');
@@ -1416,7 +1589,6 @@
       ctx.ellipse(0, -8, 34, 24, 0, Math.PI, 0);
       ctx.fill();
 
-      // Metallic Disc Hull
       const hullGrad = ctx.createLinearGradient(-75, -10, 75, 16);
       hullGrad.addColorStop(0, '#475569');
       hullGrad.addColorStop(0.5, '#cbd5e1');
@@ -1426,22 +1598,13 @@
       ctx.ellipse(0, 2, 76, 17, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Lower Thruster Ring
-      ctx.fillStyle = '#1e293b';
-      ctx.beginPath();
-      ctx.ellipse(0, 12, 42, 8, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Animated Neon Rim Lights
       for (let i = -3; i <= 3; i++) {
-        const lx = i * 19;
         const pulse = Math.sin(t * 10 + i) > 0;
         ctx.fillStyle = pulse ? '#38bdf8' : '#f472b6';
         ctx.beginPath();
-        ctx.arc(lx, 3, 3.6, 0, Math.PI * 2);
+        ctx.arc(i * 19, 3, 3.6, 0, Math.PI * 2);
         ctx.fill();
       }
-
       ctx.restore();
     }
 
@@ -1452,60 +1615,30 @@
         ctx.translate(0, -10);
         ctx.rotate(-Math.PI / 2);
       }
-
-      // Shadow
-      if (!knocked) {
-        ctx.fillStyle = 'rgba(0,0,0,0.45)';
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 18, 5, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Legs
       ctx.fillStyle = '#1e293b';
       ctx.fillRect(-10, -26, 8, 26);
       ctx.fillRect(2, -26, 8, 26);
-
-      // Convenience Store Green Vest Torso
       ctx.fillStyle = '#10b981';
       ctx.beginPath();
       ctx.roundRect(-13, -56, 26, 32, 6);
       ctx.fill();
-
-      // Head
       ctx.fillStyle = '#fde68a';
       ctx.beginPath();
       ctx.arc(0, -68, 12, 0, Math.PI * 2);
       ctx.fill();
-
-      // Cap
       ctx.fillStyle = '#059669';
       ctx.beginPath();
       ctx.arc(0, -71, 12, Math.PI, 0);
       ctx.fill();
       ctx.fillRect(0, -73, 17, 4);
-
-      // Barcode Scanner Weapon
       ctx.fillStyle = firing ? '#fde047' : '#f59e0b';
       ctx.fillRect(10, -48, 16, 7);
-
       ctx.restore();
     }
 
     function drawAlienCommander(ctx, x, y, firing, t) {
       ctx.save();
       ctx.translate(x, y);
-
-      // Purple Aura
-      const aura = ctx.createRadialGradient(0, -45, 5, 0, -45, 55);
-      aura.addColorStop(0, 'rgba(192, 38, 211, 0.45)');
-      aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = aura;
-      ctx.beginPath();
-      ctx.arc(0, -45, 55, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Armor Cloak
       ctx.fillStyle = '#4c1d95';
       ctx.beginPath();
       ctx.moveTo(-18, -8);
@@ -1514,35 +1647,21 @@
       ctx.lineTo(18, -8);
       ctx.closePath();
       ctx.fill();
-
-      // Alien Head
       ctx.fillStyle = '#a3e635';
       ctx.beginPath();
       ctx.ellipse(0, -72, 13, 17, 0, 0, Math.PI * 2);
       ctx.fill();
-
-      // Glowing Crimson Eyes
       ctx.fillStyle = '#f43f5e';
       ctx.beginPath();
       ctx.ellipse(-5, -72, 3.5, 5, -0.25, 0, Math.PI * 2);
       ctx.ellipse(5, -72, 3.5, 5, 0.25, 0, Math.PI * 2);
       ctx.fill();
-
-      // Extended Arm
-      ctx.strokeStyle = '#a3e635';
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.moveTo(-10, -48);
-      ctx.lineTo(-26, -46);
-      ctx.stroke();
-
       ctx.restore();
     }
 
     function drawEnergyBeam(ctx, x1, y1, x2, y2, thickness, outerColor, coreColor) {
       ctx.save();
       ctx.lineCap = 'round';
-
       ctx.strokeStyle = outerColor;
       ctx.lineWidth = thickness * 2.1;
       ctx.globalAlpha = 0.45;
@@ -1558,7 +1677,6 @@
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
       ctx.stroke();
-
       ctx.restore();
     }
 
@@ -1570,8 +1688,372 @@
     }
 
     // ---------------------------------------------------------
-    // UFO INVASION EVENT LISTENER & 1:30 STORY SCRIPT
+    // STORY BEATS FOR ALL 3 CUTSCENES
     // ---------------------------------------------------------
+    const UFO_STORY_BEATS = [
+      { startSec: 0, act: 'ACT 1 · 미확인 비행물체 추락', speaker: '📡 기상 관측소 긴급 경보', ground: '편의점 상공 밤하늘', text: '밤하늘을 가르는 거대한 보라빛 섬광! 정체불명의 초대형 UFO 원반이 편의점 앞 공터로 급강하하고 있습니다!', shake: 10, alarm: true },
+      { startSec: 6, act: 'ACT 1 · 미확인 비행물체 추락', speaker: '💥 대기권 돌파 & 불시착', ground: '편의점 앞 공터', text: '쿠우우웅—!! 엄청난 충격파와 함께 UFO가 편의점 바로 앞 도로에 불시착했습니다!', shake: 22, alarm: true },
+      { startSec: 12, act: 'ACT 1 · 미확인 비행물체 추락', speaker: '🧑‍💼 나 (편의점 사장님)', ground: '추락 현장', text: '나: "방금 하늘에서 떨어진 거대한 원반은 뭐지...?! 직접 나가서 확인해봐야겠어!"', shake: 6, alarm: false },
+      { startSec: 18, act: 'ACT 2 · 외계 생명체와의 조우', speaker: '🧑‍💼 나 (편의점 사장님)', ground: '추락한 UFO 접근 중', text: '추락한 UFO 가까이 다가가자, 선체 하단에서 보라색 중력 광선이 켜지기 시작합니다...', shake: 0, alarm: false },
+      { startSec: 24, act: 'ACT 2 · 외계 생명체와의 조우', speaker: '👽 외계인 사령관 강림', ground: 'UFO 견인 광선 구역', text: '보라색 광선을 타고 외계인 사령관이 지상으로 내려왔습니다! 붉게 빛나는 눈으로 편의점을 노려봅니다.', shake: 10, alarm: true },
+      { startSec: 30, act: 'ACT 2 · 외계 생명체와의 조우', speaker: '👽 외계인 사령관', ground: '일촉즉발 대치 상태', text: '외계인: "지구인... 우리는 이 행성을 침공하러 왔다. 먼저 저 보급 기지(편의점)부터 접수하겠다!"', shake: 0, alarm: false },
+      { startSec: 36, act: 'ACT 3 · 지구 & 편의점 사수 격돌!', speaker: '⚔️ 에너지 빔 전투 개시!', ground: '편의점 앞 방어선', text: '나: "내 피땀으로 키운 편의점과 지구는 절대 못 내줘!" 바코드 스캐너 광선을 최대로 개방해 맞섭니다!', shake: 12, alarm: false, battle: true, heroHp: 100, alienHp: 100 },
+      { startSec: 42, act: 'ACT 3 · 지구 & 편의점 사수 격돌!', speaker: '🧑‍💼 나 (필살 반격!)', ground: '편의점 앞 방어선', text: '초고속 스캐너 레이저가 외계인 사령관을 밀어붙입니다! 방어막에 균열이 가기 시작했습니다!', shake: 10, alarm: false, battle: true, heroHp: 90, alienHp: 62 },
+      { startSec: 48, act: 'ACT 3 · 지구 & 편의점 사수 격돌!', speaker: '👽 외계인 사령관', ground: '편의점 앞 방어선', text: '외계인: "건방진 지구인 같으니! 우주 플라즈마 출력 개방!" 거대한 보라색 레이저가 역습을 가합니다!', shake: 15, alarm: true, battle: true, heroHp: 54, alienHp: 62 },
+      { startSec: 54, act: 'ACT 3 · 지구 & 편의점 사수 격돌!', speaker: '🔥 최후의 총력전', ground: '편의점 정문 앞', text: '끝까지 버텨보지만 외계인의 압도적인 에너지 출력이 한계를 넘어섭니다!', shake: 14, alarm: false, battle: true, heroHp: 25, alienHp: 45 },
+      { startSec: 60, act: 'ACT 3 · 지구 & 편의점 사수 격돌!', speaker: '👽 외계인 사령관 (최종 일격)', ground: '편의점 정문 앞', text: '외계인: "이것으로 끝이다, 지구인!! 사라져라!" 초거대 플라즈마 광선이 정면으로 폭발합니다!', shake: 24, alarm: true, battle: true, heroHp: 12, alienHp: 45 },
+      { startSec: 66, act: 'ACT 4 · 방어선 붕괴 및 패배', speaker: '💥 방어 실패...', ground: '무너진 방어선', text: '콰광—!! 강력한 충격파에 휩쓸려 쓰러지고 말았습니다... 지구 방어전은 외계인의 승리로 끝났습니다.', shake: 18, alarm: true, battle: true, heroHp: 0, alienHp: 45 },
+      { startSec: 72, act: 'ACT 4 · 편의점 침범 및 점령', speaker: '🛸 외계인 함대 상공 포위', ground: '포위된 편의점 상공', text: '외계인 모선과 지원 함대가 편의점 지붕 위로 이동해 보라색 점령 광선을 내리꽂습니다!', shake: 8, alarm: true },
+      { startSec: 78, act: 'ACT 4 · 편의점 침범 및 점령', speaker: '👽 외계인 사령관', ground: '점령당한 편의점', text: '외계인: "오늘부로 이 편의점은 은하 제국의 지구 전초기지로 점령되었다!"', shake: 0, alarm: false },
+      { startSec: 84, act: 'ACT 4 · 점령 완료 임박', speaker: '⚠️ SYSTEM ALERT', ground: '외계인 점령 완료', text: '편의점 조명이 보라색 외계 에너지로 물들었습니다! 대침공 본편 업데이트 카운트다운이 시작됩니다!', shake: 12, alarm: true }
+    ];
+
+    const RAID_START_BEATS = [
+      { startSec: 0, act: 'RAID START · 외계인 모선 강림', speaker: '🚨 전 서버 비상 경보', ground: '편의점 상공 성층권', text: '먹구름을 찢고 초대형 외계인 모선이 상공에 모습을 드러냈습니다! 거대한 붉은 보호막이 전개됩니다!', shake: 14, alarm: true },
+      { startSec: 5, act: 'RAID START · 반격의 봉화', speaker: '🧑‍💼 나 (각성 모드)', ground: '편의점 앞 광장', text: '나: "그동안 모아둔 에너지 코어를 전부 장전했다! 전 서버 사장님들, 지금 반격을 시작하자!"', shake: 6, alarm: false },
+      { startSec: 10, act: 'RAID START · 총공세 돌입!', speaker: '⚔️ 전투 개시 5초 전', ground: '모선 직하방 방어선', text: '제한시간 3분 안에 외계인 모선의 체력을 0으로 깎아 편의점을 탈환하세요!!', shake: 12, alarm: true }
+    ];
+
+    const RAID_WIN_BEATS = [
+      { startSec: 0, act: 'VICTORY · 전 서버 총력 일격!', speaker: '🔥 하이퍼 스캐너 풀출력', ground: '편의점 앞 방어선', text: '전 서버 사장님들의 바코드 레이저와 에너지 코어가 하나로 모여 초대형 황금 광선으로 발사됩니다!!', shake: 16, alarm: false },
+      { startSec: 7, act: 'VICTORY · 모선 보호막 붕괴!', speaker: '👽 외계인 사령관', ground: '붕괴하는 모선 상공', text: '외계인: "마, 말도 안 돼... 지구인의 계산대 스캐너가 우리 모선 코어를 뚫다니—!!"', shake: 20, alarm: true },
+      { startSec: 13, act: 'VICTORY · 편의점 완전 탈환!', speaker: '🏆 대반격 승리!!', ground: '해방된 24H 편의점', text: '콰과광—!! 외계인 모선이 우주 너머로 날아가고, 따뜻한 24H 편의점 불빛이 다시 켜졌습니다! 승리 보상 지급!', shake: 8, alarm: false }
+    ];
+
+    function playCutsceneSequence(mode, onFinished) {
+      clearInterval(ufoCutsceneInterval);
+      clearInterval(ufoCountdownInterval);
+
+      const overlay = document.getElementById('ufoCutsceneOverlay');
+      const topBar = document.getElementById('ufoTopLetterbox');
+      const bottomBar = document.getElementById('ufoBottomLetterbox');
+      const mainStage = document.getElementById('ufoMainStage');
+      const finaleStage = document.getElementById('ufoCountdownFinaleStage');
+
+      overlay.classList.remove('hidden');
+      mainStage.classList.remove('hidden');
+      finaleStage.classList.add('hidden');
+
+      initCinemaCanvas(mode);
+
+      setTimeout(() => {
+        topBar.classList.remove('-translate-y-full');
+        bottomBar.classList.remove('translate-y-full');
+      }, 40);
+
+      const totalSec = mode === 'invasion' ? 90 : mode === 'raid_start' ? 15 : 20;
+      const beats = mode === 'invasion' ? UFO_STORY_BEATS : mode === 'raid_start' ? RAID_START_BEATS : RAID_WIN_BEATS;
+      const totalLabel = mode === 'invasion' ? '01:30' : mode === 'raid_start' ? '00:15' : '00:20';
+
+      let elapsedSec = 0;
+      let lastBeatIndex = -1;
+
+      const renderBeatAtSecond = sec => {
+        cinemaState.elapsedSec = sec;
+        const mins = String(Math.floor(sec / 60)).padStart(2, '0');
+        const secs = String(sec % 60).padStart(2, '0');
+        document.getElementById('ufoElapsedTimer').textContent = `${mins}:${secs} / ${totalLabel}`;
+
+        const pct = Math.min(100, Math.round((sec / totalSec) * 100));
+        document.getElementById('ufoTimelineBar').style.width = `${pct}%`;
+        document.getElementById('ufoSceneProgressText').textContent = `${pct}%`;
+
+        let beatIdx = 0;
+        for (let i = 0; i < beats.length; i++) {
+          if (sec >= beats[i].startSec) beatIdx = i;
+        }
+
+        if (beatIdx !== lastBeatIndex) {
+          lastBeatIndex = beatIdx;
+          const b = beats[beatIdx];
+          document.getElementById('ufoActBadge').textContent = b.act;
+          document.getElementById('ufoSpeakerName').textContent = b.speaker;
+          document.getElementById('ufoGroundLabel').textContent = b.ground;
+          document.getElementById('ufoDialogueText').textContent = b.text;
+
+          const battleHud = document.getElementById('ufoBattleHud');
+          if (b.battle) {
+            battleHud.classList.remove('hidden');
+            document.getElementById('heroHpBar').style.width = `${b.heroHp}%`;
+            document.getElementById('heroHpText').textContent = `${b.heroHp}%`;
+            document.getElementById('alienHpBar').style.width = `${b.alienHp}%`;
+            document.getElementById('alienHpText').textContent = `${b.alienHp}%`;
+          } else {
+            battleHud.classList.add('hidden');
+          }
+
+          if (b.shake > 0) cinemaState.shakePower = b.shake;
+          if (b.alarm) playUfoAlarm();
+          else playTone(620, 'sine', 0.08, 0.05);
+        }
+      };
+
+      renderBeatAtSecond(0);
+
+      ufoCutsceneInterval = setInterval(() => {
+        elapsedSec += 1;
+        if (elapsedSec < totalSec) {
+          renderBeatAtSecond(elapsedSec);
+        } else {
+          clearInterval(ufoCutsceneInterval);
+          if (mode === 'invasion') {
+            showThreeSecondCountdownFinale(onFinished);
+          } else {
+            closeCinemaOverlay(onFinished);
+          }
+        }
+      }, 1000);
+    }
+
+    function showThreeSecondCountdownFinale(onFinished) {
+      const mainStage = document.getElementById('ufoMainStage');
+      const finaleStage = document.getElementById('ufoCountdownFinaleStage');
+      mainStage.classList.add('hidden');
+      finaleStage.classList.remove('hidden');
+      document.getElementById('ufoActBadge').textContent = 'FINAL · 2026.11.28 11:00 KST';
+      document.getElementById('ufoElapsedTimer').textContent = 'COUNTDOWN';
+      playGiftFanfare();
+
+      const updateCountdownClock = () => {
+        const diff = Math.max(0, MAIN_INVASION_TARGET_MS - Date.now());
+        document.getElementById('cdDays').textContent = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+        document.getElementById('cdHours').textContent = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+        document.getElementById('cdMinutes').textContent = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+        document.getElementById('cdSeconds').textContent = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+      };
+
+      updateCountdownClock();
+      ufoCountdownInterval = setInterval(updateCountdownClock, 250);
+
+      setTimeout(() => {
+        clearInterval(ufoCountdownInterval);
+        closeCinemaOverlay(onFinished);
+      }, 3000);
+    }
+
+    function closeCinemaOverlay(onFinished) {
+      const overlay = document.getElementById('ufoCutsceneOverlay');
+      const topBar = document.getElementById('ufoTopLetterbox');
+      const bottomBar = document.getElementById('ufoBottomLetterbox');
+      topBar.classList.add('-translate-y-full');
+      bottomBar.classList.add('translate-y-full');
+      setTimeout(() => {
+        destroyCinemaCanvas();
+        overlay.classList.add('hidden');
+        if (typeof onFinished === 'function') onFinished();
+      }, 380);
+    }
+
+    function startUfoInvasionCutscene() {
+      playCutsceneSequence('invasion', () => {
+        applyAlienOccupationTheme(true);
+        initPOSCustomers();
+        showToast('👽 대침공이 다가옵니다.. 외계인 점령 모드가 시작되었습니다!', 'warning');
+      });
+    }
+
+    // ---------------------------------------------------------
+    // MOTHERSHIP RAID SYSTEM (ADMIN TRIGGERED OR 30M SWITCH)
+    // ---------------------------------------------------------
+    function listenMothershipRaid() {
+      db.ref('globalEvent/mothershipRaid').on('value', snap => {
+        const data = snap.val();
+        if (isInitialRaidLoad) {
+          isInitialRaidLoad = false;
+          if (data) {
+            if (data.id) lastRaidId = data.id;
+            if (data.winId) lastRaidWinId = data.winId;
+            if (data.active && Date.now() < Number(data.endsAt || 0) && Number(data.hp || 0) > 0) {
+              activeRaidState = data;
+              document.getElementById('mothershipRaidHud').classList.remove('hidden');
+              updateRaidHudUI();
+            }
+          }
+          return;
+        }
+
+        if (!data) {
+          activeRaidState = null;
+          document.getElementById('mothershipRaidHud').classList.add('hidden');
+          return;
+        }
+
+        // Check if Victory Cutscene just triggered
+        if (data.winId && data.winId !== lastRaidWinId) {
+          lastRaidWinId = data.winId;
+          activeRaidState = null;
+          document.getElementById('mothershipRaidHud').classList.add('hidden');
+          playCutsceneSequence('raid_win', () => {
+            const rewardMoney = 150000 * gameState.branchCount;
+            gameState.money += rewardMoney;
+            if (!gameState.medals.includes('🛸지구방위대')) {
+              gameState.medals.push('🛸지구방위대');
+            }
+            applyAlienOccupationTheme(false);
+            initPOSCustomers();
+            renderAll();
+            syncCloudSave(true);
+            playGiftFanfare();
+            showToast(`🏆 모선 격퇴 성공! 전리품 +${formatKRW(rewardMoney)} & [🛸지구방위대] 칭호 획득!`, 'success');
+          });
+          return;
+        }
+
+        // Check if New Raid Started
+        if (data.id && data.id !== lastRaidId && data.active) {
+          lastRaidId = data.id;
+          activeRaidState = data;
+          playCutsceneSequence('raid_start', () => {
+            document.getElementById('mothershipRaidHud').classList.remove('hidden');
+            updateRaidHudUI();
+            showToast('⚔️ 외계인 모선 보스전 시작! 레이저와 에너지 코어로 공격하세요!', 'warning');
+          });
+          return;
+        }
+
+        if (data.active && Number(data.hp || 0) > 0 && Date.now() < Number(data.endsAt || 0)) {
+          activeRaidState = data;
+          document.getElementById('mothershipRaidHud').classList.remove('hidden');
+          updateRaidHudUI();
+        } else {
+          activeRaidState = null;
+          document.getElementById('mothershipRaidHud').classList.add('hidden');
+        }
+      });
+    }
+
+    function getLaserDamage() {
+      const lv = gameState.coreWeapons?.hyperLaser || 0;
+      return (150 + lv * 100) * gameState.branchCount;
+    }
+
+    function getCoreMissileDamage() {
+      const lv = gameState.coreWeapons?.hyperLaser || 0;
+      return (1200 + lv * 500) * gameState.branchCount;
+    }
+
+    function getAutoTurretDamagePerSec() {
+      const lv = gameState.coreWeapons?.autoTurret || 0;
+      return lv * 250 * gameState.branchCount;
+    }
+
+    function updateRaidHudUI() {
+      if (!activeRaidState) return;
+      const hp = Math.max(0, Number(activeRaidState.hp || 0));
+      const maxHp = Math.max(1, Number(activeRaidState.maxHp || 100000));
+      const pct = Math.min(100, (hp / maxHp) * 100);
+      document.getElementById('bossHpLabel').textContent = `${hp.toLocaleString()} / ${maxHp.toLocaleString()}`;
+      document.getElementById('bossHpFill').style.width = `${pct}%`;
+      document.getElementById('laserDmgText').textContent = getLaserDamage().toLocaleString();
+      document.getElementById('coreDmgText').textContent = getCoreMissileDamage().toLocaleString();
+    }
+
+    async function attackMothership(type, event) {
+      if (!activeRaidState || !activeRaidState.active) return;
+      let dmg = 0;
+      if (type === 'laser') {
+        dmg = getLaserDamage();
+        playBarcodeBeep();
+      } else if (type === 'core') {
+        if ((gameState.energyCores || 0) < 1) {
+          showToast('🔋 에너지 코어가 부족합니다! 점령 매장에서 손님을 계산해 모으세요.', 'error');
+          return;
+        }
+        gameState.energyCores -= 1;
+        dmg = getCoreMissileDamage();
+        playTone(420, 'sawtooth', 0.14, 0.09);
+        updateHeaderStats();
+      }
+
+      if (event && event.clientX) {
+        spawnFloatingText(event.clientX, event.clientY, `💥 -${dmg.toLocaleString()} DMG!`, type === 'core' ? '#fbbf24' : '#34d399');
+      }
+
+      await applyDamageToMothership(dmg);
+    }
+
+    async function applyDamageToMothership(dmg) {
+      if (!activeRaidState || !activeRaidState.active || dmg <= 0) return;
+      const raidRef = db.ref('globalEvent/mothershipRaid');
+      await raidRef.transaction(curr => {
+        if (!curr || !curr.active) return curr;
+        const nextHp = Math.max(0, Number(curr.hp || 0) - dmg);
+        curr.hp = nextHp;
+        if (nextHp === 0) {
+          curr.active = false;
+          curr.winId = 'win_' + Date.now();
+        }
+        return curr;
+      });
+    }
+
+    // ---------------------------------------------------------
+    // SEASON & UFO LISTENERS
+    // ---------------------------------------------------------
+    function listenSeasonConfig() {
+      db.ref('globalEvent/seasonConfig').on('value', snap => {
+        const cfg = snap.val();
+        if (!cfg) return;
+        currentSeasonNumber = Number(cfg.seasonNum || 1);
+        currentBannerText = cfg.bannerText || '대침공이 다가옵니다..';
+        auto30MinRaidEnabled = Boolean(cfg.auto30MinRaid);
+
+        document.getElementById('headerSeasonBadge').textContent = `S${currentSeasonNumber}`;
+        document.getElementById('occupationBannerTitle').textContent = currentBannerText;
+        const tag = document.getElementById('adminCurrentSeasonTag');
+        if (tag) tag.textContent = `시즌 ${currentSeasonNumber}`;
+        const autoBadge = document.getElementById('auto30mStatusBadge');
+        if (autoBadge) {
+          autoBadge.textContent = `30분 자동: ${auto30MinRaidEnabled ? 'ON' : 'OFF'}`;
+          autoBadge.className = auto30MinRaidEnabled
+            ? 'px-1.5 py-0.5 rounded bg-emerald-500/30 text-[10px] font-black text-emerald-300'
+            : 'px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-bold text-slate-400';
+        }
+
+        if (isInitialSeasonLoad) {
+          isInitialSeasonLoad = false;
+          if (cfg.resetId) lastSeasonResetId = cfg.resetId;
+          return;
+        }
+
+        if (cfg.resetId && cfg.resetId !== lastSeasonResetId) {
+          lastSeasonResetId = cfg.resetId;
+          const prevMedal = `🏅S${Math.max(1, currentSeasonNumber - 1)}`;
+          if (!gameState.medals.includes(prevMedal)) gameState.medals.push(prevMedal);
+          gameState.branchCount = 1;
+          gameState.money = 30000;
+          gameState.day = 1;
+          gameState.combo = 0;
+          gameState.upgrades = { partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 };
+          applyAlienOccupationTheme(false);
+          initPOSCustomers();
+          renderAll();
+          syncCloudSave(true);
+          playGiftFanfare();
+          showToast(`🎊 시즌 ${currentSeasonNumber} 개막! 이전 시즌 훈장(${prevMedal}) 및 시작 지원금이 지급되었습니다!`, 'warning');
+        }
+      });
+    }
+
+    function listenHallOfFame() {
+      db.ref('hallOfFame').limitToLast(5).on('value', snap => {
+        const data = snap.val();
+        const box = document.getElementById('hallOfFameBox');
+        const list = document.getElementById('hallOfFameList');
+        if (!data) {
+          box.classList.add('hidden');
+          return;
+        }
+        box.classList.remove('hidden');
+        list.innerHTML = Object.values(data).reverse().map(entry => `
+          <div class="p-2 rounded-xl bg-slate-900/90 border border-amber-500/30 flex items-center justify-between">
+            <span class="font-black text-amber-300">시즌 ${entry.season} 챔피언 · ${entry.champion}</span>
+            <span class="text-[11px] text-slate-300">${entry.branchCount}호점 (${formatKRW(entry.money)})</span>
+          </div>
+        `).join('');
+      });
+    }
+
     function listenUfoInvasionEvent() {
       db.ref('globalEvent/ufoInvasion').on('value', snap => {
         const data = snap.val();
@@ -1621,291 +2103,6 @@
       el.textContent = days > 0 ? `D-${days} ${hours}:${mins}:${secs}` : `${hours}:${mins}:${secs}`;
     }
 
-    const UFO_STORY_BEATS = [
-      {
-        startSec: 0,
-        act: 'ACT 1 · 미확인 비행물체 추락',
-        speaker: '📡 기상 관측소 긴급 경보',
-        ground: '편의점 상공 밤하늘',
-        text: '밤하늘을 가르는 거대한 보라빛 섬광! 정체불명의 초대형 UFO 원반이 편의점 앞 공터로 급강하하고 있습니다!',
-        shake: 10,
-        alarm: true
-      },
-      {
-        startSec: 6,
-        act: 'ACT 1 · 미확인 비행물체 추락',
-        speaker: '💥 대기권 돌파 & 불시착',
-        ground: '편의점 앞 공터 (충돌 임박)',
-        text: '쿠우우웅—!! 엄청난 충격파와 함께 UFO가 편의점 바로 앞 도로에 불시착했습니다! 지면이 강하게 흔들립니다!',
-        shake: 22,
-        alarm: true
-      },
-      {
-        startSec: 12,
-        act: 'ACT 1 · 미확인 비행물체 추락',
-        speaker: '🧑‍💼 나 (편의점 사장님)',
-        ground: '연기가 피어오르는 추락 현장',
-        text: '나: "방금 하늘에서 떨어진 거대한 원반은 뭐지...?! 편의점 간판까지 흔들렸어! 직접 나가서 확인해봐야겠어!"',
-        shake: 6,
-        alarm: false
-      },
-      {
-        startSec: 18,
-        act: 'ACT 2 · 외계 생명체와의 조우',
-        speaker: '🧑‍💼 나 (편의점 사장님)',
-        ground: '추락한 UFO 접근 중',
-        text: '손전등을 들고 추락한 UFO 가까이 다가가자, 금속 선체 하단에서 보라색 중력 광선이 켜지기 시작합니다...',
-        shake: 0,
-        alarm: false
-      },
-      {
-        startSec: 24,
-        act: 'ACT 2 · 외계 생명체와의 조우',
-        speaker: '👽 외계인 사령관 강림',
-        ground: 'UFO 견인 광선 구역',
-        text: '보라색 광선을 타고 외계인 사령관이 지상으로 내려왔습니다! 붉게 빛나는 눈으로 편의점을 노려봅니다.',
-        shake: 10,
-        alarm: true
-      },
-      {
-        startSec: 30,
-        act: 'ACT 2 · 외계 생명체와의 조우',
-        speaker: '👽 외계인 사령관',
-        ground: '일촉즉발 대치 상태',
-        text: '외계인: "지구인... 우리는 이 행성을 침공하러 왔다. 먼저 저 빛나는 보급 기지(편의점)부터 접수하겠다!"',
-        shake: 0,
-        alarm: false
-      },
-      {
-        startSec: 36,
-        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
-        speaker: '⚔️ 에너지 빔 전투 개시!',
-        ground: '편의점 앞 방어선',
-        text: '나: "내 피땀으로 키운 편의점과 지구는 절대 못 내줘!" 바코드 스캐너 광선을 최대로 개방해 맞섭니다!',
-        shake: 12,
-        alarm: false,
-        battle: true,
-        heroHp: 100,
-        alienHp: 100
-      },
-      {
-        startSec: 42,
-        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
-        speaker: '🧑‍💼 나 (필살 반격!)',
-        ground: '편의점 앞 방어선',
-        text: '초고속 스캐너 레이저가 외계인 사령관을 밀어붙입니다! 외계인의 방어막에 균열이 가기 시작했습니다!',
-        shake: 10,
-        alarm: false,
-        battle: true,
-        heroHp: 90,
-        alienHp: 62
-      },
-      {
-        startSec: 48,
-        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
-        speaker: '👽 외계인 사령관',
-        ground: '편의점 앞 방어선',
-        text: '외계인: "건방진 지구인 같으니! 우주 플라즈마 출력 개방!" 거대한 보라색 레이저가 역습을 가합니다!',
-        shake: 15,
-        alarm: true,
-        battle: true,
-        heroHp: 54,
-        alienHp: 62
-      },
-      {
-        startSec: 54,
-        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
-        speaker: '🔥 최후의 총력전',
-        ground: '편의점 정문 앞',
-        text: '끝까지 버텨보지만 외계인의 압도적인 에너지 출력이 한계를 넘어섭니다! 방어선이 점점 밀리고 있습니다!',
-        shake: 14,
-        alarm: false,
-        battle: true,
-        heroHp: 25,
-        alienHp: 45
-      },
-      {
-        startSec: 60,
-        act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
-        speaker: '👽 외계인 사령관 (최종 일격)',
-        ground: '편의점 정문 앞',
-        text: '외계인: "이것으로 끝이다, 지구인!! 사라져라!" 초거대 플라즈마 광선이 정면으로 폭발합니다!',
-        shake: 24,
-        alarm: true,
-        battle: true,
-        heroHp: 12,
-        alienHp: 45
-      },
-      {
-        startSec: 66,
-        act: 'ACT 4 · 방어선 붕괴 및 패배',
-        speaker: '💥 방어 실패...',
-        ground: '무너진 방어선',
-        text: '콰광—!! 강력한 충격파에 휩쓸려 쓰러지고 말았습니다... 지구 방어전은 외계인의 승리로 끝나고 말았습니다.',
-        shake: 18,
-        alarm: true,
-        battle: true,
-        heroHp: 0,
-        alienHp: 45
-      },
-      {
-        startSec: 72,
-        act: 'ACT 4 · 편의점 침범 및 점령',
-        speaker: '🛸 외계인 함대 상공 포위',
-        ground: '포위된 편의점 상공',
-        text: '외계인 모선과 지원 함대가 편의점 지붕 위로 이동해 보라색 점령 광선을 내리꽂습니다!',
-        shake: 8,
-        alarm: true
-      },
-      {
-        startSec: 78,
-        act: 'ACT 4 · 편의점 침범 및 점령',
-        speaker: '👽 외계인 사령관',
-        ground: '점령당한 편의점',
-        text: '외계인: "오늘부로 이 편의점은 은하 제국의 지구 전초기지로 점령되었다! 모든 거래를 외계식으로 전환한다!"',
-        shake: 0,
-        alarm: false
-      },
-      {
-        startSec: 84,
-        act: 'ACT 4 · 점령 완료 임박',
-        speaker: '⚠️ SYSTEM ALERT',
-        ground: '외계인 점령 완료',
-        text: '편의점 조명이 보라색 외계 에너지로 물들었습니다! 대침공 본편 업데이트 카운트다운이 시작됩니다!',
-        shake: 12,
-        alarm: true
-      }
-    ];
-
-    function startUfoInvasionCutscene() {
-      clearInterval(ufoCutsceneInterval);
-      clearInterval(ufoCountdownInterval);
-
-      const overlay = document.getElementById('ufoCutsceneOverlay');
-      const topBar = document.getElementById('ufoTopLetterbox');
-      const bottomBar = document.getElementById('ufoBottomLetterbox');
-      const mainStage = document.getElementById('ufoMainStage');
-      const finaleStage = document.getElementById('ufoCountdownFinaleStage');
-
-      overlay.classList.remove('hidden');
-      mainStage.classList.remove('hidden');
-      finaleStage.classList.add('hidden');
-
-      initCinemaCanvas();
-
-      setTimeout(() => {
-        topBar.classList.remove('-translate-y-full');
-        bottomBar.classList.remove('translate-y-full');
-      }, 40);
-
-      const totalStorySec = 90; // 정확히 1분 30초
-      let elapsedSec = 0;
-      let lastBeatIndex = -1;
-
-      const renderBeatAtSecond = sec => {
-        cinemaState.elapsedSec = sec;
-        const mins = String(Math.floor(sec / 60)).padStart(2, '0');
-        const secs = String(sec % 60).padStart(2, '0');
-        document.getElementById('ufoElapsedTimer').textContent = `${mins}:${secs} / 01:30`;
-
-        const pct = Math.min(100, Math.round((sec / totalStorySec) * 100));
-        document.getElementById('ufoTimelineBar').style.width = `${pct}%`;
-        document.getElementById('ufoSceneProgressText').textContent = `${pct}%`;
-
-        let beatIdx = 0;
-        for (let i = 0; i < UFO_STORY_BEATS.length; i++) {
-          if (sec >= UFO_STORY_BEATS[i].startSec) beatIdx = i;
-        }
-
-        if (beatIdx !== lastBeatIndex) {
-          lastBeatIndex = beatIdx;
-          const b = UFO_STORY_BEATS[beatIdx];
-          document.getElementById('ufoActBadge').textContent = b.act;
-          document.getElementById('ufoSpeakerName').textContent = b.speaker;
-          document.getElementById('ufoGroundLabel').textContent = b.ground;
-          document.getElementById('ufoDialogueText').textContent = b.text;
-
-          const battleHud = document.getElementById('ufoBattleHud');
-          if (b.battle) {
-            battleHud.classList.remove('hidden');
-            document.getElementById('heroHpBar').style.width = `${b.heroHp}%`;
-            document.getElementById('heroHpText').textContent = `${b.heroHp}%`;
-            document.getElementById('alienHpBar').style.width = `${b.alienHp}%`;
-            document.getElementById('alienHpText').textContent = `${b.alienHp}%`;
-          } else {
-            battleHud.classList.add('hidden');
-          }
-
-          if (b.shake > 0) {
-            cinemaState.shakePower = b.shake;
-          }
-          if (b.alarm) {
-            playUfoAlarm();
-          } else {
-            playTone(620, 'sine', 0.08, 0.05);
-          }
-        }
-      };
-
-      renderBeatAtSecond(0);
-
-      ufoCutsceneInterval = setInterval(() => {
-        elapsedSec += 1;
-        if (elapsedSec < totalStorySec) {
-          renderBeatAtSecond(elapsedSec);
-        } else {
-          // 1분 30초 완료 -> 마지막 3초 카운트다운("대침공이 다가옵니다..") 표시!
-          clearInterval(ufoCutsceneInterval);
-          showThreeSecondCountdownFinale();
-        }
-      }, 1000);
-    }
-
-    function showThreeSecondCountdownFinale() {
-      const overlay = document.getElementById('ufoCutsceneOverlay');
-      const topBar = document.getElementById('ufoTopLetterbox');
-      const bottomBar = document.getElementById('ufoBottomLetterbox');
-      const mainStage = document.getElementById('ufoMainStage');
-      const finaleStage = document.getElementById('ufoCountdownFinaleStage');
-
-      mainStage.classList.add('hidden');
-      finaleStage.classList.remove('hidden');
-      document.getElementById('ufoActBadge').textContent = 'FINAL · 2026.11.28 11:00 KST';
-      document.getElementById('ufoElapsedTimer').textContent = 'COUNTDOWN';
-      playGiftFanfare();
-
-      const updateCountdownClock = () => {
-        const diff = Math.max(0, MAIN_INVASION_TARGET_MS - Date.now());
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const mins = Math.floor((diff / (1000 * 60)) % 60);
-        const secs = Math.floor((diff / 1000) % 60);
-
-        document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
-        document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
-        document.getElementById('cdMinutes').textContent = String(mins).padStart(2, '0');
-        document.getElementById('cdSeconds').textContent = String(secs).padStart(2, '0');
-      };
-
-      updateCountdownClock();
-      ufoCountdownInterval = setInterval(updateCountdownClock, 250);
-
-      // 정확히 3초 동안 카운트다운 표시 후 종료 및 외계인 점령 모드 전환
-      setTimeout(() => {
-        clearInterval(ufoCountdownInterval);
-        topBar.classList.add('-translate-y-full');
-        bottomBar.classList.add('translate-y-full');
-
-        setTimeout(() => {
-          destroyCinemaCanvas();
-          overlay.classList.add('hidden');
-          applyAlienOccupationTheme(true);
-          initPOSCustomers();
-          showToast('👽 대침공이 다가옵니다.. 외계인 점령 모드가 시작되었습니다!', 'warning');
-        }, 400);
-      }, 3000);
-    }
-
     // ---------------------------------------------------------
     // Legacy Data & Account Auto-Recovery Scanner
     // ---------------------------------------------------------
@@ -1924,9 +2121,7 @@
           if (!raw) continue;
 
           if (key.toLowerCase().includes('nick') || key === 'cvs_user') {
-            if (raw.length >= 2 && raw.length <= 12 && !raw.startsWith('{')) {
-              bestNickname = raw.trim();
-            }
+            if (raw.length >= 2 && raw.length <= 12 && !raw.startsWith('{')) bestNickname = raw.trim();
           }
 
           if (raw.startsWith('{')) {
@@ -1939,40 +2134,12 @@
                 bestDay = Number(parsed.day ?? parsed.state?.day ?? 1);
                 bestBranch = Number(parsed.branchCount ?? parsed.state?.branchCount ?? 1);
                 bestSatisfaction = Number(parsed.satisfaction ?? parsed.reputation ?? parsed.state?.satisfaction ?? 85);
-                if (parsed.upgrades || parsed.state?.upgrades) {
-                  bestUpgrades = parsed.upgrades || parsed.state?.upgrades;
-                }
+                if (parsed.upgrades || parsed.state?.upgrades) bestUpgrades = parsed.upgrades || parsed.state?.upgrades;
               }
               if (candidateNick && !bestNickname) bestNickname = candidateNick;
             } catch (e) {}
           }
         }
-      } catch (e) {}
-
-      try {
-        const [usersSnap, playersSnap, lbSnap] = await Promise.all([
-          db.ref('users').once('value'),
-          db.ref('players').once('value'),
-          db.ref('leaderboard').once('value')
-        ]);
-
-        const mergeCandidate = obj => {
-          if (!obj) return;
-          Object.entries(obj).forEach(([k, val]) => {
-            if (!val || typeof val !== 'object') return;
-            const m = Number(val.money ?? val.cash ?? val.state?.money ?? 0);
-            const nick = val.nickname || k;
-            if (bestNickname && nick === bestNickname && m >= bestMoney) {
-              bestMoney = m;
-              bestDay = Number(val.day ?? val.state?.day ?? bestDay);
-              bestBranch = Number(val.branchCount ?? val.state?.branchCount ?? bestBranch);
-            }
-          });
-        };
-
-        mergeCandidate(usersSnap.val());
-        mergeCandidate(playersSnap.val());
-        mergeCandidate(lbSnap.val());
       } catch (e) {}
 
       if (bestMoney > 15000 || bestNickname) {
@@ -1984,12 +2151,9 @@
           satisfaction: bestSatisfaction,
           upgrades: bestUpgrades
         };
-
         const banner = document.getElementById('recoveryBanner');
-        const summary = document.getElementById('recoverySummaryText');
-        summary.textContent = `${bestNickname ? `[${bestNickname}] ` : ''}${bestBranch}호점 · 보유 자금 ${formatKRW(detectedRecoveryData.money)} (DAY ${bestDay}) 기록을 찾았습니다!`;
+        document.getElementById('recoverySummaryText').textContent = `${bestNickname ? `[${bestNickname}] ` : ''}${bestBranch}호점 · 보유 자금 ${formatKRW(detectedRecoveryData.money)} (DAY ${bestDay}) 기록을 찾았습니다!`;
         banner.classList.remove('hidden');
-
         if (bestNickname && !document.getElementById('loginNickname').value) {
           document.getElementById('loginNickname').value = bestNickname;
         }
@@ -1998,22 +2162,18 @@
 
     function applyDetectedRecovery() {
       if (!detectedRecoveryData) return;
-      if (detectedRecoveryData.nickname) {
-        document.getElementById('loginNickname').value = detectedRecoveryData.nickname;
-      }
+      if (detectedRecoveryData.nickname) document.getElementById('loginNickname').value = detectedRecoveryData.nickname;
       gameState.money = Math.max(gameState.money, detectedRecoveryData.money);
       gameState.day = Math.max(gameState.day, detectedRecoveryData.day || 1);
       gameState.branchCount = Math.max(gameState.branchCount, detectedRecoveryData.branchCount || 1);
       gameState.satisfaction = detectedRecoveryData.satisfaction || 85;
-      if (detectedRecoveryData.upgrades) {
-        gameState.upgrades = { ...gameState.upgrades, ...detectedRecoveryData.upgrades };
-      }
+      if (detectedRecoveryData.upgrades) gameState.upgrades = { ...gameState.upgrades, ...detectedRecoveryData.upgrades };
       showToast(`✅ 복구 데이터(${formatKRW(gameState.money)}) 준비 완료! 4자리 PIN 입력 후 매장 오픈을 누르세요.`, 'success');
       document.getElementById('loginPin').focus();
     }
 
     // ---------------------------------------------------------
-    // Account Login, Real-Time Ban Check & Cloud Sync
+    // Account Login & Cloud Sync
     // ---------------------------------------------------------
     async function handleAccountLogin() {
       const nick = document.getElementById('loginNickname').value.trim();
@@ -2067,8 +2227,10 @@
               ...data.state,
               money: mergedMoney,
               energyCores: Number(data.state.energyCores || 0),
+              medals: Array.isArray(data.state.medals) ? data.state.medals : [],
               branchCount: Math.max(1, Number(data.state.branchCount || data.branchCount || 1)),
               usedCoupons: data.state.usedCoupons || {},
+              coreWeapons: { ...gameState.coreWeapons, ...(data.state.coreWeapons || {}) },
               upgrades: { ...gameState.upgrades, ...(data.state.upgrades || {}) }
             };
           } else {
@@ -2084,22 +2246,6 @@
           });
           showToast(`환영합니다, ${nick} 사장님! 매장 데이터를 연결했습니다.`, 'success');
         } else {
-          const [legacyPlayerSnap, legacyLbSnap] = await Promise.all([
-            db.ref(`players/${nick}`).once('value'),
-            db.ref(`leaderboard/${nick}`).once('value')
-          ]);
-
-          let legacyMoney = 0;
-          if (legacyPlayerSnap.exists()) {
-            legacyMoney = Math.max(legacyMoney, Number(legacyPlayerSnap.val().money || 0));
-          }
-          if (legacyLbSnap.exists()) {
-            legacyMoney = Math.max(legacyMoney, Number(legacyLbSnap.val().money || 0));
-          }
-          if (legacyMoney > gameState.money) {
-            gameState.money = legacyMoney;
-          }
-
           await userRef.set({
             nickname: nick,
             pin: pin,
@@ -2119,11 +2265,14 @@
         document.getElementById('loginModal').classList.add('hidden');
 
         attachRealtimeUserListeners(nick);
+        listenSeasonConfig();
+        listenHallOfFame();
         listenGlobalNotices();
         listenLivePoll();
         listenServerFever();
         listenServerSurprise();
         listenUfoInvasionEvent();
+        listenMothershipRaid();
         listenShoutbox();
 
         initPOSCustomers();
@@ -2156,9 +2305,7 @@
             updateHeaderStats();
             if (diff > 0) {
               playGiftFanfare();
-              showToast(`🎉 관리자로부터 지원금 +${formatKRW(diff)}이 지급되었습니다!`, 'warning');
-            } else {
-              showToast(`ℹ️ 관리자에 의해 자금이 ${formatKRW(val)}으로 조정되었습니다.`, 'info');
+              showToast(`🎉 지원금 +${formatKRW(diff)}이 지급되었습니다!`, 'warning');
             }
           }
         }
@@ -2166,11 +2313,8 @@
 
       db.ref(`users/${nickname}`).on('value', snap => {
         const data = snap.val();
-        if (data && data.banned) {
-          showBanScreen(data.banReason);
-        } else {
-          document.getElementById('banLockModal').classList.add('hidden');
-        }
+        if (data && data.banned) showBanScreen(data.banReason);
+        else document.getElementById('banLockModal').classList.add('hidden');
       });
     }
 
@@ -2215,25 +2359,19 @@
       document.getElementById('couponModal').classList.remove('hidden');
       document.getElementById('couponCodeInput').focus();
     }
-
-    function closeCouponModal() {
-      document.getElementById('couponModal').classList.add('hidden');
-    }
+    function closeCouponModal() { document.getElementById('couponModal').classList.add('hidden'); }
 
     async function redeemCouponCode() {
       if (!currentUser) return;
-      const rawCode = document.getElementById('couponCodeInput').value.trim();
-      const normCode = rawCode.toLowerCase();
+      const normCode = document.getElementById('couponCodeInput').value.trim().toLowerCase();
       if (!normCode) {
         showToast('쿠폰 코드를 입력해주세요!', 'warning');
         return;
       }
-
       if (gameState.usedCoupons && gameState.usedCoupons[normCode]) {
         showToast('이미 사용한 쿠폰 코드입니다!', 'error');
         return;
       }
-
       if (normCode === LAUNCH_COUPON_CODE) {
         gameState.usedCoupons[normCode] = Date.now();
         gameState.money += LAUNCH_COUPON_REWARD;
@@ -2246,15 +2384,13 @@
         showToast(`🎉 출시 기념 쿠폰 적용! +${formatKRW(LAUNCH_COUPON_REWARD)} & 만족도 100% 달성!`, 'success');
         return;
       }
-
       try {
         const snap = await db.ref(`coupons/${normCode}`).once('value');
         if (!snap.exists()) {
           showToast('❌ 존재하지 않거나 만료된 쿠폰 코드입니다.', 'error');
           return;
         }
-        const coupon = snap.val();
-        const reward = Number(coupon.reward || 0);
+        const reward = Number(snap.val().reward || 0);
         gameState.usedCoupons[normCode] = Date.now();
         gameState.money += reward;
         playGiftFanfare();
@@ -2269,25 +2405,13 @@
     }
 
     // ---------------------------------------------------------
-    // Franchise Expansion & Multipliers
+    // Franchise Expansion & Core Weapons
     // ---------------------------------------------------------
-    function getNextBranchRequirement() {
-      return 500000 * Math.pow(3, gameState.branchCount - 1);
-    }
-
-    function getBranchMultiplier() {
-      return 1 + (gameState.branchCount - 1) * 0.5;
-    }
-
-    function getActiveFeverMultiplier() {
-      return Date.now() < serverFeverUntil ? serverFeverMultiplier : 1.0;
-    }
-
+    function getNextBranchRequirement() { return 500000 * Math.pow(3, gameState.branchCount - 1); }
+    function getBranchMultiplier() { return 1 + (gameState.branchCount - 1) * 0.5; }
+    function getActiveFeverMultiplier() { return Date.now() < serverFeverUntil ? serverFeverMultiplier : 1.0; }
     function getTotalRevenueMultiplier() {
-      const feverMult = getActiveFeverMultiplier();
-      const comboMult = getComboMultiplier();
-      const scannerMult = 1 + (gameState.upgrades.posScanner || 0) * 0.15;
-      return getBranchMultiplier() * comboMult * scannerMult * feverMult;
+      return getBranchMultiplier() * getComboMultiplier() * (1 + (gameState.upgrades.posScanner || 0) * 0.15) * getActiveFeverMultiplier();
     }
 
     async function expandNewBranch() {
@@ -2296,17 +2420,10 @@
         showToast(`점포 확장 자금이 부족합니다! (${formatKRW(req)} 필요)`, 'error');
         return;
       }
-
       gameState.branchCount += 1;
       gameState.money = 20000 * gameState.branchCount;
       gameState.combo = 0;
-      gameState.upgrades = {
-        partTimer: 0,
-        posScanner: 0,
-        coffeeMachine: 0,
-        storeExpansion: 0
-      };
-
+      gameState.upgrades = { partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 };
       playGiftFanfare();
       showToast(`🎊 축하합니다! ${gameState.branchCount}호점 오픈 완료! 영구 수익 배율 x${getBranchMultiplier().toFixed(1)} 적용!`, 'success');
       renderAll();
@@ -2314,10 +2431,29 @@
       await syncCloudSave(true);
     }
 
+    function buyCoreWeapon(key) {
+      const def = CORE_WEAPON_DEFS.find(w => w.key === key);
+      if (!def) return;
+      const lv = gameState.coreWeapons?.[key] || 0;
+      if (lv >= def.maxLv) return;
+      const cost = def.baseCoreCost + lv * 2;
+      if ((gameState.energyCores || 0) < cost) {
+        showToast(`🔋 에너지 코어가 부족합니다! (${cost}개 필요)`, 'error');
+        return;
+      }
+      gameState.energyCores -= cost;
+      gameState.coreWeapons[key] = lv + 1;
+      playGiftFanfare();
+      showToast(`⚔️ ${def.title} Lv.${lv + 1} 강화 완료!`, 'success');
+      renderAll();
+      renderUpgradesList();
+      syncCloudSave(true);
+    }
+
     // ---------------------------------------------------------
-    // Interactive POS Register & Alien Occupation Items
+    // Interactive POS Register
     // ---------------------------------------------------------
-    function generateCustomerOrder(forceVip = false) {
+    function generateCustomerOrder(forceVip = false, itemCountOverride = 0) {
       const itemPool = isAlienOccupied ? ALIEN_STORE_ITEMS : STORE_ITEMS;
 
       if (forceVip) {
@@ -2328,19 +2464,10 @@
           items.push({ uid: i, id: pick.id, name: pick.name, emoji: pick.emoji, price: pick.price, scanned: false });
           total += pick.price;
         }
-        return {
-          isIncident: false,
-          isVip: true,
-          emoji: '👑',
-          name: 'VIP 재벌 손님 (매출 10배!)',
-          items,
-          total,
-          paymentType: 'card',
-          cashGiven: 0
-        };
+        return { isIncident: false, isVip: true, emoji: '👑', name: 'VIP 재벌 손님 (매출 10배!)', items, total, paymentType: 'card', cashGiven: 0 };
       }
 
-      if (!isAlienOccupied && Math.random() < 0.20) {
+      if (!isAlienOccupied && itemCountOverride === 0 && Math.random() < 0.18) {
         return {
           isIncident: true,
           emoji: '🧢',
@@ -2355,20 +2482,13 @@
 
       const pool = isAlienOccupied ? ALIEN_PROFILES : CUSTOMER_PROFILES;
       const profile = pool[Math.floor(Math.random() * pool.length)];
-      const itemCount = Math.floor(Math.random() * 3) + 2;
+      const itemCount = itemCountOverride > 0 ? itemCountOverride : Math.floor(Math.random() * 3) + 2;
       const items = [];
       let total = 0;
 
       for (let i = 0; i < itemCount; i++) {
         const pick = itemPool[Math.floor(Math.random() * itemPool.length)];
-        items.push({
-          uid: i,
-          id: pick.id,
-          name: pick.name,
-          emoji: pick.emoji,
-          price: pick.price,
-          scanned: false
-        });
+        items.push({ uid: i, id: pick.id, name: pick.name, emoji: pick.emoji, price: pick.price, scanned: false });
         total += pick.price;
       }
 
@@ -2379,28 +2499,15 @@
         else if (total <= 10000) cashGiven = 10000;
         else if (total <= 15000) cashGiven = 15000;
         else if (total <= 20000) cashGiven = 20000;
-        else cashGiven = 30000;
+        else cashGiven = 40000;
       }
 
-      return {
-        isIncident: false,
-        isVip: false,
-        emoji: profile.emoji,
-        name: profile.name,
-        items,
-        total,
-        paymentType: isCash ? 'cash' : 'card',
-        cashGiven
-      };
+      return { isIncident: false, isVip: false, emoji: profile.emoji, name: profile.name, items, total, paymentType: isCash ? 'cash' : 'card', cashGiven };
     }
 
     function initPOSCustomers() {
       currentCustomer = generateCustomerOrder();
-      waitingQueue = [
-        generateCustomerOrder(),
-        generateCustomerOrder(),
-        generateCustomerOrder()
-      ];
+      waitingQueue = [generateCustomerOrder(), generateCustomerOrder(), generateCustomerOrder()];
       preparedChange = 0;
       renderPOSRegister();
     }
@@ -2420,19 +2527,15 @@
         gameState.combo += 1;
         gameState.satisfaction = Math.min(100, gameState.satisfaction + 4);
         playRegisterComplete();
-        if (event && event.clientX) {
-          spawnFloatingText(event.clientX, event.clientY, `모범업소 포상 +${formatKRW(bonus)}!`, '#34d399');
-        }
+        if (event && event.clientX) spawnFloatingText(event.clientX, event.clientY, `모범업소 포상 +${formatKRW(bonus)}!`, '#34d399');
         showToast(`👮 청소년 보호 모범 업소 포상금 +${formatKRW(bonus)} 지급!`, 'success');
       } else {
-        const fine = 5000;
-        gameState.money = Math.max(0, gameState.money - fine);
+        gameState.money = Math.max(0, gameState.money - 5000);
         gameState.combo = 0;
         gameState.satisfaction = Math.max(10, gameState.satisfaction - 10);
         playTone(170, 'sawtooth', 0.25, 0.1);
-        showToast(`🚨 신분증 미확인 판매 적발! 과태료 -${formatKRW(fine)} 차감!`, 'error');
+        showToast(`🚨 신분증 미확인 판매 적발! 과태료 -5,000원 차감!`, 'error');
       }
-
       currentCustomer = waitingQueue.shift() || generateCustomerOrder();
       waitingQueue.push(generateCustomerOrder());
       renderAll();
@@ -2442,17 +2545,10 @@
       if (!currentCustomer || currentCustomer.isIncident) return;
       const item = currentCustomer.items.find(it => it.uid === uid);
       if (!item || item.scanned) return;
-
       item.scanned = true;
       playBarcodeBeep();
-
-      if (event && event.clientX) {
-        spawnFloatingText(event.clientX, event.clientY, `삑! +${formatKRW(item.price)}`, '#34d399');
-      }
-
-      if (currentCustomer.items.every(it => it.scanned)) {
-        preparedChange = 0;
-      }
+      if (event && event.clientX) spawnFloatingText(event.clientX, event.clientY, `삑! +${formatKRW(item.price)}`, '#34d399');
+      if (currentCustomer.items.every(it => it.scanned)) preparedChange = 0;
       renderPOSRegister();
     }
 
@@ -2461,23 +2557,19 @@
       playCoinTap();
       document.getElementById('cashPreparedText').textContent = formatKRW(preparedChange);
     }
-
     function resetChangeCash() {
       preparedChange = 0;
       playTone(300, 'sine', 0.08, 0.05);
       document.getElementById('cashPreparedText').textContent = '0원';
     }
-
     function completeCardPayment(event) {
       if (!currentCustomer || currentCustomer.paymentType !== 'card') return;
       finalizeTransaction(true, event);
     }
-
     function completeCashPayment(event) {
       if (!currentCustomer || currentCustomer.paymentType !== 'cash') return;
       const expectedChange = currentCustomer.cashGiven - currentCustomer.total;
-      const isExact = preparedChange === expectedChange;
-      finalizeTransaction(isExact, event, expectedChange);
+      finalizeTransaction(preparedChange === expectedChange, event, expectedChange);
     }
 
     function finalizeTransaction(isAccurate, event, expectedChange = 0) {
@@ -2489,25 +2581,17 @@
         gameState.combo += 1;
         const tipBonus = currentCustomer.paymentType === 'cash' ? 1.2 : 1.0;
         const finalEarned = Math.round(baseTotal * totalMult * tipBonus * vipBonus);
-
         gameState.money += finalEarned;
         gameState.totalServed += 1;
         gameState.satisfaction = Math.min(100, gameState.satisfaction + 2);
         gameState.cleanliness = Math.max(20, gameState.cleanliness - 2);
 
-        if (isAlienOccupied) {
-          gameState.energyCores = (gameState.energyCores || 0) + 1;
-        }
+        if (isAlienOccupied) gameState.energyCores = (gameState.energyCores || 0) + 1;
 
         playRegisterComplete();
         if (event && event.clientX) {
           const coreNote = isAlienOccupied ? ' & 🔋+1' : '';
           spawnFloatingText(event.clientX, event.clientY, `정산완료 +${formatKRW(finalEarned)}${coreNote}!`, '#fbbf24');
-        }
-        if (currentCustomer.isVip) {
-          showToast(`👑 VIP 재벌 손님 10배 정산! +${formatKRW(finalEarned)}`, 'warning');
-        } else if (currentCustomer.paymentType === 'cash') {
-          showToast(`🪙 정확한 거스름돈! 팁 보너스 포함 +${formatKRW(finalEarned)}`, 'success');
         }
       } else {
         gameState.combo = 0;
@@ -2520,7 +2604,6 @@
       currentCustomer = waitingQueue.shift() || generateCustomerOrder();
       waitingQueue.push(generateCustomerOrder());
       preparedChange = 0;
-
       renderAll();
     }
 
@@ -2533,41 +2616,30 @@
       gameState.satisfaction = Math.min(100, gameState.satisfaction + 1);
       gameState.money += Math.round(300 * getBranchMultiplier());
       playTone(560, 'sine', 0.09, 0.06);
-      if (event && event.clientX) {
-        spawnFloatingText(event.clientX, event.clientY, '🧹 청결 +20%', '#38bdf8');
-      }
+      if (event && event.clientX) spawnFloatingText(event.clientX, event.clientY, '🧹 청결 +20%', '#38bdf8');
       renderAll();
     }
 
     // ---------------------------------------------------------
     // Upgrades & Passive Revenue
     // ---------------------------------------------------------
-    function getUpgradeCost(def) {
-      const lv = gameState.upgrades[def.key] || 0;
-      return Math.round(def.baseCost * Math.pow(def.mult, lv));
-    }
-
+    function getUpgradeCost(def) { return Math.round(def.baseCost * Math.pow(def.mult, gameState.upgrades[def.key] || 0)); }
     function getPassiveIncomePerSec() {
       let total = 0;
-      UPGRADE_DEFS.forEach(def => {
-        total += (gameState.upgrades[def.key] || 0) * def.passivePerLv;
-      });
-      const feverMult = getActiveFeverMultiplier();
-      return Math.round(total * getBranchMultiplier() * feverMult);
+      UPGRADE_DEFS.forEach(def => { total += (gameState.upgrades[def.key] || 0) * def.passivePerLv; });
+      return Math.round(total * getBranchMultiplier() * getActiveFeverMultiplier());
     }
 
     function buyUpgrade(key) {
       const def = UPGRADE_DEFS.find(u => u.key === key);
       const lv = gameState.upgrades[key] || 0;
       if (lv >= def.maxLv) return;
-
       const cost = getUpgradeCost(def);
       if (gameState.money < cost) {
         playTone(190, 'sawtooth', 0.15, 0.08);
         showToast(`자금이 부족합니다! (${formatKRW(cost)} 필요)`, 'error');
         return;
       }
-
       gameState.money -= cost;
       gameState.upgrades[key] += 1;
       playGiftFanfare();
@@ -2580,21 +2652,26 @@
     // ---------------------------------------------------------
     // Rendering Functions
     // ---------------------------------------------------------
-    function formatKRW(num) {
-      return Math.floor(num).toLocaleString('ko-KR') + '원';
-    }
+    function formatKRW(num) { return Math.floor(num).toLocaleString('ko-KR') + '원'; }
 
     function updateHeaderStats() {
       document.getElementById('statMoney').textContent = formatKRW(gameState.money);
-      document.getElementById('statSatisfaction').textContent = `${gameState.satisfaction}%`;
+      document.getElementById('statEnergyCores').textContent = `${(gameState.energyCores || 0).toLocaleString()}개`;
       document.getElementById('statMultiplier').textContent = `x${getTotalRevenueMultiplier().toFixed(1)}`;
       document.getElementById('headerBranchBadge').textContent = `${gameState.branchCount}호점`;
-      document.getElementById('headerDayBadge').textContent = `D-${gameState.day}`;
       document.getElementById('cleanlinessText').textContent = `${gameState.cleanliness}%`;
-      document.getElementById('energyCoreCountText').textContent = (gameState.energyCores || 0).toLocaleString();
+      const armoryEl = document.getElementById('armoryCoreCount');
+      if (armoryEl) armoryEl.textContent = (gameState.energyCores || 0).toLocaleString();
 
-      const passive = getPassiveIncomePerSec();
-      document.getElementById('passiveIncomeLabel').textContent = `알바 자동매출: +${formatKRW(passive)}/초`;
+      const medalBadge = document.getElementById('headerTitleMedal');
+      if (gameState.medals && gameState.medals.length > 0) {
+        medalBadge.textContent = gameState.medals[gameState.medals.length - 1];
+        medalBadge.classList.remove('hidden');
+      } else {
+        medalBadge.classList.add('hidden');
+      }
+
+      document.getElementById('passiveIncomeLabel').textContent = `알바 자동매출: +${formatKRW(getPassiveIncomePerSec())}/초`;
 
       const storeLv = 1 + (gameState.upgrades.storeExpansion || 0);
       const names = ['동네 편의점', '역세권 편의점', '24시 메가스토어', '플래그십 본점', '전국 1등 편의점'];
@@ -2617,7 +2694,6 @@
 
     function renderPOSRegister() {
       if (!currentCustomer) return;
-
       document.getElementById('posCustomerTitle').textContent = `${currentCustomer.emoji} ${currentCustomer.name}`;
       document.getElementById('posComboText').textContent = `${gameState.combo}콤보`;
 
@@ -2627,10 +2703,10 @@
       const cardArea = document.getElementById('posStep2CardArea');
       const cashArea = document.getElementById('posStep2CashArea');
       const laser = document.getElementById('scannerLaserLine');
+      const isZeroG = Date.now() < zeroGravityUntil;
 
       if (currentCustomer.isIncident) {
         stepBadge.textContent = '🚨 돌발 이벤트';
-        stepBadge.className = 'px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/50 text-rose-300 text-[10px] font-black shrink-0';
         laser.classList.add('hidden');
         incidentArea.classList.remove('hidden');
         step1Area.classList.add('hidden');
@@ -2651,14 +2727,12 @@
 
         if (!allScanned) {
           stepBadge.textContent = 'STEP 1 · 바코드 스캔';
-          stepBadge.className = 'px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-black shrink-0';
           laser.classList.remove('hidden');
           step1Area.classList.remove('hidden');
           cardArea.classList.add('hidden');
           cashArea.classList.add('hidden');
 
-          const basketGrid = document.getElementById('posBasketGrid');
-          basketGrid.innerHTML = currentCustomer.items.map(it => {
+          document.getElementById('posBasketGrid').innerHTML = currentCustomer.items.map(it => {
             if (it.scanned) {
               return `
                 <div class="p-2.5 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 flex items-center justify-between opacity-75">
@@ -2675,7 +2749,7 @@
             }
             return `
               <button onclick="scanPOSItem(${it.uid}, event)"
-                class="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-750 border border-amber-400/60 hover:border-amber-300 text-left active:scale-95 transition flex items-center justify-between shadow-md">
+                class="${isZeroG ? 'zero-gravity-item' : ''} p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-750 border border-amber-400/60 hover:border-amber-300 text-left active:scale-95 transition flex items-center justify-between shadow-md">
                 <div class="flex items-center gap-2 min-w-0">
                   <span class="text-xl shrink-0">${it.emoji}</span>
                   <div class="min-w-0">
@@ -2690,16 +2764,13 @@
         } else {
           laser.classList.add('hidden');
           step1Area.classList.add('hidden');
-
           if (currentCustomer.paymentType === 'card') {
             stepBadge.textContent = 'STEP 2 · 카드/페이 결제';
-            stepBadge.className = 'px-2 py-0.5 rounded-full bg-sky-500/20 border border-sky-500/40 text-sky-300 text-[10px] font-black shrink-0';
             cardArea.classList.remove('hidden');
             cashArea.classList.add('hidden');
             document.getElementById('cardPayAmountText').textContent = formatKRW(currentCustomer.total);
           } else {
             stepBadge.textContent = 'STEP 2 · 현금 거스름돈';
-            stepBadge.className = 'px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-black shrink-0';
             cardArea.classList.add('hidden');
             cashArea.classList.remove('hidden');
             document.getElementById('cashGivenText').textContent = formatKRW(currentCustomer.cashGiven);
@@ -2709,19 +2780,45 @@
         }
       }
 
-      const queueBar = document.getElementById('waitingLineBar');
       document.getElementById('waitingLineCount').textContent = `${waitingQueue.length}명 대기중`;
-      queueBar.innerHTML = waitingQueue.map((w, idx) => `
+      document.getElementById('waitingLineBar').innerHTML = waitingQueue.map((w, idx) => `
         <div class="shrink-0 px-2.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/70 flex items-center gap-1.5 text-[11px]">
           <span>${w.emoji}</span>
-          <span class="font-bold text-slate-300">#${idx + 1} (${w.isIncident ? '🚨민증확인' : `${w.items.length}개 · ${w.paymentType === 'cash' ? '💵현금' : '💳카드'}`})</span>
+          <span class="font-bold text-slate-300">#${idx + 1} (${w.isIncident ? '🚨민증확인' : `${w.items.length}개`})</span>
         </div>
       `).join('');
     }
 
     function renderUpgradesList() {
-      const container = document.getElementById('upgradeListContainer');
-      container.innerHTML = UPGRADE_DEFS.map(def => {
+      // Core Weapons
+      const armoryBox = document.getElementById('coreWeaponList');
+      if (armoryBox) {
+        armoryBox.innerHTML = CORE_WEAPON_DEFS.map(def => {
+          const lv = gameState.coreWeapons?.[def.key] || 0;
+          const isMax = lv >= def.maxLv;
+          const cost = def.baseCoreCost + lv * 2;
+          return `
+            <div class="p-3 rounded-2xl bg-slate-900/90 border border-purple-500/40 flex items-center justify-between gap-2.5">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs sm:text-sm font-black text-white truncate">${def.title}</span>
+                  <span class="px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-200 text-[10px] font-bold shrink-0">Lv.${lv}/${def.maxLv}</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">${def.desc}</p>
+              </div>
+              <button onclick="buyCoreWeapon('${def.key}')" ${isMax ? 'disabled' : ''}
+                class="shrink-0 px-3 py-2 rounded-xl text-xs font-black whitespace-nowrap transition ${
+                  isMax ? 'bg-slate-700 text-slate-400' : 'bg-purple-500 hover:bg-purple-400 text-white active:scale-95'
+                }">
+                ${isMax ? 'MAX' : `🔋 ${cost}개`}
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Standard Upgrades
+      document.getElementById('upgradeListContainer').innerHTML = UPGRADE_DEFS.map(def => {
         const lv = gameState.upgrades[def.key] || 0;
         const isMax = lv >= def.maxLv;
         const cost = getUpgradeCost(def);
@@ -2736,9 +2833,7 @@
             </div>
             <button onclick="buyUpgrade('${def.key}')" ${isMax ? 'disabled' : ''}
               class="shrink-0 px-3 py-2 rounded-xl text-xs font-black whitespace-nowrap transition ${
-                isMax
-                  ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                  : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 active:scale-95'
+                isMax ? 'bg-slate-700 text-slate-400' : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 active:scale-95'
               }">
               ${isMax ? 'MAX' : formatKRW(cost)}
             </button>
@@ -2753,7 +2848,7 @@
     }
 
     // ---------------------------------------------------------
-    // Game Loops & Server Fever / Surprise Listeners
+    // 12 SURPRISE EVENTS EXECUTOR
     // ---------------------------------------------------------
     function listenServerFever() {
       db.ref('globalEvent').on('value', snap => {
@@ -2770,11 +2865,11 @@
         if (!data || !data.id || data.id === lastSurpriseId) return;
         if (Date.now() - Number(data.createdAt || 0) > 10000) return;
         lastSurpriseId = data.id;
-        executeSurpriseEffect(data.type);
+        executeSurpriseEffect(data.type, data);
       });
     }
 
-    function executeSurpriseEffect(type) {
+    function executeSurpriseEffect(type, payload = {}) {
       if (type === 'money_rain') {
         playGiftFanfare();
         gameState.money += 30000;
@@ -2789,18 +2884,84 @@
           document.body.appendChild(el);
           setTimeout(() => el.remove(), 3600);
         }
+      } else if (type === 'core_drop') {
+        playGiftFanfare();
+        gameState.energyCores = (gameState.energyCores || 0) + 15;
+        renderAll();
+        showToast('🔋 에너지 코어 긴급 폭격! (+15 코어 지급)', 'success');
+      } else if (type === 'server_lotto') {
+        playGiftFanfare();
+        if (currentUser && payload.winner === currentUser.nickname) {
+          gameState.money += 500000;
+          renderAll();
+          syncCloudSave(true);
+          showToast('🎰 축하합니다!! 전 서버 로또 당첨! (+500,000원)', 'warning');
+        } else {
+          showToast(`🎰 전 서버 로또 당첨자: [${payload.winner || '행운의 사장님'}] (+500,000원)!`, 'info');
+        }
       } else if (type === 'vip_spawn') {
         playGiftFanfare();
         currentCustomer = generateCustomerOrder(true);
         renderPOSRegister();
         showToast('👑 운영자가 VIP 재벌 손님(매출 10배)을 소환했습니다!', 'warning');
+      } else if (type === 'golden_broom') {
+        playGiftFanfare();
+        gameState.cleanliness = 100;
+        gameState.money += 10000 * gameState.branchCount;
+        renderAll();
+        showToast(`🧹 황금 빗자루 타임! 청결도 100% 회복 + 보너스 ${formatKRW(10000 * gameState.branchCount)}!`, 'success');
       } else if (type === 'flip_psycho') {
         playTone(660, 'sawtooth', 0.25, 0.08);
         showToast('🙃 운영자가 장난을 쳤습니다! (5초간 화면 반전)', 'warning');
         document.body.classList.add('admin-flip', 'admin-psycho');
+        setTimeout(() => document.body.classList.remove('admin-flip', 'admin-psycho'), 5000);
+      } else if (type === 'zero_gravity') {
+        playTone(540, 'sine', 0.25, 0.08);
+        zeroGravityUntil = Date.now() + 7000;
+        renderPOSRegister();
+        showToast('🛸 무중력 둥둥 모드 발동! (7초간 상품 버튼 부유)', 'warning');
+        setTimeout(() => renderPOSRegister(), 7200);
+      } else if (type === 'alien_slime') {
+        playUfoAlarm();
+        showToast('🧪 외계 점액이 화면에 묻었습니다! 터치해서 닦아내세요!', 'warning');
+        const box = document.getElementById('slimeOverlay');
+        box.innerHTML = '';
+        box.classList.remove('hidden');
+        for (let i = 0; i < 6; i++) {
+          const splat = document.createElement('button');
+          splat.textContent = '🦠';
+          splat.className = 'pointer-events-auto fixed text-5xl sm:text-6xl drop-shadow-[0_0_15px_rgba(163,230,53,0.9)] active:scale-75 transition';
+          splat.style.left = `${12 + Math.random() * 72}vw`;
+          splat.style.top = `${18 + Math.random() * 60}vh`;
+          splat.onclick = () => {
+            playCoinTap();
+            splat.remove();
+            if (box.children.length === 0) box.classList.add('hidden');
+          };
+          box.appendChild(splat);
+        }
+      } else if (type === 'megaphone') {
+        playUfoAlarm();
+        document.body.classList.add('admin-shake');
+        const banner = document.getElementById('megaphoneBanner');
+        document.getElementById('megaphoneText').textContent = payload.msg || '총괄 운영자가 지켜보고 있습니다!! 👀';
+        banner.classList.remove('hidden');
         setTimeout(() => {
-          document.body.classList.remove('admin-flip', 'admin-psycho');
-        }, 5000);
+          document.body.classList.remove('admin-shake');
+          banner.classList.add('hidden');
+        }, 4000);
+      } else if (type === 'blackout') {
+        playTone(140, 'sawtooth', 0.4, 0.1);
+        const bo = document.getElementById('blackoutOverlay');
+        bo.classList.remove('hidden');
+        showToast('⚡ 깜짝 정전 사태! (5초 후 복구됩니다)', 'warning');
+        setTimeout(() => bo.classList.add('hidden'), 5000);
+      } else if (type === 'rush_queue') {
+        playGiftFanfare();
+        currentCustomer = generateCustomerOrder(false, 5);
+        waitingQueue = [generateCustomerOrder(false, 5), generateCustomerOrder(false, 5), generateCustomerOrder(false, 5)];
+        renderPOSRegister();
+        showToast('🏃 대량 구매 손님 러시! 장바구니 5개씩 가득 찼습니다!', 'warning');
       } else if (type === 'auto_rush') {
         playGiftFanfare();
         autoRushUntil = Date.now() + 10000;
@@ -2808,22 +2969,46 @@
       }
     }
 
+    // ---------------------------------------------------------
+    // Main Game Loops (Includes Admin-controlled 30m Raid Switch)
+    // ---------------------------------------------------------
     function startGameLoops() {
       setInterval(() => {
         const now = Date.now();
         const dt = (now - lastTick) / 1000;
         lastTick = now;
 
-        if (isAlienOccupied) {
-          updateLiveInvasionDdayBanner();
+        if (isAlienOccupied) updateLiveInvasionDdayBanner();
+
+        // Check 30-minute auto raid ONLY if Admin turned ON the switch
+        if (auto30MinRaidEnabled && (!activeRaidState || !activeRaidState.active)) {
+          const d = new Date();
+          const min = d.getMinutes();
+          const sec = d.getSeconds();
+          if ((min === 0 || min === 30) && sec < 3) {
+            const slotKey = `${d.getHours()}:${min}`;
+            if (slotKey !== lastAuto30MinSlot) {
+              lastAuto30MinSlot = slotKey;
+              adminLaunchMothershipRaid();
+            }
+          }
+        }
+
+        // Active Mothership Raid Timer & Auto Turret Damage
+        if (activeRaidState && activeRaidState.active) {
+          const remSec = Math.max(0, Math.ceil((Number(activeRaidState.endsAt || 0) - now) / 1000));
+          const m = String(Math.floor(remSec / 60)).padStart(2, '0');
+          const s = String(remSec % 60).padStart(2, '0');
+          document.getElementById('raidTimerBadge').textContent = `${m}:${s}`;
+
+          const turretDmg = Math.round(getAutoTurretDamagePerSec() * dt);
+          if (turretDmg > 0) applyDamageToMothership(turretDmg);
         }
 
         const feverBanner = document.getElementById('globalFeverBanner');
         if (now < serverFeverUntil) {
           const remSec = Math.ceil((serverFeverUntil - now) / 1000);
-          const mins = String(Math.floor(remSec / 60)).padStart(2, '0');
-          const secs = String(remSec % 60).padStart(2, '0');
-          document.getElementById('globalFeverTimer').textContent = `${mins}:${secs}`;
+          document.getElementById('globalFeverTimer').textContent = `${String(Math.floor(remSec / 60)).padStart(2, '0')}:${String(remSec % 60).padStart(2, '0')}`;
           feverBanner.classList.remove('hidden');
         } else {
           feverBanner.classList.add('hidden');
@@ -2844,22 +3029,17 @@
           gameState.day += 1;
           const settlementBonus = Math.round((3000 + (gameState.upgrades.storeExpansion || 0) * 2000) * getBranchMultiplier());
           gameState.money += settlementBonus;
-          showToast(`🌅 DAY ${gameState.day} 시작! 일일 정산 보너스 +${formatKRW(settlementBonus)}`, 'success');
           syncCloudSave(true);
         }
         document.getElementById('dayProgressBar').style.width = `${(dayTimer / DAY_DURATION_SEC) * 100}%`;
 
         const passivePerSec = getPassiveIncomePerSec();
-        if (passivePerSec > 0) {
-          gameState.money += passivePerSec * dt;
-        }
+        if (passivePerSec > 0) gameState.money += passivePerSec * dt;
 
         updateHeaderStats();
       }, 500);
 
-      setInterval(() => {
-        syncCloudSave(true);
-      }, 20000);
+      setInterval(() => syncCloudSave(true), 20000);
     }
 
     // ---------------------------------------------------------
@@ -2868,12 +3048,10 @@
     function switchTab(tabName) {
       ['store', 'upgrade', 'ranking', 'community'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add('hidden');
-        const btn = document.getElementById(`nav-${t}`);
-        btn.className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition';
+        document.getElementById(`nav-${t}`).className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition';
       });
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-      const active = document.getElementById(`nav-${tabName}`);
-      active.className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition';
+      document.getElementById(`nav-${tabName}`).className = 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition';
 
       if (tabName === 'upgrade') renderUpgradesList();
       if (tabName === 'ranking') fetchLeaderboard();
@@ -2939,12 +3117,7 @@
       const input = document.getElementById('shoutboxInput');
       const text = input.value.trim();
       if (!text) return;
-      await db.ref('shoutbox').push({
-        nickname: currentUser.nickname,
-        branch: gameState.branchCount,
-        text: text,
-        createdAt: Date.now()
-      });
+      await db.ref('shoutbox').push({ nickname: currentUser.nickname, branch: gameState.branchCount, text, createdAt: Date.now() });
       input.value = '';
     }
 
@@ -2960,14 +3133,10 @@
             nickname: u.nickname || '사장님',
             money: Number(u.money ?? u.state?.money ?? 0),
             branchCount: Number(u.branchCount ?? u.state?.branchCount ?? 1),
-            day: u.state?.day || 1,
-            satisfaction: u.state?.satisfaction || 85
+            day: u.state?.day || 1
           }));
 
-        arr.sort((a, b) => {
-          if (b.branchCount !== a.branchCount) return b.branchCount - a.branchCount;
-          return b.money - a.money;
-        });
+        arr.sort((a, b) => b.branchCount !== a.branchCount ? b.branchCount - a.branchCount : b.money - a.money);
 
         if (arr.length === 0) {
           listEl.innerHTML = `<div class="text-center text-xs text-slate-400 py-6">아직 등록된 사장님이 없습니다.</div>`;
@@ -2985,9 +3154,7 @@
                   <div class="text-xs font-extrabold text-white truncate flex items-center gap-1">
                     <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] shrink-0">${item.branchCount}호점</span>
                     <span class="truncate">${item.nickname}</span>
-                    ${isMe ? '<span class="px-1.5 py-0.2 rounded bg-emerald-500/30 text-emerald-300 text-[9px]">나</span>' : ''}
                   </div>
-                  <div class="text-[10px] text-slate-400">DAY ${item.day} · 만족도 ${item.satisfaction}%</div>
                 </div>
               </div>
               <div class="text-xs font-black text-amber-400 shrink-0">${formatKRW(item.money)}</div>
@@ -3003,24 +3170,19 @@
       db.ref('notices/active').on('value', snap => {
         const val = snap.val();
         const banner = document.getElementById('globalNoticeBanner');
-
         if (isInitialNoticeLoad) {
           isInitialNoticeLoad = false;
           if (val && val.createdAt) lastNoticeTimestamp = Number(val.createdAt);
           return;
         }
-
         if (val && val.text) {
           const created = Number(val.createdAt || 0);
           if (created && created === lastNoticeTimestamp) return;
           lastNoticeTimestamp = created;
-
           document.getElementById('globalNoticeText').textContent = val.text;
           banner.classList.remove('hidden');
           clearTimeout(noticeHideTimer);
-          noticeHideTimer = setTimeout(() => {
-            banner.classList.add('hidden');
-          }, 3500);
+          noticeHideTimer = setTimeout(() => banner.classList.add('hidden'), 3500);
         } else {
           banner.classList.add('hidden');
         }
@@ -3046,24 +3208,15 @@
           <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-3 space-y-2">
             <div class="text-xs font-black text-amber-300">Q. ${poll.question}</div>
             <div class="space-y-1.5">
-              <button onclick="castPollVote(1)" ${voted ? 'disabled' : ''}
-                class="w-full p-2 rounded-lg bg-slate-900 border ${voted === 1 ? 'border-emerald-400' : 'border-slate-700'} text-left relative overflow-hidden">
+              <button onclick="castPollVote(1)" ${voted ? 'disabled' : ''} class="w-full p-2 rounded-lg bg-slate-900 border ${voted === 1 ? 'border-emerald-400' : 'border-slate-700'} text-left relative overflow-hidden">
                 <div class="absolute inset-y-0 left-0 bg-emerald-500/20" style="width: ${p1}%"></div>
-                <div class="relative flex justify-between text-xs font-bold">
-                  <span>1. ${poll.opt1}</span>
-                  <span class="text-emerald-300">${v1}표 (${p1}%)</span>
-                </div>
+                <div class="relative flex justify-between text-xs font-bold"><span>1. ${poll.opt1}</span><span class="text-emerald-300">${v1}표 (${p1}%)</span></div>
               </button>
-              <button onclick="castPollVote(2)" ${voted ? 'disabled' : ''}
-                class="w-full p-2 rounded-lg bg-slate-900 border ${voted === 2 ? 'border-sky-400' : 'border-slate-700'} text-left relative overflow-hidden">
+              <button onclick="castPollVote(2)" ${voted ? 'disabled' : ''} class="w-full p-2 rounded-lg bg-slate-900 border ${voted === 2 ? 'border-sky-400' : 'border-slate-700'} text-left relative overflow-hidden">
                 <div class="absolute inset-y-0 left-0 bg-sky-500/20" style="width: ${p2}%"></div>
-                <div class="relative flex justify-between text-xs font-bold">
-                  <span>2. ${poll.opt2}</span>
-                  <span class="text-sky-300">${v2}표 (${p2}%)</span>
-                </div>
+                <div class="relative flex justify-between text-xs font-bold"><span>2. ${poll.opt2}</span><span class="text-sky-300">${v2}표 (${p2}%)</span></div>
               </button>
             </div>
-            <div class="text-[10px] text-slate-400 text-right">${voted ? `✅ 투표 완료 (총 ${total}명)` : '항목을 터치해 투표하세요'}</div>
           </div>
         `;
       });
@@ -3094,7 +3247,6 @@
       el.innerHTML = Object.values(hist).reverse().map(n => `
         <div class="p-2 rounded-lg bg-slate-800/70 border border-slate-700/70">
           <div class="text-slate-200">${n.text}</div>
-          <div class="text-[10px] text-slate-500 mt-0.5">${new Date(n.createdAt).toLocaleString('ko-KR')}</div>
         </div>
       `).join('');
     }
@@ -3103,21 +3255,14 @@
       if (!currentUser) return;
       const input = document.getElementById('feedbackInput');
       const text = input.value.trim();
-      if (!text) {
-        showToast('내용을 입력해주세요!', 'warning');
-        return;
-      }
-      await db.ref('feedbacks').push({
-        nickname: currentUser.nickname,
-        message: text,
-        createdAt: Date.now()
-      });
+      if (!text) return;
+      await db.ref('feedbacks').push({ nickname: currentUser.nickname, message: text, createdAt: Date.now() });
       input.value = '';
       showToast('📨 관리자에게 비공개 전송되었습니다!', 'success');
     }
 
     // ---------------------------------------------------------
-    // Admin Panel (landers_0724_jaeha)
+    // ALL-IN-ONE ADMIN PANEL ACTIONS (landers_0724_jaeha)
     // ---------------------------------------------------------
     let isAdminUnlocked = false;
 
@@ -3125,10 +3270,7 @@
       document.getElementById('adminModal').classList.remove('hidden');
       if (isAdminUnlocked) loadAdminDashboardData();
     }
-
-    function closeAdminModal() {
-      document.getElementById('adminModal').classList.add('hidden');
-    }
+    function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
 
     function verifyAdminPass() {
       const pass = document.getElementById('adminPassInput').value.trim();
@@ -3139,7 +3281,7 @@
         document.getElementById('adminAuthGate').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
         loadAdminDashboardData();
-        showToast('🛡️ 관리자 패널이 열렸습니다.', 'success');
+        showToast('🛡️ 관리자 마스터 패널이 열렸습니다.', 'success');
       } else {
         err.classList.remove('hidden');
       }
@@ -3148,8 +3290,121 @@
     async function loadAdminDashboardData() {
       const vSnap = await db.ref('meta/totalVisits').once('value');
       document.getElementById('adminTotalVisits').textContent = `${(vSnap.val() || 0).toLocaleString()}회`;
+      document.getElementById('adminSeasonNumInput').value = currentSeasonNumber;
+      document.getElementById('adminBannerMsgInput').value = currentBannerText;
       await loadAdminUserList();
       await loadAdminFeedbacks();
+    }
+
+    async function saveSeasonConfig() {
+      const sNum = Math.max(1, Number(document.getElementById('adminSeasonNumInput').value || 1));
+      const bText = document.getElementById('adminBannerMsgInput').value.trim() || '대침공이 다가옵니다..';
+      await db.ref('globalEvent/seasonConfig').update({
+        seasonNum: sNum,
+        bannerText: bText
+      });
+      showToast(`✅ 시즌 ${sNum} 설정 및 상단 배너가 전 서버에 반영되었습니다!`, 'success');
+    }
+
+    async function adminLaunchMothershipRaid() {
+      const userSnap = await db.ref('users').once('value');
+      const count = Math.max(1, Object.keys(userSnap.val() || {}).length);
+      const scaledHp = 50000 * count;
+      await db.ref('globalEvent/mothershipRaid').set({
+        id: 'raid_' + Date.now(),
+        active: true,
+        hp: scaledHp,
+        maxHp: scaledHp,
+        endsAt: Date.now() + 3 * 60 * 1000
+      });
+      closeAdminModal();
+      showToast('⚔️ 관리자 직권으로 외계인 모선 레이드(컷씬 + 3분 보스전)를 발동했습니다!', 'warning');
+    }
+
+    async function toggleAuto30MinRaid() {
+      const nextState = !auto30MinRaidEnabled;
+      await db.ref('globalEvent/seasonConfig').update({
+        auto30MinRaid: nextState
+      });
+      showToast(nextState ? '🕒 매시 00분·30분 자동 레이드가 활성화되었습니다!' : '⏸️ 30분 자동 레이드가 비활성화되었습니다.', 'info');
+    }
+
+    async function adminForceWinRaid() {
+      await db.ref('globalEvent/mothershipRaid').update({
+        active: false,
+        hp: 0,
+        winId: 'win_' + Date.now()
+      });
+      closeAdminModal();
+    }
+
+    async function adminStopRaid() {
+      await db.ref('globalEvent/mothershipRaid').remove();
+      showToast('모선 레이드를 강제 종료했습니다.', 'info');
+    }
+
+    async function adminEndSeasonAndAdvance() {
+      const snap = await db.ref('users').once('value');
+      const users = Object.values(snap.val() || {}).filter(u => !u.banned);
+      users.sort((a, b) => (b.branchCount || 1) - (a.branchCount || 1) || (b.money || 0) - (a.money || 0));
+      const topUser = users[0] || { nickname: '전설의점장', branchCount: 1, money: 0 };
+
+      await db.ref('hallOfFame').push({
+        season: currentSeasonNumber,
+        champion: topUser.nickname,
+        branchCount: topUser.branchCount || 1,
+        money: topUser.money || 0,
+        endedAt: Date.now()
+      });
+
+      const nextSeason = currentSeasonNumber + 1;
+      await db.ref('globalEvent/ufoInvasion').remove();
+      await db.ref('globalEvent/mothershipRaid').remove();
+      await db.ref('globalEvent/seasonConfig').set({
+        seasonNum: nextSeason,
+        bannerText: `시즌 ${nextSeason} 오픈!`,
+        auto30MinRaid: false,
+        resetId: 'reset_' + Date.now()
+      });
+
+      closeAdminModal();
+      showToast(`👑 시즌 ${currentSeasonNumber} 결산 완료! 시즌 ${nextSeason}이 시작되었습니다!`, 'warning');
+    }
+
+    async function launchUfoInvasionCutscene() {
+      await db.ref('globalEvent/ufoInvasion').set({
+        id: 'ufo_' + Date.now(),
+        playCutscene: true,
+        occupied: true,
+        createdAt: Date.now()
+      });
+      closeAdminModal();
+      showToast('🛸 전 접속자 화면에 60fps UFO 침공 컷씬(1분 33초)이 발동되었습니다!', 'warning');
+    }
+
+    async function resetAlienOccupation() {
+      await db.ref('globalEvent/ufoInvasion').remove();
+      applyAlienOccupationTheme(false);
+      initPOSCustomers();
+      showToast('일반 편의점 모드로 복구했습니다.', 'info');
+    }
+
+    async function triggerAdminSurprise(type) {
+      let extra = {};
+      if (type === 'server_lotto') {
+        const snap = await db.ref('users').once('value');
+        const names = Object.keys(snap.val() || {});
+        extra.winner = names.length > 0 ? names[Math.floor(Math.random() * names.length)] : (currentUser?.nickname || '사장님');
+      } else if (type === 'megaphone') {
+        extra.msg = document.getElementById('adminMegaphoneInput').value.trim() || '총괄 운영자가 지켜보고 있습니다!! 👀';
+      }
+      await db.ref('globalEvent/surprise').set({
+        id: 'sp_' + Date.now(),
+        type,
+        ...extra,
+        createdAt: Date.now()
+      });
+      showToast('🎪 전체 접속자 화면에 깜짝 이벤트를 발동했습니다!', 'warning');
     }
 
     async function loadAdminUserList() {
@@ -3158,24 +3413,15 @@
       const keys = Object.keys(users).sort();
       document.getElementById('adminTotalUsers').textContent = `${keys.length}명`;
 
-      const select = document.getElementById('adminUserSelect');
-      select.innerHTML = `<option value="">-- 가입 유저 선택 (${keys.length}명) --</option>` +
-        keys.map(nick => {
-          const m = Number(users[nick].money ?? users[nick].state?.money ?? 0);
-          return `<option value="${nick}">${nick} (보유: ${formatKRW(m)})</option>`;
-        }).join('');
+      document.getElementById('adminUserSelect').innerHTML = `<option value="">-- 가입 유저 선택 (${keys.length}명) --</option>` +
+        keys.map(nick => `<option value="${nick}">${nick} (보유: ${formatKRW(Number(users[nick].money ?? 0))})</option>`).join('');
 
-      const statusList = document.getElementById('adminUserStatusList');
-      statusList.innerHTML = keys.map(nick => {
-        const u = users[nick];
-        const isBanned = Boolean(u.banned);
+      document.getElementById('adminUserStatusList').innerHTML = keys.map(nick => {
+        const isBanned = Boolean(users[nick].banned);
         return `
           <div class="flex items-center justify-between px-2 py-1 rounded bg-slate-900 border border-slate-700/70">
             <span class="truncate font-bold ${isBanned ? 'text-rose-400 line-through' : 'text-slate-200'}">${nick}</span>
-            <div class="flex items-center gap-1 shrink-0">
-              <span class="text-[10px] ${isBanned ? 'text-rose-400 font-black' : 'text-emerald-400'}">${isBanned ? '차단됨' : '정상'}</span>
-              <button onclick="quickFillBanTarget('${nick}')" class="px-1.5 py-0.5 rounded bg-slate-700 text-[10px] text-white">선택</button>
-            </div>
+            <button onclick="quickFillBanTarget('${nick}')" class="px-1.5 py-0.5 rounded bg-slate-700 text-[10px] text-white">선택</button>
           </div>
         `;
       }).join('');
@@ -3189,68 +3435,15 @@
     async function adminSetUserBan(shouldBan) {
       const targetNick = document.getElementById('adminBanTargetInput').value.trim();
       const reason = document.getElementById('adminBanReasonInput').value.trim();
-      if (!targetNick) {
-        showToast('차단/해제할 닉네임을 입력하세요!', 'warning');
-        return;
-      }
-      const ref = db.ref(`users/${targetNick}`);
-      const snap = await ref.once('value');
-      if (!snap.exists()) {
-        showToast(`❌ '${targetNick}' 유저를 찾을 수 없습니다.`, 'error');
-        return;
-      }
-      await ref.update({
-        banned: shouldBan,
-        banReason: shouldBan ? (reason || '관리자 직권 이용 정지') : '',
-        updatedAt: Date.now()
-      });
-      showToast(shouldBan ? `🚫 '${targetNick}' 유저를 즉시 차단했습니다.` : `✅ '${targetNick}' 유저의 차단을 해제했습니다.`, 'success');
+      if (!targetNick) return;
+      await db.ref(`users/${targetNick}`).update({ banned: shouldBan, banReason: shouldBan ? (reason || '관리자 직권 이용 정지') : '', updatedAt: Date.now() });
+      showToast(shouldBan ? `🚫 '${targetNick}' 차단 완료` : `✅ '${targetNick}' 차단 해제`, 'success');
       await loadAdminUserList();
     }
 
-    async function launchUfoInvasionCutscene() {
-      try {
-        await db.ref('globalEvent/ufoInvasion').set({
-          id: 'ufo_' + Date.now(),
-          playCutscene: true,
-          occupied: true,
-          createdAt: Date.now()
-        });
-        closeAdminModal();
-        showToast('🛸 전 접속자 화면에 60fps 고화질 UFO 침공 컷씬(1분 33초)이 발동되었습니다!', 'warning');
-      } catch (err) {
-        alert('UFO 컷씬 발동 오류: ' + (err.message || err));
-      }
-    }
-
-    async function resetAlienOccupation() {
-      try {
-        await db.ref('globalEvent/ufoInvasion').remove();
-        applyAlienOccupationTheme(false);
-        initPOSCustomers();
-        showToast('외계인 점령 모드를 해제하고 일반 매장으로 복구했습니다.', 'info');
-      } catch (err) {
-        alert('점령 해제 오류: ' + (err.message || err));
-      }
-    }
-
-    async function triggerAdminSurprise(type) {
-      await db.ref('globalEvent/surprise').set({
-        id: 'sp_' + Date.now(),
-        type,
-        createdAt: Date.now()
-      });
-      showToast('🎪 전체 접속자 화면에 깜짝 이벤트를 발동했습니다!', 'warning');
-    }
-
     async function triggerServerFever(minutes, mult = 2) {
-      const until = Date.now() + minutes * 60 * 1000;
-      await db.ref('globalEvent').update({
-        feverUntil: until,
-        feverMult: mult
-      });
-      playGiftFanfare();
-      showToast(`🔥 전체 서버 ${minutes}분간 매출 ${mult}배 피버 타임이 발동되었습니다!`, 'warning');
+      await db.ref('globalEvent').update({ feverUntil: Date.now() + minutes * 60 * 1000, feverMult: mult });
+      showToast(`🔥 전체 서버 ${minutes}분간 매출 ${mult}배 피버 발동!`, 'warning');
     }
 
     function triggerCustomFever() {
@@ -3260,25 +3453,15 @@
     }
 
     async function stopServerFever() {
-      await db.ref('globalEvent').update({
-        feverUntil: 0,
-        feverMult: 1
-      });
+      await db.ref('globalEvent').update({ feverUntil: 0, feverMult: 1 });
       showToast('피버 이벤트를 종료했습니다.', 'info');
     }
 
     async function createAdminCoupon() {
       const code = document.getElementById('adminNewCouponCode').value.trim().toLowerCase();
       const reward = Number(document.getElementById('adminNewCouponReward').value);
-      if (!code || isNaN(reward) || reward <= 0) {
-        showToast('쿠폰 코드와 올바른 보상 금액을 입력하세요!', 'warning');
-        return;
-      }
-      await db.ref(`coupons/${code}`).set({
-        code,
-        reward,
-        createdAt: Date.now()
-      });
+      if (!code || isNaN(reward) || reward <= 0) return;
+      await db.ref(`coupons/${code}`).set({ code, reward, createdAt: Date.now() });
       document.getElementById('adminNewCouponCode').value = '';
       showToast(`🎁 새 쿠폰 '${code}' (${formatKRW(reward)}) 발행 완료!`, 'success');
     }
@@ -3287,96 +3470,43 @@
       const val = document.getElementById('adminUserSelect').value;
       if (val) document.getElementById('adminTargetNickname').value = val;
     }
-
-    function setAdminAmountPreset(amount) {
-      document.getElementById('adminMoneyAmount').value = amount;
-    }
+    function setAdminAmountPreset(amount) { document.getElementById('adminMoneyAmount').value = amount; }
 
     async function adminModifyUserMoney(mode) {
       const targetNick = document.getElementById('adminTargetNickname').value.trim();
       const amount = Number(document.getElementById('adminMoneyAmount').value);
-      if (!targetNick) {
-        showToast('유저 닉네임을 선택하거나 입력하세요!', 'warning');
-        return;
-      }
-      if (isNaN(amount)) {
-        showToast('올바른 금액을 입력하세요!', 'error');
-        return;
-      }
-
+      if (!targetNick || isNaN(amount)) return;
       const ref = db.ref(`users/${targetNick}`);
       const snap = await ref.once('value');
-      if (!snap.exists()) {
-        showToast(`❌ '${targetNick}' 유저를 찾을 수 없습니다.`, 'error');
-        return;
-      }
-
-      const data = snap.val();
-      const cur = Number(data.money ?? data.state?.money ?? 0);
+      if (!snap.exists()) return;
+      const cur = Number(snap.val().money ?? 0);
       const nextMoney = mode === 'add' ? Math.max(0, cur + amount) : Math.max(0, amount);
-
-      await ref.update({
-        money: nextMoney,
-        'state/money': nextMoney,
-        updatedAt: Date.now()
-      });
-      await db.ref(`leaderboard/${targetNick}`).update({
-        nickname: targetNick,
-        money: nextMoney,
-        updatedAt: Date.now()
-      });
-
-      playGiftFanfare();
+      await ref.update({ money: nextMoney, 'state/money': nextMoney, updatedAt: Date.now() });
       showToast(`✅ '${targetNick}'님의 자금이 ${formatKRW(nextMoney)}으로 반영되었습니다!`, 'success');
       await loadAdminUserList();
     }
 
     async function postGlobalNotice() {
       const input = document.getElementById('adminNoticeInput');
-      if (!input) return;
       const text = input.value.trim();
-      if (!text) {
-        showToast('⚠️ 공지할 내용을 먼저 입력하세요!', 'warning');
-        return;
-      }
-      try {
-        const payload = { text, createdAt: Date.now() };
-        await db.ref('notices/active').set(payload);
-        input.value = '';
-        showToast('📢 상단 긴급 공지가 발송되었습니다 (3.5초 표시)!', 'success');
-      } catch (err) {
-        console.error('공지 발송 오류:', err);
-        alert('공지 발송 실패 원인: ' + (err.message || err));
-      }
+      if (!text) return;
+      await db.ref('notices/active').set({ text, createdAt: Date.now() });
+      input.value = '';
+      showToast('📢 상단 긴급 공지가 발송되었습니다!', 'success');
     }
 
     async function clearGlobalNotice() {
-      try {
-        await db.ref('notices/active').remove();
-        showToast('상단 공지 배너를 내렸습니다.', 'info');
-      } catch (err) {
-        alert('배너 내리기 실패: ' + (err.message || err));
-      }
+      await db.ref('notices/active').remove();
+      showToast('상단 공지 배너를 내렸습니다.', 'info');
     }
 
     async function createAdminPoll() {
       const q = document.getElementById('adminPollQuestion').value.trim();
       const o1 = document.getElementById('adminPollOpt1').value.trim();
       const o2 = document.getElementById('adminPollOpt2').value.trim();
-      if (!q || !o1 || !o2) {
-        showToast('질문과 선택지 1, 2를 모두 입력하세요.', 'warning');
-        return;
-      }
-      await db.ref('poll/active').set({
-        question: q,
-        opt1: o1,
-        opt2: o2,
-        votes1: 0,
-        votes2: 0,
-        voters: {},
-        createdAt: Date.now()
-      });
-      showToast('🗳️ 실시간 투표가 시작되었습니다 (0표 시작)!', 'success');
+      if (!q || !o1 || !o2) return;
+      await db.ref('poll/active').set({ question: q, opt1: o1, opt2: o2, votes1: 0, votes2: 0, voters: {}, createdAt: Date.now() });
+      showToast('🗳️ 실시간 투표가 시작되었습니다!', 'success');
     }
 
     async function closeAdminPoll() {
@@ -3394,10 +3524,7 @@
       }
       box.innerHTML = Object.values(data).reverse().map(f => `
         <div class="p-2 rounded-lg bg-slate-900 border border-slate-700">
-          <div class="flex justify-between text-[10px] text-amber-300 font-bold mb-0.5">
-            <span>보낸이: ${f.nickname}</span>
-            <span class="text-slate-500">${new Date(f.createdAt).toLocaleDateString('ko-KR')}</span>
-          </div>
+          <div class="text-[10px] text-amber-300 font-bold">보낸이: ${f.nickname}</div>
           <div class="text-slate-200 text-xs">${f.message}</div>
         </div>
       `).join('');
@@ -3406,9 +3533,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       db.ref('meta/totalVisits').transaction(c => (c || 0) + 1, (err, _, snap) => {
-        if (!err && snap) {
-          document.getElementById('loginVisitorCount').textContent = `누적 방문 ${(snap.val() || 1).toLocaleString()}회`;
-        }
+        if (!err && snap) document.getElementById('loginVisitorCount').textContent = `누적 방문 ${(snap.val() || 1).toLocaleString()}회`;
       });
       scanForRecoverableData();
     });
