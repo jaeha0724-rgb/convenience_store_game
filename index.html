@@ -8,8 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Three.js 3D Engine CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Google Fonts: Noto Sans KR -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <!-- Firebase v10 Compat SDK -->
@@ -44,22 +42,12 @@
       50% { filter: hue-rotate(180deg) saturate(2.1); }
       100% { filter: hue-rotate(360deg) saturate(1.7); }
     }
-    @keyframes screenShake {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      20% { transform: translate(-8px, 6px) rotate(-1.2deg); }
-      40% { transform: translate(8px, -6px) rotate(1.2deg); }
-      60% { transform: translate(-6px, -4px) rotate(-0.8deg); }
-      80% { transform: translate(6px, 5px) rotate(0.8deg); }
-    }
-    .animate-shake {
-      animation: screenShake 0.45s ease-in-out 2;
-    }
     @keyframes sirenFlash {
-      0%, 100% { opacity: 0.12; }
-      50% { opacity: 0.45; }
+      0%, 100% { opacity: 0.1; }
+      50% { opacity: 0.35; }
     }
     .animate-siren {
-      animation: sirenFlash 0.7s infinite ease-in-out;
+      animation: sirenFlash 0.85s infinite ease-in-out;
     }
     @keyframes moneyFall {
       0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
@@ -133,41 +121,42 @@
 </head>
 <body class="flex flex-col min-h-screen bg-[#080c14] text-slate-100">
 
-  <!-- ==================== 3D UFO INVASION 1:30 CUTSCENE + 3S COUNTDOWN OVERLAY ==================== -->
+  <!-- ==================== 60FPS HIGH-QUALITY UFO INVASION 1:30 CUTSCENE + 3S COUNTDOWN ==================== -->
   <div id="ufoCutsceneOverlay" class="hidden fixed inset-0 z-[130] flex flex-col justify-between bg-[#03050a] overflow-hidden">
-    <!-- Fullscreen 3D WebGL Canvas Container -->
-    <div id="ufo3dCanvasContainer" class="absolute inset-0 w-full h-full z-0"></div>
+    <!-- Ultra-Smooth 60FPS Cinema Canvas -->
+    <canvas id="ufoCinemaCanvas" class="absolute inset-0 w-full h-full z-0 block"></canvas>
 
-    <!-- Ambient Purple/Crimson Invasion Glow -->
-    <div id="ufoSirenGlow" class="absolute inset-0 bg-gradient-to-b from-purple-700/20 via-transparent to-rose-700/20 animate-siren pointer-events-none z-[1]"></div>
+    <!-- Subtle Vignette & Ambient Glow -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(2,4,10,0.85)_100%)] pointer-events-none z-[1]"></div>
+    <div id="ufoSirenGlow" class="absolute inset-0 bg-gradient-to-b from-purple-600/15 via-transparent to-rose-600/15 animate-siren pointer-events-none z-[1]"></div>
 
     <!-- Top Cinema Letterbox Bar -->
-    <div id="ufoTopLetterbox" class="w-full h-14 sm:h-16 bg-black/95 border-b-2 border-purple-500/80 flex items-center justify-between px-4 z-20 transition-transform duration-500 -translate-y-full">
+    <div id="ufoTopLetterbox" class="w-full h-14 sm:h-16 bg-black/95 border-b border-purple-500/60 flex items-center justify-between px-4 z-20 transition-transform duration-500 -translate-y-full">
       <div class="flex items-center gap-2 min-w-0">
         <span class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-ping shrink-0"></span>
-        <span id="ufoActBadge" class="text-xs sm:text-sm font-black tracking-wider text-purple-300 truncate">ACT 1 · 미확인 비행물체 추락</span>
+        <span id="ufoActBadge" class="text-xs sm:text-sm font-black tracking-wider text-purple-200 truncate">ACT 1 · 미확인 비행물체 추락</span>
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
-        <span class="px-2 py-0.5 rounded bg-purple-600/40 border border-purple-400/50 text-[10px] font-black text-purple-200">3D LIVE</span>
+        <span class="px-2 py-0.5 rounded bg-purple-500/25 border border-purple-400/50 text-[10px] font-black text-purple-200">CINEMA 60FPS</span>
         <span id="ufoElapsedTimer" class="text-xs font-black text-amber-300 bg-slate-900 px-2.5 py-0.5 rounded-full border border-slate-700">00:00 / 01:30</span>
       </div>
     </div>
 
-    <!-- MAIN 3D HUD & SUBTITLE STAGE (1:30 STORY) -->
+    <!-- MAIN HUD & SUBTITLE STAGE (1:30 STORY) -->
     <div id="ufoMainStage" class="relative flex-1 flex flex-col justify-between p-3.5 sm:p-5 z-10 max-w-2xl mx-auto w-full pointer-events-none">
       <!-- Top Floating Battle HP Bars (Visible during Act 3 Fight) -->
       <div class="w-full flex flex-col items-center">
-        <div id="ufoBattleHud" class="hidden w-full flex items-center justify-between gap-3 bg-black/80 backdrop-blur-md border border-purple-500/60 rounded-2xl px-3.5 py-2 shadow-xl">
+        <div id="ufoBattleHud" class="hidden w-full flex items-center justify-between gap-3 bg-slate-950/85 backdrop-blur-md border border-purple-400/60 rounded-2xl px-4 py-2.5 shadow-[0_0_25px_rgba(168,85,247,0.35)]">
           <div class="flex-1 text-left">
             <div class="flex justify-between text-[11px] font-black text-emerald-300 mb-1">
-              <span>🧑‍💼 나 (사장님)</span>
+              <span>🧑‍💼 나 (편의점 사장님)</span>
               <span id="heroHpText">100%</span>
             </div>
             <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
-              <div id="heroHpBar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-300 transition-all duration-300" style="width: 100%"></div>
+              <div id="heroHpBar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-300 transition-all duration-300" style="width: 100%"></div>
             </div>
           </div>
-          <span class="text-xs font-black text-amber-400 px-1">VS</span>
+          <span class="text-xs font-black text-amber-400 px-1.5">VS</span>
           <div class="flex-1 text-right">
             <div class="flex justify-between text-[11px] font-black text-purple-300 mb-1">
               <span id="alienHpText">100%</span>
@@ -181,7 +170,7 @@
       </div>
 
       <!-- Bottom Cinema Subtitle Box -->
-      <div class="w-full bg-black/85 backdrop-blur-md border-2 border-purple-400/75 rounded-2xl p-4 text-left shadow-2xl">
+      <div class="w-full bg-slate-950/88 backdrop-blur-md border border-purple-400/70 rounded-2xl p-4 text-left shadow-[0_10px_35px_rgba(0,0,0,0.85)]">
         <div class="flex items-center justify-between text-[11px] font-black text-purple-300 mb-1.5 border-b border-purple-500/30 pb-1">
           <span id="ufoSpeakerName">📡 긴급 속보</span>
           <span id="ufoGroundLabel" class="text-amber-300">편의점 앞 공터</span>
@@ -190,19 +179,19 @@
       </div>
     </div>
 
-    <!-- FINAL 3-SECOND COUNTDOWN STAGE (2026-11-28 11:00:00 KST) -->
-    <div id="ufoCountdownFinaleStage" class="hidden relative flex-1 flex flex-col items-center justify-center px-4 text-center z-20 bg-black/75 backdrop-blur-sm animate-pop">
-      <div class="px-4 py-1 rounded-full bg-rose-600/95 border border-rose-300 text-xs sm:text-sm font-black tracking-widest text-white mb-3 animate-pulse">
-        👽 ALIEN INVASION · D-DAY COUNTDOWN
+    <!-- FINAL 3-SECOND COUNTDOWN STAGE ("대침공이 다가옵니다..") -->
+    <div id="ufoCountdownFinaleStage" class="hidden relative flex-1 flex flex-col items-center justify-center px-4 text-center z-20 bg-black/80 backdrop-blur-md animate-pop">
+      <div class="px-4 py-1 rounded-full bg-rose-600 border border-rose-300 text-xs sm:text-sm font-black tracking-widest text-white mb-4 animate-pulse shadow-[0_0_20px_rgba(244,63,94,0.8)]">
+        👽 ALIEN INVASION · D-DAY
       </div>
-      <h2 class="text-lg sm:text-2xl font-black text-purple-200 mb-1">
-        외계인 편의점 점령 업데이트 예정 시각
+      <h2 class="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2 drop-shadow-[0_0_20px_rgba(192,132,252,0.9)]">
+        대침공이 다가옵니다..
       </h2>
-      <p class="text-xs sm:text-sm font-bold text-amber-300 mb-5">
+      <p class="text-xs sm:text-sm font-bold text-amber-300 mb-6">
         2026년 11월 28일 (토) 오전 11:00 (한국시간 KST)
       </p>
 
-      <div class="grid grid-cols-4 gap-2 sm:gap-3 w-full max-w-md bg-slate-900/95 border-2 border-purple-400 rounded-3xl p-4 shadow-[0_0_50px_rgba(168,85,247,0.7)]">
+      <div class="grid grid-cols-4 gap-2 sm:gap-3 w-full max-w-md bg-slate-900/95 border-2 border-purple-400 rounded-3xl p-4 shadow-[0_0_60px_rgba(168,85,247,0.75)]">
         <div class="bg-slate-950 border border-purple-500/50 rounded-2xl py-3 px-1">
           <div id="cdDays" class="text-2xl sm:text-4xl font-black text-amber-400">00</div>
           <div class="text-[11px] font-bold text-slate-400 mt-1">일 (DAYS)</div>
@@ -223,10 +212,10 @@
     </div>
 
     <!-- Bottom Cinema Letterbox Bar -->
-    <div id="ufoBottomLetterbox" class="w-full h-14 sm:h-16 bg-black/95 border-t-2 border-purple-500/80 flex items-center justify-center px-4 z-20 transition-transform duration-500 translate-y-full">
+    <div id="ufoBottomLetterbox" class="w-full h-14 sm:h-16 bg-black/95 border-t border-purple-500/60 flex items-center justify-center px-4 z-20 transition-transform duration-500 translate-y-full">
       <div class="w-full max-w-md flex items-center gap-3">
         <div class="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-          <div id="ufoTimelineBar" class="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-amber-400 transition-all duration-300" style="width: 0%"></div>
+          <div id="ufoTimelineBar" class="h-full bg-gradient-to-r from-purple-500 via-fuchsia-500 to-amber-400 transition-all duration-300" style="width: 0%"></div>
         </div>
         <span id="ufoSceneProgressText" class="text-[11px] font-black text-purple-300 shrink-0">0%</span>
       </div>
@@ -349,10 +338,18 @@
         </div>
       </div>
 
-      <!-- Alien Occupation Banner -->
-      <div id="alienOccupationBanner" class="hidden bg-gradient-to-r from-purple-900/90 via-fuchsia-900/90 to-purple-900/90 border border-purple-400 rounded-lg px-2.5 py-1 flex items-center justify-between text-[11px] text-purple-100">
-        <span class="font-black text-purple-200">👽 외계인 점령 모드 활성 중! (우주 손님 출현)</span>
-        <span class="text-[10px] font-bold text-amber-300">11/28 11:00 KST</span>
+      <!-- Alien Occupation Live Countdown Banner (11/28 11:00 KST) -->
+      <div id="alienOccupationBanner" class="hidden bg-gradient-to-r from-purple-950 via-fuchsia-950 to-purple-950 border border-purple-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span class="shrink-0">👽</span>
+          <span class="font-black text-purple-200 truncate">대침공이 다가옵니다..</span>
+          <span class="shrink-0 px-1.5 py-0.2 rounded bg-purple-500/30 border border-purple-400/40 text-[10px] font-black text-emerald-300">
+            🔋 코어 <span id="energyCoreCountText">0</span>개
+          </span>
+        </div>
+        <span id="liveInvasionDdayText" class="shrink-0 font-black text-amber-300 bg-black/50 px-2 py-0.5 rounded-lg border border-purple-500/40 text-[10px]">
+          D-7 00:00:00
+        </span>
       </div>
 
       <div id="globalFeverBanner" class="hidden bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-amber-500/25 border border-amber-400 rounded-lg px-2.5 py-1 flex items-center justify-between text-[11px] text-amber-200 fever-pulse">
@@ -682,19 +679,19 @@
           </div>
         </div>
 
-        <!-- 3D UFO INVASION LIVE EVENT CUTSCENE (1:30 + 3S COUNTDOWN) -->
+        <!-- HIGH-QUALITY 60FPS UFO INVASION CUTSCENE (1:30 + 3S COUNTDOWN) -->
         <div class="bg-gradient-to-br from-purple-950/90 via-slate-900 to-rose-950/80 border-2 border-purple-400/80 rounded-2xl p-3.5 space-y-2.5 shadow-lg">
           <div class="flex items-center justify-between">
-            <h4 class="text-xs font-black text-purple-200">🛸 3D UFO 침공 라이브 이벤트 (1분 33초 풀버전)</h4>
-            <span class="px-1.5 py-0.5 rounded bg-purple-500/30 text-[10px] font-black text-purple-200">3D LIVE</span>
+            <h4 class="text-xs font-black text-purple-200">🛸 UFO 침공 시네마틱 컷씬 (60fps 고화질 · 1분 33초)</h4>
+            <span class="px-1.5 py-0.5 rounded bg-purple-500/30 text-[10px] font-black text-purple-200">LIVE</span>
           </div>
           <p class="text-[11px] text-slate-300 leading-relaxed">
-            실시간 3D 공간에서 <strong>UFO 추락 → 외계인 등장 → 레이저 격돌 → 패배 및 편의점 점령(1분 30초)</strong> 후, 마지막 <strong>3초 동안 2026/11/28 오전 11:00 (KST) 카운트다운</strong>이 전 접속자 화면에 송출됩니다!
+            버벅임 없는 60fps 고화질 그래픽으로 <strong>UFO 추락 → 외계인 조우 → 레이저 격돌 → 패배 및 편의점 점령(1분 30초)</strong> 후, 마지막 <strong>3초간 “대침공이 다가옵니다..” (11/28 오전 11:00 KST)</strong> 카운트다운이 송출됩니다!
           </p>
           <div class="flex gap-1.5">
             <button type="button" onclick="launchUfoInvasionCutscene()"
               class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 via-fuchsia-500 to-rose-500 hover:opacity-95 text-white font-black text-xs active:scale-95 transition shadow-lg">
-              🎬 3D UFO 침공 컷씬 발동하기!
+              🎬 UFO 침공 시네마틱 발동하기!
             </button>
             <button type="button" onclick="resetAlienOccupation()"
               class="px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-600 text-slate-300 font-bold text-[11px]">
@@ -950,6 +947,7 @@
     const DAY_DURATION_SEC = 30;
     const LAUNCH_COUPON_CODE = "open_261119";
     const LAUNCH_COUPON_REWARD = 50000;
+    const MAIN_INVASION_TARGET_MS = new Date('2026-11-28T11:00:00+09:00').getTime();
 
     const STORE_ITEMS = [
       { id: 'kimbap', name: '참치마요 삼각김밥', emoji: '🍙', price: 1200 },
@@ -958,6 +956,14 @@
       { id: 'bento', name: '혜자 편의점 도시락', emoji: '🍱', price: 4900 },
       { id: 'coffee', name: '아이스 아메리카노', emoji: '🧊', price: 2000 },
       { id: 'snack', name: '허니버터 과자', emoji: '🥨', price: 1800 }
+    ];
+
+    const ALIEN_STORE_ITEMS = [
+      { id: 'alien_kimbap', name: '플라즈마 삼각김밥', emoji: '🔮', price: 2800 },
+      { id: 'alien_ramen', name: '은하수 매운 우주라면', emoji: '🌌', price: 3500 },
+      { id: 'alien_drink', name: '안드로메다 에너지캔', emoji: '🧪', price: 3200 },
+      { id: 'alien_bento', name: '외계 함대 특식 도시락', emoji: '🛸', price: 8900 },
+      { id: 'alien_core', name: '농축 다크매터 젤리', emoji: '☄️', price: 4200 }
     ];
 
     const CUSTOMER_PROFILES = [
@@ -1025,13 +1031,13 @@
     let noticeHideTimer = null;
     let lastSurpriseId = '';
 
-    // 3D UFO Invasion Cutscene State
+    // High-Quality 60FPS UFO Invasion Cutscene State
     let lastUfoEventId = '';
     let isInitialUfoLoad = true;
     let isAlienOccupied = false;
     let ufoCutsceneInterval = null;
     let ufoCountdownInterval = null;
-    let ufo3DAnimFrameId = null;
+    let ufoCinemaAnimId = null;
 
     let gameState = {
       money: 15000,
@@ -1041,6 +1047,7 @@
       cleanliness: 100,
       combo: 0,
       totalServed: 0,
+      energyCores: 0,
       usedCoupons: {},
       upgrades: {
         partTimer: 0,
@@ -1057,454 +1064,514 @@
     let lastTick = Date.now();
 
     // ---------------------------------------------------------
-    // 3D THREE.JS UFO INVASION SCENE & 1:30 STORY ENGINE
+    // 60FPS ULTRA-SMOOTH HIGH-QUALITY CINEMA CANVAS ENGINE
     // ---------------------------------------------------------
-    let ufo3D = {
-      scene: null,
-      camera: null,
-      renderer: null,
-      ufoGroup: null,
-      fleetGroup: null,
-      heroGroup: null,
-      alienGroup: null,
-      tractorBeam: null,
-      heroBeam: null,
-      alienBeam: null,
-      clashSphere: null,
-      shockwaveRing: null,
-      storeGlowLight: null,
-      particles: null,
+    let cinemaState = {
       elapsedSec: 0,
-      cameraShakePower: 0
+      shakePower: 0,
+      stars: [],
+      particles: [],
+      shockwaves: []
     };
 
-    function initUfo3DWorld() {
-      const container = document.getElementById('ufo3dCanvasContainer');
-      container.innerHTML = '';
+    function initCinemaCanvas() {
+      const canvas = document.getElementById('ufoCinemaCanvas');
+      const ctx = canvas.getContext('2d');
 
-      if (typeof THREE === 'undefined') return;
-
-      const width = container.clientWidth || window.innerWidth;
-      const height = container.clientHeight || window.innerHeight;
-
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x04060d);
-      scene.fog = new THREE.FogExp2(0x060916, 0.022);
-
-      const camera = new THREE.PerspectiveCamera(52, width / height, 0.1, 200);
-      camera.position.set(0, 7, 19);
-      camera.lookAt(0, 2, 0);
-
-      const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.shadowMap.enabled = true;
-      container.appendChild(renderer.domElement);
-
-      // Lights
-      const hemiLight = new THREE.HemisphereLight(0x6366f1, 0x0f172a, 0.85);
-      scene.add(hemiLight);
-
-      const dirLight = new THREE.DirectionalLight(0xc7d2fe, 1.1);
-      dirLight.position.set(12, 22, 14);
-      dirLight.castShadow = true;
-      scene.add(dirLight);
-
-      const storeGlowLight = new THREE.PointLight(0x34d399, 2.2, 22);
-      storeGlowLight.position.set(-7.5, 3.5, -2);
-      scene.add(storeGlowLight);
-
-      // Starfield
-      const starGeo = new THREE.BufferGeometry();
-      const starCount = 450;
-      const starPos = new Float32Array(starCount * 3);
-      for (let i = 0; i < starCount * 3; i += 3) {
-        starPos[i] = (Math.random() - 0.5) * 140;
-        starPos[i + 1] = Math.random() * 65 + 4;
-        starPos[i + 2] = (Math.random() - 0.5) * 140 - 20;
-      }
-      starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-      const starMat = new THREE.PointsMaterial({ color: 0xe2e8f0, size: 0.35 });
-      scene.add(new THREE.Points(starGeo, starMat));
-
-      // Ground & Asphalt Road
-      const groundMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85 });
-      const ground = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), groundMat);
-      ground.rotation.x = -Math.PI / 2;
-      ground.receiveShadow = true;
-      scene.add(ground);
-
-      const roadMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 });
-      const road = new THREE.Mesh(new THREE.PlaneGeometry(120, 7), roadMat);
-      road.rotation.x = -Math.PI / 2;
-      road.position.set(0, 0.02, 5.5);
-      scene.add(road);
-
-      // 3D Convenience Store Building (Left Side)
-      const storeGroup = new THREE.Group();
-      storeGroup.position.set(-8.5, 0, -3.5);
-
-      const buildingBody = new THREE.Mesh(
-        new THREE.BoxGeometry(7, 4.4, 5.5),
-        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 })
-      );
-      buildingBody.position.y = 2.2;
-      buildingBody.castShadow = true;
-      storeGroup.add(buildingBody);
-
-      // Glowing Glass Window
-      const glassWindow = new THREE.Mesh(
-        new THREE.BoxGeometry(5.8, 2.4, 0.15),
-        new THREE.MeshStandardMaterial({
-          color: 0xa7f3d0,
-          emissive: 0x10b981,
-          emissiveIntensity: 0.65,
-          roughness: 0.1
-        })
-      );
-      glassWindow.position.set(0, 1.8, 2.78);
-      storeGroup.add(glassWindow);
-
-      // Neon Signboard (3 Stripes: Emerald, White, Amber)
-      const signFrame = new THREE.Mesh(
-        new THREE.BoxGeometry(7.3, 1.1, 5.8),
-        new THREE.MeshStandardMaterial({ color: 0x0f172a })
-      );
-      signFrame.position.y = 4.9;
-      storeGroup.add(signFrame);
-
-      const neonStripe1 = new THREE.Mesh(
-        new THREE.BoxGeometry(7.36, 0.25, 5.86),
-        new THREE.MeshBasicMaterial({ color: 0x10b981 })
-      );
-      neonStripe1.position.y = 5.2;
-      storeGroup.add(neonStripe1);
-
-      const neonStripe2 = new THREE.Mesh(
-        new THREE.BoxGeometry(7.36, 0.25, 5.86),
-        new THREE.MeshBasicMaterial({ color: 0xf59e0b })
-      );
-      neonStripe2.position.y = 4.6;
-      storeGroup.add(neonStripe2);
-
-      scene.add(storeGroup);
-
-      // 3D Main UFO Mothership
-      const ufoGroup = new THREE.Group();
-      ufoGroup.position.set(4.5, 28, -1.5);
-
-      const saucerMain = new THREE.Mesh(
-        new THREE.CylinderGeometry(2.2, 4.6, 1.1, 32),
-        new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.85, roughness: 0.2 })
-      );
-      ufoGroup.add(saucerMain);
-
-      const saucerBottom = new THREE.Mesh(
-        new THREE.CylinderGeometry(4.6, 1.8, 0.7, 32),
-        new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.25 })
-      );
-      saucerBottom.position.y = -0.85;
-      ufoGroup.add(saucerBottom);
-
-      const dome = new THREE.Mesh(
-        new THREE.SphereGeometry(2.0, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2),
-        new THREE.MeshStandardMaterial({
-          color: 0xc084fc,
-          emissive: 0x9333ea,
-          emissiveIntensity: 0.8,
-          transparent: true,
-          opacity: 0.85
-        })
-      );
-      dome.position.y = 0.5;
-      ufoGroup.add(dome);
-
-      // Rim Neon Lights around UFO
-      for (let i = 0; i < 12; i++) {
-        const angle = (i / 12) * Math.PI * 2;
-        const orb = new THREE.Mesh(
-          new THREE.SphereGeometry(0.22, 8, 8),
-          new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? 0xe879f9 : 0x38bdf8 })
-        );
-        orb.position.set(Math.cos(angle) * 4.3, -0.35, Math.sin(angle) * 4.3);
-        ufoGroup.add(orb);
-      }
-
-      const ufoPointLight = new THREE.PointLight(0xd946ef, 3.5, 25);
-      ufoPointLight.position.set(0, -1.5, 0);
-      ufoGroup.add(ufoPointLight);
-
-      scene.add(ufoGroup);
-
-      // Tractor Beam Cone
-      const tractorBeam = new THREE.Mesh(
-        new THREE.ConeGeometry(3.2, 7.5, 24, 1, true),
-        new THREE.MeshBasicMaterial({
-          color: 0xc084fc,
-          transparent: true,
-          opacity: 0.28,
-          side: THREE.DoubleSide
-        })
-      );
-      tractorBeam.position.set(4.5, 3.6, -1.5);
-      tractorBeam.visible = false;
-      scene.add(tractorBeam);
-
-      // Shockwave Ring on Crash
-      const shockwaveRing = new THREE.Mesh(
-        new THREE.RingGeometry(0.5, 1.2, 32),
-        new THREE.MeshBasicMaterial({ color: 0xf97316, side: THREE.DoubleSide, transparent: true, opacity: 0 })
-      );
-      shockwaveRing.rotation.x = -Math.PI / 2;
-      shockwaveRing.position.set(4.5, 0.08, -1.5);
-      scene.add(shockwaveRing);
-
-      // 3D Hero Character (Convenience Store Manager)
-      const heroGroup = new THREE.Group();
-      heroGroup.position.set(-5.2, 0, 1.2);
-
-      const heroTorso = new THREE.Mesh(
-        new THREE.BoxGeometry(0.95, 1.35, 0.55),
-        new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4 })
-      );
-      heroTorso.position.y = 1.45;
-      heroGroup.add(heroTorso);
-
-      const heroHead = new THREE.Mesh(
-        new THREE.SphereGeometry(0.45, 16, 16),
-        new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.5 })
-      );
-      heroHead.position.y = 2.55;
-      heroGroup.add(heroHead);
-
-      const scannerGun = new THREE.Mesh(
-        new THREE.BoxGeometry(0.6, 0.25, 0.25),
-        new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xd97706, emissiveIntensity: 0.5 })
-      );
-      scannerGun.position.set(0.75, 1.65, 0.2);
-      heroGroup.add(scannerGun);
-
-      scene.add(heroGroup);
-
-      // 3D Alien Commander
-      const alienGroup = new THREE.Group();
-      alienGroup.position.set(4.5, 0, 1.2);
-      alienGroup.visible = false;
-
-      const alienBody = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.45, 0.75, 1.65, 16),
-        new THREE.MeshStandardMaterial({ color: 0x4c1d95, metalness: 0.5, roughness: 0.3 })
-      );
-      alienBody.position.y = 1.35;
-      alienGroup.add(alienBody);
-
-      const alienHead = new THREE.Mesh(
-        new THREE.SphereGeometry(0.58, 16, 16),
-        new THREE.MeshStandardMaterial({ color: 0xa3e635, emissive: 0x4d7c0f, emissiveIntensity: 0.4 })
-      );
-      alienHead.scale.set(0.9, 1.25, 0.95);
-      alienHead.position.y = 2.75;
-      alienGroup.add(alienHead);
-
-      const eyeMat = new THREE.MeshBasicMaterial({ color: 0xf43f5e });
-      const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), eyeMat);
-      eyeL.position.set(-0.22, 2.8, 0.48);
-      const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), eyeMat);
-      eyeR.position.set(0.22, 2.8, 0.48);
-      alienGroup.add(eyeL, eyeR);
-
-      scene.add(alienGroup);
-
-      // 3D Battle Laser Beams & Clash Core
-      const heroBeam = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.14, 0.14, 1, 12),
-        new THREE.MeshBasicMaterial({ color: 0x34d399 })
-      );
-      heroBeam.rotation.z = Math.PI / 2;
-      heroBeam.visible = false;
-      scene.add(heroBeam);
-
-      const alienBeam = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.22, 0.22, 1, 12),
-        new THREE.MeshBasicMaterial({ color: 0xd946ef })
-      );
-      alienBeam.rotation.z = Math.PI / 2;
-      alienBeam.visible = false;
-      scene.add(alienBeam);
-
-      const clashSphere = new THREE.Mesh(
-        new THREE.SphereGeometry(0.65, 16, 16),
-        new THREE.MeshBasicMaterial({ color: 0xfef08a })
-      );
-      clashSphere.visible = false;
-      scene.add(clashSphere);
-
-      // Invasion Fleet UFOs (For Act 4 Occupation)
-      const fleetGroup = new THREE.Group();
-      fleetGroup.visible = false;
-      const fleetCoords = [
-        [-8.5, 9.5, -3.5],
-        [-3.5, 11.0, -5.0],
-        [-11.5, 10.5, -1.0]
-      ];
-      fleetCoords.forEach(([fx, fy, fz]) => {
-        const miniUfo = new THREE.Mesh(
-          new THREE.CylinderGeometry(1.1, 2.4, 0.65, 20),
-          new THREE.MeshStandardMaterial({ color: 0x9333ea, emissive: 0x6b21a8, emissiveIntensity: 0.7 })
-        );
-        miniUfo.position.set(fx, fy, fz);
-        fleetGroup.add(miniUfo);
-      });
-      scene.add(fleetGroup);
-
-      ufo3D = {
-        scene,
-        camera,
-        renderer,
-        ufoGroup,
-        fleetGroup,
-        heroGroup,
-        alienGroup,
-        tractorBeam,
-        heroBeam,
-        alienBeam,
-        clashSphere,
-        shockwaveRing,
-        storeGlowLight,
-        elapsedSec: 0,
-        cameraShakePower: 0
+      const resizeCanvas = () => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       };
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
 
-      const animate3D = () => {
-        ufo3DAnimFrameId = requestAnimationFrame(animate3D);
-        if (!ufo3D.renderer) return;
+      cinemaState.stars = Array.from({ length: 110 }, () => ({
+        x: Math.random(),
+        y: Math.random() * 0.65,
+        r: Math.random() * 1.8 + 0.4,
+        twinkle: Math.random() * Math.PI * 2
+      }));
+      cinemaState.particles = [];
+      cinemaState.shockwaves = [];
+      cinemaState.elapsedSec = 0;
+      cinemaState.shakePower = 0;
 
+      const renderFrame = () => {
+        ufoCinemaAnimId = requestAnimationFrame(renderFrame);
+        const w = window.innerWidth;
+        const h = window.innerHeight;
         const t = performance.now() * 0.001;
-        const sec = ufo3D.elapsedSec;
+        const sec = cinemaState.elapsedSec;
 
-        // Rotate UFO continuously
-        ufo3D.ufoGroup.rotation.y += 0.035;
-        ufo3D.fleetGroup.rotation.y += 0.015;
+        ctx.save();
 
-        // Act 1 (0~18s): UFO falling from sky & crashing
-        if (sec < 12) {
-          const progress = Math.min(1, sec / 11);
-          ufo3D.ufoGroup.position.y = 28 - progress * 25.2;
-          ufo3D.ufoGroup.rotation.z = Math.sin(t * 9) * (1 - progress) * 0.35;
-          ufo3D.camera.position.set(2 + progress * 2, 7 - progress * 1.5, 19 - progress * 3);
-          ufo3D.camera.lookAt(ufo3D.ufoGroup.position.x, ufo3D.ufoGroup.position.y, 0);
-        } else if (sec < 18) {
-          // Hovering after crash + shockwave
-          ufo3D.ufoGroup.position.y = 2.8 + Math.sin(t * 3) * 0.25;
-          ufo3D.ufoGroup.rotation.z = 0.14;
-          const ringScale = ((t * 2) % 1) * 9 + 1;
-          ufo3D.shockwaveRing.scale.set(ringScale, ringScale, 1);
-          ufo3D.shockwaveRing.material.opacity = Math.max(0, 0.7 - ringScale / 11);
+        // Camera Shake
+        if (cinemaState.shakePower > 0.2) {
+          const sx = (Math.random() - 0.5) * cinemaState.shakePower;
+          const sy = (Math.random() - 0.5) * cinemaState.shakePower;
+          ctx.translate(sx, sy);
+          cinemaState.shakePower *= 0.91;
+        }
+
+        // 1. Deep Atmospheric Night Sky Gradient
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.76);
+        if (sec >= 72) {
+          skyGrad.addColorStop(0, '#090314');
+          skyGrad.addColorStop(0.55, '#1e0b36');
+          skyGrad.addColorStop(1, '#3b0764');
         } else {
-          ufo3D.shockwaveRing.material.opacity = 0;
-          ufo3D.ufoGroup.position.y = 3.2 + Math.sin(t * 2.5) * 0.22;
-          ufo3D.ufoGroup.rotation.z = 0;
+          skyGrad.addColorStop(0, '#02040a');
+          skyGrad.addColorStop(0.6, '#0a1124');
+          skyGrad.addColorStop(1, '#131d38');
+        }
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // 2. Twinkling Stars & Nebula Glow
+        cinemaState.stars.forEach(s => {
+          const alpha = 0.35 + 0.65 * Math.abs(Math.sin(t * 2.2 + s.twinkle));
+          ctx.fillStyle = `rgba(226, 232, 240, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Moon / Cosmic Halo
+        const moonX = w * 0.82;
+        const moonY = h * 0.18;
+        const moonGlow = ctx.createRadialGradient(moonX, moonY, 6, moonX, moonY, 95);
+        moonGlow.addColorStop(0, sec >= 72 ? 'rgba(216,180,254,0.85)' : 'rgba(254,249,195,0.85)');
+        moonGlow.addColorStop(0.3, sec >= 72 ? 'rgba(168,85,247,0.22)' : 'rgba(148,163,184,0.16)');
+        moonGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = moonGlow;
+        ctx.beginPath();
+        ctx.arc(moonX, moonY, 95, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. Distant City Skyline Silhouette
+        ctx.fillStyle = '#070b14';
+        const bCount = 12;
+        for (let i = 0; i < bCount; i++) {
+          const bx = (w / bCount) * i;
+          const bw = w / bCount + 4;
+          const bh = 55 + ((i * 37) % 65);
+          ctx.fillRect(bx, h * 0.73 - bh, bw, bh);
         }
 
-        // Act 2 (18~36s): Hero walks toward UFO & Alien beams down
+        // 4. Asphalt Ground & Neon Street Reflection
+        const groundY = h * 0.73;
+        const groundGrad = ctx.createLinearGradient(0, groundY, 0, h);
+        groundGrad.addColorStop(0, '#0f172a');
+        groundGrad.addColorStop(1, '#04060b');
+        ctx.fillStyle = groundGrad;
+        ctx.fillRect(0, groundY, w, h - groundY);
+
+        // Road Line
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([18, 16]);
+        ctx.beginPath();
+        ctx.moveTo(0, groundY + (h - groundY) * 0.45);
+        ctx.lineTo(w, groundY + (h - groundY) * 0.45);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 5. Detailed High-Res Convenience Store (Left Side)
+        const storeW = Math.min(220, w * 0.36);
+        const storeH = Math.min(135, h * 0.22);
+        const storeX = Math.max(16, w * 0.06);
+        const storeY = groundY - storeH;
+        const isOccupiedVisual = sec >= 72;
+
+        // Ambient Store Light Pool on Ground
+        const storePool = ctx.createRadialGradient(
+          storeX + storeW * 0.5, groundY, 10,
+          storeX + storeW * 0.5, groundY, storeW * 0.95
+        );
+        storePool.addColorStop(0, isOccupiedVisual ? 'rgba(192,132,252,0.4)' : 'rgba(52,211,153,0.35)');
+        storePool.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = storePool;
+        ctx.fillRect(storeX - 40, groundY - 20, storeW + 80, 90);
+
+        // Store Body
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.roundRect(storeX, storeY, storeW, storeH, [8, 8, 0, 0]);
+        ctx.fill();
+
+        // Neon Roof Signboard
+        const signH = 26;
+        ctx.fillStyle = '#090d16';
+        ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, signH);
+
+        ctx.fillStyle = isOccupiedVisual ? '#a855f7' : '#10b981';
+        ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, 5);
+        ctx.fillStyle = isOccupiedVisual ? '#f43f5e' : '#f59e0b';
+        ctx.fillRect(storeX - 4, storeY + signH - 11, storeW + 8, 5);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 11px "Noto Sans KR", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(isOccupiedVisual ? 'ALIEN OUTPOST 24' : '24H 편의점', storeX + storeW * 0.5, storeY + 12);
+
+        // Bright Glass Windows
+        const winGrad = ctx.createLinearGradient(0, storeY + 26, 0, groundY - 6);
+        if (isOccupiedVisual) {
+          winGrad.addColorStop(0, '#581c87');
+          winGrad.addColorStop(1, '#3b0764');
+        } else {
+          winGrad.addColorStop(0, '#a7f3d0');
+          winGrad.addColorStop(1, '#059669');
+        }
+        ctx.fillStyle = winGrad;
+        ctx.fillRect(storeX + 12, storeY + 26, storeW - 24, storeH - 32);
+
+        // Window Frame Mullions
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(storeX + 12, storeY + 26, storeW - 24, storeH - 32);
+        ctx.beginPath();
+        ctx.moveTo(storeX + storeW * 0.5, storeY + 26);
+        ctx.lineTo(storeX + storeW * 0.5, groundY - 6);
+        ctx.stroke();
+
+        // 6. Compute UFO Coordinates & Motion
+        let ufoX = w * 0.72;
+        let ufoY = h * 0.2;
+        let ufoScale = 1.0;
+        let ufoTilt = 0;
+
+        if (sec < 12) {
+          const p = Math.min(1, sec / 11);
+          const ease = 1 - Math.pow(1 - p, 2.2);
+          ufoX = w * (0.85 - ease * 0.13);
+          ufoY = h * (0.1 + ease * 0.45);
+          ufoTilt = Math.sin(t * 14) * (1 - p) * 0.25;
+          // Fire trail particles during crash descent
+          if (Math.random() < 0.7) {
+            cinemaState.particles.push({
+              x: ufoX + (Math.random() - 0.5) * 30,
+              y: ufoY - 10,
+              vx: (Math.random() - 0.5) * 2,
+              vy: -Math.random() * 3 - 1,
+              size: Math.random() * 8 + 4,
+              color: Math.random() < 0.5 ? '#f97316' : '#facc15',
+              life: 1
+            });
+          }
+        } else if (sec < 72) {
+          ufoX = w * 0.72;
+          ufoY = groundY - 82 + Math.sin(t * 3) * 6;
+          ufoTilt = sec < 18 ? 0.12 : Math.sin(t * 2) * 0.04;
+        } else {
+          // Moves above the convenience store in Act 4
+          ufoX = storeX + storeW * 0.5;
+          ufoY = storeY - 62 + Math.sin(t * 3) * 5;
+          ufoScale = 1.15;
+        }
+
+        // Tractor Beam (Act 2 & Act 4)
+        if ((sec >= 22 && sec < 36) || sec >= 72) {
+          const beamTargetY = sec >= 72 ? groundY : groundY;
+          const beamTopW = 36 * ufoScale;
+          const beamBotW = sec >= 72 ? storeW * 0.85 : 95;
+          const beamGrad = ctx.createLinearGradient(0, ufoY, 0, beamTargetY);
+          beamGrad.addColorStop(0, 'rgba(216, 180, 254, 0.55)');
+          beamGrad.addColorStop(1, 'rgba(168, 85, 247, 0.05)');
+          ctx.fillStyle = beamGrad;
+          ctx.beginPath();
+          ctx.moveTo(ufoX - beamTopW, ufoY + 10);
+          ctx.lineTo(ufoX + beamTopW, ufoY + 10);
+          ctx.lineTo(ufoX + beamBotW, beamTargetY);
+          ctx.lineTo(ufoX - beamBotW, beamTargetY);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Draw Sleek Metallic UFO Saucer
+        drawSleekUFO(ctx, ufoX, ufoY, ufoScale, ufoTilt, t);
+
+        // Extra Fleet UFOs in Act 4
+        if (sec >= 72) {
+          drawSleekUFO(ctx, storeX - 25, storeY - 95 + Math.cos(t * 2.6) * 5, 0.55, -0.06, t + 1);
+          drawSleekUFO(ctx, storeX + storeW + 35, storeY - 90 + Math.sin(t * 2.8) * 5, 0.6, 0.06, t + 2);
+        }
+
+        // 7. Characters: Store Manager (Hero) & Alien Commander
+        let heroX = storeX + storeW + 28;
+        let heroY = groundY;
+        let heroKnocked = false;
+
         if (sec >= 18 && sec < 36) {
-          const walkProg = Math.min(1, (sec - 18) / 6);
-          ufo3D.heroGroup.position.x = -5.2 + walkProg * 3.2; // moves to -2.0
-          ufo3D.heroGroup.position.y = Math.abs(Math.sin(t * 8)) * (walkProg < 1 ? 0.18 : 0);
-
-          if (sec >= 24) {
-            ufo3D.tractorBeam.visible = true;
-            ufo3D.alienGroup.visible = true;
-            ufo3D.alienGroup.position.x = 3.2;
-            ufo3D.alienGroup.position.y = Math.sin(t * 3) * 0.12;
-          }
-          ufo3D.camera.position.set(0.5, 4.2, 12.5);
-          ufo3D.camera.lookAt(0.6, 2.0, 0.5);
+          const walkP = Math.min(1, (sec - 18) / 6);
+          heroX = (storeX + storeW + 28) + walkP * (w * 0.14);
+          heroY = groundY - Math.abs(Math.sin(t * 10)) * (walkP < 1 ? 5 : 0);
+        } else if (sec >= 36 && sec < 66) {
+          heroX = w * 0.34;
+        } else if (sec >= 66) {
+          heroX = w * 0.25;
+          heroKnocked = true;
         }
 
-        // Act 3 (36~66s): Epic 3D Laser Clash!
-        if (sec >= 36 && sec < 66) {
-          ufo3D.tractorBeam.visible = false;
-          ufo3D.alienGroup.visible = true;
-          ufo3D.heroGroup.position.set(-2.5, 0, 1.2);
-          ufo3D.alienGroup.position.set(3.2, 0, 1.2);
+        drawHeroCharacter(ctx, heroX, heroY, heroKnocked, sec >= 36 && sec < 66);
 
-          ufo3D.heroBeam.visible = true;
-          ufo3D.alienBeam.visible = true;
-          ufo3D.clashSphere.visible = true;
+        if (sec >= 24) {
+          const alienX = w * 0.68;
+          const alienY = groundY + Math.sin(t * 3.5) * 3;
+          drawAlienCommander(ctx, alienX, alienY, sec >= 36 && sec < 66, t);
 
-          // Clash point shifts based on who is winning
-          let clashX = 0.3;
-          if (sec >= 42 && sec < 48) clashX = 1.6; // Hero pushing alien back
-          if (sec >= 48 && sec < 60) clashX = -0.6; // Alien pushing hero back
-          if (sec >= 60) clashX = -1.8; // Alien final mega beam overwhelms hero
+          // 8. Act 3 (36~66s): High-Energy Laser Beam Clash!
+          if (sec >= 36 && sec < 66) {
+            let clashRatio = 0.5;
+            if (sec >= 42 && sec < 48) clashRatio = 0.68; // Hero pushes alien back
+            if (sec >= 48 && sec < 60) clashRatio = 0.36; // Alien pushes hero back
+            if (sec >= 60) clashRatio = 0.16; // Alien mega beam overwhelms
 
-          const heroStartX = -1.8;
-          const alienStartX = 2.6;
-          const hLen = Math.max(0.2, clashX - heroStartX);
-          const aLen = Math.max(0.2, alienStartX - clashX);
+            const startX = heroX + 26;
+            const endX = alienX - 26;
+            const beamY = groundY - 46;
+            const clashX = startX + (endX - startX) * clashRatio;
 
-          ufo3D.heroBeam.scale.set(1, hLen, 1);
-          ufo3D.heroBeam.position.set(heroStartX + hLen / 2, 1.75, 1.2);
+            // Hero Emerald Scanner Beam
+            drawEnergyBeam(ctx, startX, beamY, clashX, beamY, 8, '#10b981', '#a7f3d0');
 
-          ufo3D.alienBeam.scale.set(sec >= 60 ? 2.4 : 1.2, aLen, sec >= 60 ? 2.4 : 1.2);
-          ufo3D.alienBeam.position.set(clashX + aLen / 2, 1.75, 1.2);
+            // Alien Purple Plasma Beam
+            const alienWidth = sec >= 60 ? 22 : 11;
+            drawEnergyBeam(ctx, endX, beamY, clashX, beamY, alienWidth, '#c026d3', '#f5d0fe');
 
-          const pulse = 1 + Math.sin(t * 25) * 0.35;
-          ufo3D.clashSphere.position.set(clashX, 1.75, 1.2);
-          ufo3D.clashSphere.scale.set(pulse, pulse, pulse);
+            // Glowing Clash Core Orb
+            const coreR = (sec >= 60 ? 26 : 16) + Math.sin(t * 35) * 5;
+            const coreGrad = ctx.createRadialGradient(clashX, beamY, 2, clashX, beamY, coreR * 1.8);
+            coreGrad.addColorStop(0, '#ffffff');
+            coreGrad.addColorStop(0.35, '#fef08a');
+            coreGrad.addColorStop(0.7, '#d946ef');
+            coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = coreGrad;
+            ctx.beginPath();
+            ctx.arc(clashX, beamY, coreR * 1.8, 0, Math.PI * 2);
+            ctx.fill();
 
-          ufo3D.camera.position.set(Math.sin(t * 1.4) * 2.5, 4.5, 11.5);
-          ufo3D.camera.lookAt(0.3, 1.8, 1.2);
-        }
-
-        // Act 4 (66~90s): Hero Defeated & Store Occupied by Alien Fleet
-        if (sec >= 66) {
-          ufo3D.heroBeam.visible = false;
-          ufo3D.alienBeam.visible = false;
-          ufo3D.clashSphere.visible = false;
-
-          // Hero knocked down
-          ufo3D.heroGroup.position.set(-4.2, 0.35, 1.5);
-          ufo3D.heroGroup.rotation.z = Math.PI / 2;
-
-          if (sec >= 72) {
-            ufo3D.fleetGroup.visible = true;
-            ufo3D.ufoGroup.position.set(-8.5, 8.5 + Math.sin(t * 2) * 0.3, -3.5);
-            ufo3D.tractorBeam.visible = true;
-            ufo3D.tractorBeam.position.set(-8.5, 4.2, -3.5);
-            ufo3D.storeGlowLight.color.setHex(0xc084fc); // Store turns purple!
-            ufo3D.camera.position.set(-4.0, 6.5, 15.5);
-            ufo3D.camera.lookAt(-7.5, 3.2, -2.5);
+            // Clash Sparks
+            for (let i = 0; i < 3; i++) {
+              cinemaState.particles.push({
+                x: clashX,
+                y: beamY,
+                vx: (Math.random() - 0.5) * 9,
+                vy: (Math.random() - 0.5) * 9,
+                size: Math.random() * 3.5 + 1.5,
+                color: Math.random() < 0.5 ? '#fde047' : '#e879f9',
+                life: 1
+              });
+            }
           }
         }
 
-        // Camera Shake Effect
-        if (ufo3D.cameraShakePower > 0.01) {
-          ufo3D.camera.position.x += (Math.random() - 0.5) * ufo3D.cameraShakePower;
-          ufo3D.camera.position.y += (Math.random() - 0.5) * ufo3D.cameraShakePower;
-          ufo3D.cameraShakePower *= 0.92;
+        // 9. Update & Draw Particles
+        for (let i = cinemaState.particles.length - 1; i >= 0; i--) {
+          const p = cinemaState.particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 0.035;
+          if (p.life <= 0) {
+            cinemaState.particles.splice(i, 1);
+            continue;
+          }
+          ctx.globalAlpha = p.life;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+          ctx.fill();
         }
+        ctx.globalAlpha = 1;
 
-        ufo3D.renderer.render(ufo3D.scene, ufo3D.camera);
+        ctx.restore();
       };
 
-      animate3D();
+      renderFrame();
     }
 
-    function destroyUfo3DWorld() {
-      if (ufo3DAnimFrameId) {
-        cancelAnimationFrame(ufo3DAnimFrameId);
-        ufo3DAnimFrameId = null;
+    function drawSleekUFO(ctx, x, y, scale, tilt, t) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(tilt);
+      ctx.scale(scale, scale);
+
+      // Ambient Glow under UFO
+      const aura = ctx.createRadialGradient(0, 6, 8, 0, 6, 95);
+      aura.addColorStop(0, 'rgba(217, 70, 239, 0.45)');
+      aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = aura;
+      ctx.beginPath();
+      ctx.arc(0, 6, 95, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Glass Cockpit Dome
+      const domeGrad = ctx.createLinearGradient(0, -34, 0, 0);
+      domeGrad.addColorStop(0, '#f0abfc');
+      domeGrad.addColorStop(1, '#7e22ce');
+      ctx.fillStyle = domeGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, -8, 34, 24, 0, Math.PI, 0);
+      ctx.fill();
+
+      // Metallic Disc Hull
+      const hullGrad = ctx.createLinearGradient(-75, -10, 75, 16);
+      hullGrad.addColorStop(0, '#475569');
+      hullGrad.addColorStop(0.5, '#cbd5e1');
+      hullGrad.addColorStop(1, '#334155');
+      ctx.fillStyle = hullGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 2, 76, 17, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Lower Thruster Ring
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.ellipse(0, 12, 42, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Animated Neon Rim Lights
+      for (let i = -3; i <= 3; i++) {
+        const lx = i * 19;
+        const pulse = Math.sin(t * 10 + i) > 0;
+        ctx.fillStyle = pulse ? '#38bdf8' : '#f472b6';
+        ctx.beginPath();
+        ctx.arc(lx, 3, 3.6, 0, Math.PI * 2);
+        ctx.fill();
       }
-      if (ufo3D.renderer) {
-        ufo3D.renderer.dispose();
-        ufo3D.renderer = null;
-      }
-      const container = document.getElementById('ufo3dCanvasContainer');
-      if (container) container.innerHTML = '';
+
+      ctx.restore();
     }
 
+    function drawHeroCharacter(ctx, x, y, knocked, firing) {
+      ctx.save();
+      ctx.translate(x, y);
+      if (knocked) {
+        ctx.translate(0, -10);
+        ctx.rotate(-Math.PI / 2);
+      }
+
+      // Shadow
+      if (!knocked) {
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 18, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Legs
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(-10, -26, 8, 26);
+      ctx.fillRect(2, -26, 8, 26);
+
+      // Convenience Store Green Vest Torso
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.roundRect(-13, -56, 26, 32, 6);
+      ctx.fill();
+
+      // Head
+      ctx.fillStyle = '#fde68a';
+      ctx.beginPath();
+      ctx.arc(0, -68, 12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cap
+      ctx.fillStyle = '#059669';
+      ctx.beginPath();
+      ctx.arc(0, -71, 12, Math.PI, 0);
+      ctx.fill();
+      ctx.fillRect(0, -73, 17, 4);
+
+      // Barcode Scanner Weapon
+      ctx.fillStyle = firing ? '#fde047' : '#f59e0b';
+      ctx.fillRect(10, -48, 16, 7);
+
+      ctx.restore();
+    }
+
+    function drawAlienCommander(ctx, x, y, firing, t) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Purple Aura
+      const aura = ctx.createRadialGradient(0, -45, 5, 0, -45, 55);
+      aura.addColorStop(0, 'rgba(192, 38, 211, 0.45)');
+      aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = aura;
+      ctx.beginPath();
+      ctx.arc(0, -45, 55, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Armor Cloak
+      ctx.fillStyle = '#4c1d95';
+      ctx.beginPath();
+      ctx.moveTo(-18, -8);
+      ctx.lineTo(-12, -58);
+      ctx.lineTo(12, -58);
+      ctx.lineTo(18, -8);
+      ctx.closePath();
+      ctx.fill();
+
+      // Alien Head
+      ctx.fillStyle = '#a3e635';
+      ctx.beginPath();
+      ctx.ellipse(0, -72, 13, 17, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Glowing Crimson Eyes
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath();
+      ctx.ellipse(-5, -72, 3.5, 5, -0.25, 0, Math.PI * 2);
+      ctx.ellipse(5, -72, 3.5, 5, 0.25, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Extended Arm
+      ctx.strokeStyle = '#a3e635';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(-10, -48);
+      ctx.lineTo(-26, -46);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawEnergyBeam(ctx, x1, y1, x2, y2, thickness, outerColor, coreColor) {
+      ctx.save();
+      ctx.lineCap = 'round';
+
+      ctx.strokeStyle = outerColor;
+      ctx.lineWidth = thickness * 2.1;
+      ctx.globalAlpha = 0.45;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      ctx.strokeStyle = coreColor;
+      ctx.lineWidth = thickness * 0.85;
+      ctx.globalAlpha = 0.95;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function destroyCinemaCanvas() {
+      if (ufoCinemaAnimId) {
+        cancelAnimationFrame(ufoCinemaAnimId);
+        ufoCinemaAnimId = null;
+      }
+    }
+
+    // ---------------------------------------------------------
+    // UFO INVASION EVENT LISTENER & 1:30 STORY SCRIPT
+    // ---------------------------------------------------------
     function listenUfoInvasionEvent() {
       db.ref('globalEvent/ufoInvasion').on('value', snap => {
         const data = snap.val();
@@ -1540,17 +1607,28 @@
         posCard.classList.remove('from-purple-950/90', 'to-slate-950', 'border-purple-500/80');
         posCard.classList.add('from-slate-900', 'to-slate-900/90', 'border-slate-700/80');
       }
+      updateHeaderStats();
     }
 
-    // 1분 30초(90초) 3D 시네마틱 스토리 스크립트 (총 15개 장면, 각 6초씩 = 정확히 90초)
+    function updateLiveInvasionDdayBanner() {
+      const el = document.getElementById('liveInvasionDdayText');
+      if (!el) return;
+      const diff = Math.max(0, MAIN_INVASION_TARGET_MS - Date.now());
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+      const mins = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+      const secs = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+      el.textContent = days > 0 ? `D-${days} ${hours}:${mins}:${secs}` : `${hours}:${mins}:${secs}`;
+    }
+
     const UFO_STORY_BEATS = [
       {
         startSec: 0,
         act: 'ACT 1 · 미확인 비행물체 추락',
         speaker: '📡 기상 관측소 긴급 경보',
         ground: '편의점 상공 밤하늘',
-        text: '밤하늘을 가르는 거대한 보라빛 섬광! 정체불명의 초대형 3D UFO 원반이 편의점 앞 공터로 급강하하고 있습니다!',
-        shake: 0.45,
+        text: '밤하늘을 가르는 거대한 보라빛 섬광! 정체불명의 초대형 UFO 원반이 편의점 앞 공터로 급강하하고 있습니다!',
+        shake: 10,
         alarm: true
       },
       {
@@ -1559,7 +1637,7 @@
         speaker: '💥 대기권 돌파 & 불시착',
         ground: '편의점 앞 공터 (충돌 임박)',
         text: '쿠우우웅—!! 엄청난 충격파와 함께 UFO가 편의점 바로 앞 도로에 불시착했습니다! 지면이 강하게 흔들립니다!',
-        shake: 0.85,
+        shake: 22,
         alarm: true
       },
       {
@@ -1568,7 +1646,7 @@
         speaker: '🧑‍💼 나 (편의점 사장님)',
         ground: '연기가 피어오르는 추락 현장',
         text: '나: "방금 하늘에서 떨어진 거대한 원반은 뭐지...?! 편의점 간판까지 흔들렸어! 직접 나가서 확인해봐야겠어!"',
-        shake: 0.25,
+        shake: 6,
         alarm: false
       },
       {
@@ -1586,7 +1664,7 @@
         speaker: '👽 외계인 사령관 강림',
         ground: 'UFO 견인 광선 구역',
         text: '보라색 광선을 타고 외계인 사령관이 지상으로 내려왔습니다! 붉게 빛나는 눈으로 편의점을 노려봅니다.',
-        shake: 0.4,
+        shake: 10,
         alarm: true
       },
       {
@@ -1601,10 +1679,10 @@
       {
         startSec: 36,
         act: 'ACT 3 · 지구 & 편의점 사수 격돌!',
-        speaker: '⚔️ 3D 에너지 빔 전투 개시!',
+        speaker: '⚔️ 에너지 빔 전투 개시!',
         ground: '편의점 앞 방어선',
         text: '나: "내 피땀으로 키운 편의점과 지구는 절대 못 내줘!" 바코드 스캐너 광선을 최대로 개방해 맞섭니다!',
-        shake: 0.5,
+        shake: 12,
         alarm: false,
         battle: true,
         heroHp: 100,
@@ -1616,7 +1694,7 @@
         speaker: '🧑‍💼 나 (필살 반격!)',
         ground: '편의점 앞 방어선',
         text: '초고속 스캐너 레이저가 외계인 사령관을 밀어붙입니다! 외계인의 방어막에 균열이 가기 시작했습니다!',
-        shake: 0.45,
+        shake: 10,
         alarm: false,
         battle: true,
         heroHp: 90,
@@ -1628,7 +1706,7 @@
         speaker: '👽 외계인 사령관',
         ground: '편의점 앞 방어선',
         text: '외계인: "건방진 지구인 같으니! 우주 플라즈마 출력 개방!" 거대한 보라색 레이저가 역습을 가합니다!',
-        shake: 0.65,
+        shake: 15,
         alarm: true,
         battle: true,
         heroHp: 54,
@@ -1640,7 +1718,7 @@
         speaker: '🔥 최후의 총력전',
         ground: '편의점 정문 앞',
         text: '끝까지 버텨보지만 외계인의 압도적인 에너지 출력이 한계를 넘어섭니다! 방어선이 점점 밀리고 있습니다!',
-        shake: 0.6,
+        shake: 14,
         alarm: false,
         battle: true,
         heroHp: 25,
@@ -1652,7 +1730,7 @@
         speaker: '👽 외계인 사령관 (최종 일격)',
         ground: '편의점 정문 앞',
         text: '외계인: "이것으로 끝이다, 지구인!! 사라져라!" 초거대 플라즈마 광선이 정면으로 폭발합니다!',
-        shake: 0.95,
+        shake: 24,
         alarm: true,
         battle: true,
         heroHp: 12,
@@ -1664,7 +1742,7 @@
         speaker: '💥 방어 실패...',
         ground: '무너진 방어선',
         text: '콰광—!! 강력한 충격파에 휩쓸려 쓰러지고 말았습니다... 지구 방어전은 외계인의 승리로 끝나고 말았습니다.',
-        shake: 0.8,
+        shake: 18,
         alarm: true,
         battle: true,
         heroHp: 0,
@@ -1676,7 +1754,7 @@
         speaker: '🛸 외계인 함대 상공 포위',
         ground: '포위된 편의점 상공',
         text: '외계인 모선과 지원 함대가 편의점 지붕 위로 이동해 보라색 점령 광선을 내리꽂습니다!',
-        shake: 0.35,
+        shake: 8,
         alarm: true
       },
       {
@@ -1694,7 +1772,7 @@
         speaker: '⚠️ SYSTEM ALERT',
         ground: '외계인 점령 완료',
         text: '편의점 조명이 보라색 외계 에너지로 물들었습니다! 대침공 본편 업데이트 카운트다운이 시작됩니다!',
-        shake: 0.5,
+        shake: 12,
         alarm: true
       }
     ];
@@ -1713,7 +1791,7 @@
       mainStage.classList.remove('hidden');
       finaleStage.classList.add('hidden');
 
-      initUfo3DWorld();
+      initCinemaCanvas();
 
       setTimeout(() => {
         topBar.classList.remove('-translate-y-full');
@@ -1725,7 +1803,7 @@
       let lastBeatIndex = -1;
 
       const renderBeatAtSecond = sec => {
-        ufo3D.elapsedSec = sec;
+        cinemaState.elapsedSec = sec;
         const mins = String(Math.floor(sec / 60)).padStart(2, '0');
         const secs = String(sec % 60).padStart(2, '0');
         document.getElementById('ufoElapsedTimer').textContent = `${mins}:${secs} / 01:30`;
@@ -1759,7 +1837,7 @@
           }
 
           if (b.shake > 0) {
-            ufo3D.cameraShakePower = b.shake;
+            cinemaState.shakePower = b.shake;
           }
           if (b.alarm) {
             playUfoAlarm();
@@ -1776,7 +1854,7 @@
         if (elapsedSec < totalStorySec) {
           renderBeatAtSecond(elapsedSec);
         } else {
-          // 1분 30초 완료 -> 마지막 3초 카운트다운(2026-11-28 11:00 KST) 표시!
+          // 1분 30초 완료 -> 마지막 3초 카운트다운("대침공이 다가옵니다..") 표시!
           clearInterval(ufoCutsceneInterval);
           showThreeSecondCountdownFinale();
         }
@@ -1796,10 +1874,8 @@
       document.getElementById('ufoElapsedTimer').textContent = 'COUNTDOWN';
       playGiftFanfare();
 
-      const targetTimeMs = new Date('2026-11-28T11:00:00+09:00').getTime();
-
       const updateCountdownClock = () => {
-        const diff = Math.max(0, targetTimeMs - Date.now());
+        const diff = Math.max(0, MAIN_INVASION_TARGET_MS - Date.now());
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const mins = Math.floor((diff / (1000 * 60)) % 60);
@@ -1814,18 +1890,18 @@
       updateCountdownClock();
       ufoCountdownInterval = setInterval(updateCountdownClock, 250);
 
-      // 정확히 3초 동안 카운트다운 표시 후 종료 및 외계인 점령 상태 적용
+      // 정확히 3초 동안 카운트다운 표시 후 종료 및 외계인 점령 모드 전환
       setTimeout(() => {
         clearInterval(ufoCountdownInterval);
         topBar.classList.add('-translate-y-full');
         bottomBar.classList.add('translate-y-full');
 
         setTimeout(() => {
-          destroyUfo3DWorld();
+          destroyCinemaCanvas();
           overlay.classList.add('hidden');
           applyAlienOccupationTheme(true);
           initPOSCustomers();
-          showToast('👽 외계인이 편의점을 점령했습니다! 이제 외계인 손님들이 찾아옵니다!', 'warning');
+          showToast('👽 대침공이 다가옵니다.. 외계인 점령 모드가 시작되었습니다!', 'warning');
         }, 400);
       }, 3000);
     }
@@ -1990,6 +2066,7 @@
               ...gameState,
               ...data.state,
               money: mergedMoney,
+              energyCores: Number(data.state.energyCores || 0),
               branchCount: Math.max(1, Number(data.state.branchCount || data.branchCount || 1)),
               usedCoupons: data.state.usedCoupons || {},
               upgrades: { ...gameState.upgrades, ...(data.state.upgrades || {}) }
@@ -2238,14 +2315,16 @@
     }
 
     // ---------------------------------------------------------
-    // Interactive POS Register & Special Incidents
+    // Interactive POS Register & Alien Occupation Items
     // ---------------------------------------------------------
     function generateCustomerOrder(forceVip = false) {
+      const itemPool = isAlienOccupied ? ALIEN_STORE_ITEMS : STORE_ITEMS;
+
       if (forceVip) {
         const items = [];
         let total = 0;
         for (let i = 0; i < 4; i++) {
-          const pick = STORE_ITEMS[Math.floor(Math.random() * STORE_ITEMS.length)];
+          const pick = itemPool[Math.floor(Math.random() * itemPool.length)];
           items.push({ uid: i, id: pick.id, name: pick.name, emoji: pick.emoji, price: pick.price, scanned: false });
           total += pick.price;
         }
@@ -2281,7 +2360,7 @@
       let total = 0;
 
       for (let i = 0; i < itemCount; i++) {
-        const pick = STORE_ITEMS[Math.floor(Math.random() * STORE_ITEMS.length)];
+        const pick = itemPool[Math.floor(Math.random() * itemPool.length)];
         items.push({
           uid: i,
           id: pick.id,
@@ -2299,7 +2378,8 @@
         if (total <= 5000) cashGiven = 5000;
         else if (total <= 10000) cashGiven = 10000;
         else if (total <= 15000) cashGiven = 15000;
-        else cashGiven = 20000;
+        else if (total <= 20000) cashGiven = 20000;
+        else cashGiven = 30000;
       }
 
       return {
@@ -2415,9 +2495,14 @@
         gameState.satisfaction = Math.min(100, gameState.satisfaction + 2);
         gameState.cleanliness = Math.max(20, gameState.cleanliness - 2);
 
+        if (isAlienOccupied) {
+          gameState.energyCores = (gameState.energyCores || 0) + 1;
+        }
+
         playRegisterComplete();
         if (event && event.clientX) {
-          spawnFloatingText(event.clientX, event.clientY, `정산완료 +${formatKRW(finalEarned)}!`, '#fbbf24');
+          const coreNote = isAlienOccupied ? ' & 🔋+1' : '';
+          spawnFloatingText(event.clientX, event.clientY, `정산완료 +${formatKRW(finalEarned)}${coreNote}!`, '#fbbf24');
         }
         if (currentCustomer.isVip) {
           showToast(`👑 VIP 재벌 손님 10배 정산! +${formatKRW(finalEarned)}`, 'warning');
@@ -2506,6 +2591,7 @@
       document.getElementById('headerBranchBadge').textContent = `${gameState.branchCount}호점`;
       document.getElementById('headerDayBadge').textContent = `D-${gameState.day}`;
       document.getElementById('cleanlinessText').textContent = `${gameState.cleanliness}%`;
+      document.getElementById('energyCoreCountText').textContent = (gameState.energyCores || 0).toLocaleString();
 
       const passive = getPassiveIncomePerSec();
       document.getElementById('passiveIncomeLabel').textContent = `알바 자동매출: +${formatKRW(passive)}/초`;
@@ -2727,6 +2813,10 @@
         const now = Date.now();
         const dt = (now - lastTick) / 1000;
         lastTick = now;
+
+        if (isAlienOccupied) {
+          updateLiveInvasionDdayBanner();
+        }
 
         const feverBanner = document.getElementById('globalFeverBanner');
         if (now < serverFeverUntil) {
@@ -3127,7 +3217,7 @@
           createdAt: Date.now()
         });
         closeAdminModal();
-        showToast('🛸 전 접속자 화면에 3D UFO 침공 컷씬(1분 33초)이 발동되었습니다!', 'warning');
+        showToast('🛸 전 접속자 화면에 60fps 고화질 UFO 침공 컷씬(1분 33초)이 발동되었습니다!', 'warning');
       } catch (err) {
         alert('UFO 컷씬 발동 오류: ' + (err.message || err));
       }
@@ -3312,17 +3402,6 @@
         </div>
       `).join('');
     }
-
-    window.addEventListener('resize', () => {
-      if (ufo3D.renderer && ufo3D.camera) {
-        const container = document.getElementById('ufo3dCanvasContainer');
-        const w = container.clientWidth || window.innerWidth;
-        const h = container.clientHeight || window.innerHeight;
-        ufo3D.camera.aspect = w / h;
-        ufo3D.camera.updateProjectionMatrix();
-        ufo3D.renderer.setSize(w, h);
-      }
-    });
 
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
