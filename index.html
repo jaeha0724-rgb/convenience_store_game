@@ -3549,3 +3549,172 @@
   </script>
 </body>
 </html>
+    function triggerCustomFever() {
+      const mult = parseFloat(document.getElementById('adminFeverMultInput').value) || 2;
+      const min = parseInt(document.getElementById('adminFeverMinInput').value) || 5;
+      triggerServerFever(min, mult);
+    }
+
+    function stopServerFever() {
+      db.ref('serverState/fever').remove();
+      showToast('피버 타임이 종료되었습니다.');
+    }
+
+    async function loadAdminUserList() {
+      try {
+        const snap = await db.ref('users').once('value');
+        const usersObj = snap.val() || {};
+        const users = Object.entries(usersObj).map(([key, val]) => ({ key, ...val }));
+
+        document.getElementById('adminTotalUsers').textContent = `${users.length}명`;
+
+        const select = document.getElementById('adminUserSelect');
+        select.innerHTML = '<option value="">-- 가입 유저 선택 --</option>' +
+          users.map(u => `<option value="${escapeHtml(u.nickname)}">${escapeHtml(u.nickname)} (${u.state?.branchCount || 1}호점 · ${formatMoney(u.state?.money || 0)})</option>`).join('');
+
+        const statusList = document.getElementById('adminUserStatusList');
+        statusList.innerHTML = users.map(u => `
+          <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700/70">
+            <span class="font-bold ${u.banned ? 'text-rose-400 line-through' : 'text-slate-200'}">
+              ${escapeHtml(u.nickname)} (${u.state?.branchCount || 1}호점)
+            </span>
+            <span class="text-[10px] font-black ${u.banned ? 'text-rose-400' : 'text-emerald-400'}">
+              ${u.banned ? '🚫 차단됨' : '정상'}
+            </span>
+          </div>
+        `).join('');
+      } catch (e) {}
+    }
+
+    function syncSelectedUserToInput() {
+      const val = document.getElementById('adminUserSelect').value;
+      if (val) {
+        document.getElementById('adminTargetNickname').value = val;
+        document.getElementById('adminBanTargetInput').value = val;
+      }
+    }
+
+    async function adminSetUserBan(isBan) {
+      const nick = document.getElementById('adminBanTargetInput').value.trim();
+      const reason = document.getElementById('adminBanReasonInput').value.trim();
+      if (!nick) {
+        showToast('❌ 대상 닉네임을 입력해주세요.');
+        return;
+      }
+      const safeKey = encodeURIComponent(nick).replace(/\./g, '%2E');
+      const snap = await db.ref(`users/${safeKey}`).once('value');
+      if (!snap.exists()) {
+        showToast('❌ 존재하지 않는 닉네임입니다.');
+        return;
+      }
+      await db.ref(`users/${safeKey}`).update({
+        banned: isBan,
+        banReason: isBan ? (reason || '운영 정책 위반으로 접근이 제한되었습니다.') : ''
+      });
+      showToast(isBan ? `🚫 [${nick}] 유저를 즉시 차단했습니다.` : `✅ [${nick}] 유저의 차단을 해제했습니다.`);
+      loadAdminUserList();
+    }
+
+    function setAdminAmountPreset(amt) {
+      document.getElementById('adminMoneyAmount').value = amt;
+    }
+
+    async function adminModifyUserMoney(mode) {
+      const nick = document.getElementById('adminTargetNickname').value.trim();
+      const amt = Number(document.getElementById('adminMoneyAmount').value) || 0;
+      if (!nick) {
+        showToast('❌ 대상 닉네임을 선택하거나 입력해주세요.');
+        return;
+      }
+      const safeKey = encodeURIComponent(nick).replace(/\./g, '%2E');
+      const snap = await db.ref(`users/${safeKey}`).once('value');
+      if (!snap.exists()) {
+        showToast('❌ 존재하지 않는 닉네임입니다.');
+        return;
+      }
+      const userData = snap.val();
+      const currentMoney = (userData.state && userData.state.money) || 0;
+      const updatedMoney = mode === 'set' ? amt : currentMoney + amt;
+
+      await db.ref(`users/${safeKey}`).update({
+        'state/money': updatedMoney,
+        adminGrantMoney: amt,
+        adminGrantMode: mode,
+        adminGrantId: 'grant_' + Date.now()
+      });
+      showToast(`💸 [${nick}] 유저 자금 반영 완료! (${formatMoney(updatedMoney)})`);
+      loadAdminUserList();
+    }
+
+    async function createAdminCoupon() {
+      const code = document.getElementById('adminNewCouponCode').value.trim().toLowerCase();
+      const reward = Number(document.getElementById('adminNewCouponReward').value) || 100000;
+      if (!code) {
+        showToast('❌ 쿠폰 코드를 입력해주세요.');
+        return;
+      }
+      await db.ref(`coupons/${encodeURIComponent(code)}`).set({
+        active: true,
+        reward,
+        createdAt: Date.now()
+      });
+      document.getElementById('adminNewCouponCode').value = '';
+      showToast(`🎁 새 쿠폰 [${code}] (${formatMoney(reward)}) 발행 완료!`);
+    }
+
+    function createAdminPoll() {
+      const question = document.getElementById('adminPollQuestion').value.trim();
+      const opt1 = document.getElementById('adminPollOpt1').value.trim();
+      const opt2 = document.getElementById('adminPollOpt2').value.trim();
+      if (!question || !opt1 || !opt2) {
+        showToast('❌ 투표 질문과 선택지 2개를 모두 입력해주세요.');
+        return;
+      }
+      db.ref('serverState/poll').set({
+        active: true,
+        question,
+        opt1,
+        opt2,
+        votes1: 0,
+        votes2: 0,
+        voters: {}
+      });
+      showToast('🗳️ 실시간 투표가 시작되었습니다!');
+    }
+
+    function closeAdminPoll() {
+      db.ref('serverState/poll/active').set(false);
+      showToast('투표를 종료했습니다.');
+    }
+
+    async function loadAdminFeedbacks() {
+      const list = document.getElementById('adminFeedbackList');
+      const snap = await db.ref('feedbacks').limitToLast(20).once('value');
+      const val = snap.val();
+      if (!val) {
+        list.innerHTML = '<p class="text-slate-400 text-[11px]">제보 내역이 없습니다.</p>';
+        return;
+      }
+      const items = Object.values(val).reverse();
+      list.innerHTML = items.map(f => `
+        <div class="p-2 rounded-xl bg-slate-900 border border-slate-700">
+          <div class="flex justify-between text-[10px] text-amber-300 font-bold">
+            <span>${escapeHtml(f.nickname)}</span>
+            <span class="text-slate-400">${new Date(f.ts).toLocaleString('ko-KR')}</span>
+          </div>
+          <p class="text-slate-200 mt-0.5 break-all">${escapeHtml(f.text)}</p>
+        </div>
+      `).join('');
+    }
+
+    // ---------------------------------------------------------
+    // INITIALIZE ON PAGE LOAD
+    // ---------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      checkLocalRecovery();
+      initServerListeners();
+    });
+  </script>
+</body>
+</html>
