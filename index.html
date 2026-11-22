@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" class="dark">
+<html lang="ko" class="dark max-w-full overflow-x-hidden">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -33,11 +33,13 @@
   
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;900&display=swap');
-    body {
+    html, body {
       font-family: 'Pretendard', sans-serif;
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
+      max-width: 100vw;
+      overflow-x: hidden;
     }
     
     /* 화면 애니메이션 및 이펙트 */
@@ -59,6 +61,24 @@
       z-index: 99;
       text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }
+
+    @keyframes surpriseShockwave {
+      0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; border-width: 8px; }
+      100% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; border-width: 1px; }
+    }
+    .surprise-shockwave {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 60vw;
+      height: 60vw;
+      max-width: 500px;
+      max-height: 500px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 180;
+      animation: surpriseShockwave 0.85s ease-out forwards;
+    }
     
     @keyframes moneyFall {
       0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
@@ -72,6 +92,20 @@
       font-size: 2rem;
       animation: moneyFall 4s linear forwards;
     }
+
+    @keyframes particleBurst {
+      0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+      100% { transform: translate(var(--tw-tx), var(--tw-ty)) scale(1.4); opacity: 0; }
+    }
+    .surprise-particle {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      pointer-events: none;
+      z-index: 185;
+      font-size: 2.2rem;
+      animation: particleBurst 1.1s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
     
     /* 행운의 무중력 아이템 부유 */
     @keyframes zeroGFloat {
@@ -80,20 +114,6 @@
     }
     .zero-gravity-item {
       animation: zeroGFloat 2.5s ease-in-out infinite;
-    }
-
-    /* 크리스마스 눈송이 */
-    @keyframes snowFall {
-      0% { transform: translateY(-10px) translateX(0); opacity: 0.9; }
-      100% { transform: translateY(100vh) translateX(25px); opacity: 0.2; }
-    }
-    .snow-flake {
-      position: fixed;
-      top: -20px;
-      z-index: 45;
-      pointer-events: none;
-      color: #ffffff;
-      animation: snowFall linear infinite;
     }
 
     /* 관리자 효과 필터 클래스 */
@@ -116,14 +136,14 @@
   </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col max-w-full overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
 
   <!-- ========================================== -->
   <!-- 1. 최상단 실시간 상태 및 상단 알림 배너들 -->
   <!-- ========================================== -->
   <div id="topBannerArea" class="w-full z-40 flex flex-col gap-1 pointer-events-auto">
     <!-- 확성기 방송 배너 -->
-    <div id="megaphoneBanner" class="hidden bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 p-2.5 shadow-lg border-b border-amber-300/40 text-center animate-bounce">
+    <div id="megaphoneBanner" class="hidden bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 p-2 shadow-lg border-b border-amber-300/40 text-center animate-bounce">
       <div class="flex items-center justify-center gap-2 max-w-4xl mx-auto text-xs md:text-sm font-black text-white">
         <span class="text-base">📣</span>
         <span class="px-2 py-0.5 rounded-full bg-black/40 text-amber-200 text-[10px]">전 서버 확성기</span>
@@ -157,87 +177,89 @@
     </div>
   </div>
 
-  <!-- 메인 헤더 (자금, 재화, 지점, 우편함, 관리자) -->
-  <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30 px-3 py-2.5">
-    <div class="max-w-4xl mx-auto flex items-center justify-between gap-2">
-      <!-- 매장 정보 & 프로필 -->
-      <div class="flex items-center gap-2 min-w-0">
-        <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 font-black text-base">
-          🏬
+  <!-- 모바일 2단 반응형 헤더 (아이콘 밀림 및 가로 스크롤 완전 예방) -->
+  <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30 px-3 py-2">
+    <div class="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+      
+      <!-- [1단 - 모바일] 프로필 정보 및 우측 아이콘 버튼 3종 -->
+      <div class="flex items-center justify-between gap-2 w-full md:w-auto">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-black text-sm shrink-0">🏬</div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1">
+              <span id="headerNickname" class="font-black text-white truncate max-w-[100px] md:max-w-[140px]">사장님</span>
+              <span id="headerBranchBadge" class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-black border border-emerald-500/30 shrink-0">1호점</span>
+              <span id="headerTitleMedal" class="hidden px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-black border border-purple-500/30 shrink-0">칭호</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono mt-0.5">
+              <span class="text-amber-300 font-bold shrink-0" id="passiveIncomeLabel">⚡ 0원/초</span>
+              <span class="text-slate-600">|</span>
+              <span id="headerSeasonBadge" class="text-sky-300 font-bold shrink-0">S1</span>
+            </div>
+          </div>
         </div>
-        <div class="min-w-0">
-          <div class="flex items-center gap-1.5">
-            <span id="headerNickname" class="font-black text-xs md:text-sm text-white truncate">사장님</span>
-            <span id="headerBranchBadge" class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-black border border-emerald-500/30">1호점</span>
-            <span id="headerTitleMedal" class="hidden px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 text-[10px] font-black border border-purple-500/30">칭호</span>
-          </div>
-          <div class="flex items-center gap-2 text-[11px] text-slate-400 font-mono mt-0.5">
-            <span class="text-amber-300 font-bold" id="passiveIncomeLabel">자동매출: 0원/초</span>
-            <span class="text-slate-500">|</span>
-            <span id="headerSeasonBadge" class="text-sky-300 font-bold">S1</span>
-          </div>
+
+        <!-- 상단 우측 아이콘 버튼 (모바일에서도 절대 밀리지 않음) -->
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="toggleSound()" id="soundToggleBtn" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center justify-center text-xs shrink-0" title="효과음 On/Off">
+            <span id="soundIconSymbol">🔊</span>
+          </button>
+
+          <button onclick="openMailboxModal()" class="relative w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center justify-center text-xs shrink-0" title="우편함">
+            <span>✉️</span>
+            <span id="mailboxUnreadBadge" class="hidden absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">0</span>
+          </button>
+
+          <button onclick="openAdminModal()" class="w-8 h-8 rounded-xl bg-purple-900/40 hover:bg-purple-900/70 text-purple-300 border border-purple-500/40 flex items-center justify-center text-xs shrink-0" title="관리자 패널">
+            <span>⚙️</span>
+          </button>
         </div>
       </div>
 
-      <!-- 핵심 재화 (자금 & 코어) & 상단 버튼들 -->
-      <div class="flex items-center gap-2 shrink-0">
-        <!-- 자금 표시 -->
-        <div class="bg-slate-950 border border-slate-800 rounded-2xl px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+      <!-- [2단 - 모바일] 보유 자금 & 특수 재화 코어 배지 -->
+      <div class="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+        <!-- 자금 -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1 flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-1.5 shadow-inner">
           <span class="text-amber-400 text-xs">💸</span>
-          <div class="text-right">
-            <div id="statMoney" class="text-xs md:text-sm font-black text-emerald-400 font-mono leading-none">15,000원</div>
-            <div id="statMultiplier" class="text-[9px] text-slate-400 font-bold leading-none mt-0.5">x1.00</div>
+          <div class="text-right leading-none">
+            <div id="statMoney" class="text-xs md:text-sm font-black text-emerald-400 font-mono">15,000원</div>
+            <div id="statMultiplier" class="text-[9px] text-slate-400 font-bold mt-0.5">x1.00</div>
           </div>
         </div>
 
-        <!-- 이벤트 특수 재화 (코어/칩/선물) -->
-        <div class="bg-slate-950 border border-purple-900/60 rounded-2xl px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+        <!-- 특수 재화 -->
+        <div class="bg-slate-950 border border-purple-900/60 rounded-xl px-2.5 py-1 flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-1.5 shadow-inner">
           <span id="statTokenIcon" class="text-purple-400 text-xs">🔋</span>
-          <div>
-            <div id="statTokenLabel" class="text-[9px] text-purple-300 font-bold leading-none">🔋 코어</div>
-            <div id="statEnergyCores" class="text-xs md:text-sm font-black text-purple-300 font-mono leading-none mt-0.5">0개</div>
+          <div class="text-right leading-none">
+            <div id="statTokenLabel" class="text-[9px] text-purple-300 font-bold">코어</div>
+            <div id="statEnergyCores" class="text-xs md:text-sm font-black text-purple-300 font-mono">0개</div>
           </div>
         </div>
-
-        <!-- 효과음 토글 버튼 -->
-        <button onclick="toggleSound()" id="soundToggleBtn" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="효과음 On/Off">
-          <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
-        </button>
-
-        <!-- 개인 우편함 버튼 -->
-        <button onclick="openMailboxModal()" class="relative p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="우편함">
-          <i data-lucide="mail" class="w-3.5 h-3.5"></i>
-          <span id="mailboxUnreadBadge" class="hidden absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">0</span>
-        </button>
-
-        <!-- 관리자 패널 버튼 -->
-        <button onclick="openAdminModal()" class="p-2 rounded-xl bg-purple-900/40 hover:bg-purple-900/70 text-purple-300 border border-purple-500/40 transition" title="관리자 패널">
-          <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-        </button>
       </div>
+
     </div>
   </header>
 
   <!-- ========================================== -->
-  <!-- 2. 네비게이션 탭 (메인 POS / 업그레이드 / 랭킹 / 커뮤니티) -->
+  <!-- 2. 네비게이션 탭 -->
   <!-- ========================================== -->
   <div class="max-w-4xl mx-auto w-full px-3 pt-3">
     <div class="grid grid-cols-4 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
       <button onclick="switchTab('store')" id="nav-store" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition">
-        <i data-lucide="shopping-bag" class="w-4 h-4 mb-0.5"></i>
-        <span class="text-[11px] font-black">POS 계산대</span>
+        <span class="text-sm">🏪</span>
+        <span class="text-[11px] font-black mt-0.5 whitespace-nowrap">POS 계산대</span>
       </button>
       <button onclick="switchTab('upgrade')" id="nav-upgrade" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition">
-        <i data-lucide="trending-up" class="w-4 h-4 mb-0.5"></i>
-        <span class="text-[11px] font-black">업그레이드</span>
+        <span class="text-sm">📈</span>
+        <span class="text-[11px] font-black mt-0.5 whitespace-nowrap">업그레이드</span>
       </button>
       <button onclick="switchTab('ranking')" id="nav-ranking" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition">
-        <i data-lucide="trophy" class="w-4 h-4 mb-0.5"></i>
-        <span class="text-[11px] font-black">명예의 전당</span>
+        <span class="text-sm">🏆</span>
+        <span class="text-[11px] font-black mt-0.5 whitespace-nowrap">명예의 전당</span>
       </button>
       <button onclick="switchTab('community')" id="nav-community" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition">
-        <i data-lucide="message-square" class="w-4 h-4 mb-0.5"></i>
-        <span class="text-[11px] font-black">광장 & 이벤트</span>
+        <span class="text-sm">💬</span>
+        <span class="text-[11px] font-black mt-0.5 whitespace-nowrap">광장 & 이벤트</span>
       </button>
     </div>
   </div>
@@ -249,7 +271,7 @@
     
     <!-- A. TAB 1: POS 계산대 & 매장 현황 -->
     <div id="tab-store" class="space-y-3">
-      <!-- 실시간 레이드 / 보스전 HUD (이벤트 시 노출) -->
+      <!-- 실시간 레이드 / 보스전 HUD -->
       <div id="mothershipRaidHud" class="hidden bg-purple-950/80 border-2 border-purple-500/60 rounded-3xl p-3.5 shadow-xl space-y-2">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
@@ -266,7 +288,7 @@
         <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-purple-500/40 p-0.5">
           <div id="bossHpFill" class="h-full bg-gradient-to-r from-purple-500 via-rose-500 to-amber-400 rounded-full transition-all duration-300" style="width: 100%"></div>
         </div>
-        <!-- 사이버 방화벽 암호 해독 입력창 (사이버 보스전 전용) -->
+        <!-- 사이버 방화벽 암호 해독 입력창 -->
         <div id="cyberFirewallBox" class="hidden bg-slate-900/90 border border-cyan-500/50 rounded-2xl p-2 flex items-center justify-between gap-2">
           <span class="text-[11px] font-bold text-cyan-300">🔐 암호 해독: <span id="cyberCodeDisplay" class="font-mono text-amber-300 font-black">1234</span></span>
           <div class="flex items-center gap-1">
@@ -284,82 +306,54 @@
         </div>
       </div>
 
-      <!-- 크리스마스 트리 점등 이벤트 HUD (크리스마스 이벤트 시 노출) -->
-      <div id="xmasTreeHud" class="hidden bg-emerald-950/80 border-2 border-emerald-500/60 rounded-3xl p-3.5 shadow-xl space-y-2">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="text-2xl animate-bounce">🎄</span>
-            <div>
-              <div class="text-xs font-black text-emerald-200">전 서버 협동! 초대형 크리스마스 트리 점등</div>
-              <div id="xmasTreeStageBadge" class="text-[10px] text-amber-300 font-bold">1단계 / 5단계</div>
-            </div>
-          </div>
-          <div id="xmasTreeProgressLabel" class="text-xs font-black text-amber-300 font-mono">0 / 500 점등 포인트</div>
-        </div>
-        <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-emerald-500/40 p-0.5">
-          <div id="xmasTreeProgressFill" class="h-full bg-gradient-to-r from-emerald-500 to-amber-300 rounded-full transition-all duration-300" style="width: 0%"></div>
-        </div>
-        <div class="flex items-center gap-2 pt-1">
-          <button onclick="donateToXmasTree('gift', event)" class="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs active:scale-95 transition">
-            🎁 선물 기부 (+10pt)
-          </button>
-          <button onclick="donateToXmasTree('money', event)" class="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs active:scale-95 transition">
-            💸 10,000원 기부 (+5pt)
-          </button>
-        </div>
-      </div>
-
-      <!-- 매장 상태 상단 요약 (청결도, 콤보, 손님 대기열) -->
+      <!-- 매장 상태 상단 요약 -->
       <div class="grid grid-cols-3 gap-2">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between">
           <div>
-            <div class="text-[10px] text-slate-400 font-bold">매장 청결도</div>
+            <div class="text-[10px] text-slate-400 font-bold whitespace-nowrap">매장 청결도</div>
             <div id="cleanlinessText" class="text-sm font-black text-sky-400 font-mono">100%</div>
           </div>
-          <button onclick="cleanStoreFloor(event)" class="px-2.5 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[11px] font-black active:scale-95">
+          <button onclick="cleanStoreFloor(event)" class="px-2 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[11px] font-black active:scale-95 whitespace-nowrap">
             🧹 청소
           </button>
         </div>
 
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2.5 text-center">
-          <div class="text-[10px] text-slate-400 font-bold">연속 정산 콤보</div>
+          <div class="text-[10px] text-slate-400 font-bold whitespace-nowrap">연속 정산 콤보</div>
           <div id="posComboText" class="text-sm font-black text-amber-400 font-mono">0콤보</div>
         </div>
 
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2.5 text-right">
-          <div class="text-[10px] text-slate-400 font-bold">매장 등급/일차</div>
+          <div class="text-[10px] text-slate-400 font-bold whitespace-nowrap">매장 등급/일차</div>
           <div id="storeGradeBadge" class="text-xs font-black text-emerald-400 truncate">1호점 · Day 1</div>
         </div>
       </div>
 
-      <!-- 손님 대기 줄 (Waiting Queue) -->
+      <!-- 손님 대기 줄 -->
       <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between gap-2 overflow-x-auto">
         <div class="flex items-center gap-1.5 shrink-0">
-          <span class="text-xs font-black text-slate-300">👥 손님 대기줄:</span>
-          <span id="waitingLineCount" class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 text-[10px] font-bold font-mono">0명 대기중</span>
+          <span class="text-xs font-black text-slate-300 whitespace-nowrap">👥 손님 대기줄:</span>
+          <span id="waitingLineCount" class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 text-[10px] font-bold font-mono whitespace-nowrap">0명 대기중</span>
         </div>
-        <div id="waitingLineBar" class="flex items-center gap-1.5 min-w-0 overflow-x-auto">
-          <!-- 손님 큐 아이콘들이 동적으로 삽입됨 -->
-        </div>
+        <div id="waitingLineBar" class="flex items-center gap-1.5 min-w-0 overflow-x-auto"></div>
       </div>
 
       <!-- POS 계산대 메인 작업 스테이지 -->
       <div id="posMainStage" class="bg-slate-900 border-2 border-slate-800 rounded-3xl p-4 space-y-4 shadow-2xl relative overflow-hidden">
-        <!-- 현재 결제 손님 Header -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div class="flex items-center gap-2">
-            <span id="posCustomerEmoji" class="text-3xl animate-bounce">🧑‍🎓</span>
-            <div>
-              <div id="posCustomerTitle" class="text-sm font-black text-white">야자 끝난 고등학생</div>
-              <div id="posCustomerDialogue" class="text-xs text-slate-400 mt-0.5 font-bold">"출출해서 삼각김밥 사러 왔어요!"</div>
+          <div class="flex items-center gap-2 min-w-0">
+            <span id="posCustomerEmoji" class="text-3xl animate-bounce shrink-0">🧑‍🎓</span>
+            <div class="min-w-0">
+              <div id="posCustomerTitle" class="text-sm font-black text-white truncate">야자 끝난 고등학생</div>
+              <div id="posCustomerDialogue" class="text-xs text-slate-400 mt-0.5 font-bold truncate">"출출해서 삼각김밥 사러 왔어요!"</div>
             </div>
           </div>
-          <span id="posStepBadge" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black">
+          <span id="posStepBadge" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black shrink-0 whitespace-nowrap">
             STEP 1 · 바코드 스캔
           </span>
         </div>
 
-        <!-- 돌발 상황 스테이지 (미성년자 신분증 확인 등) -->
+        <!-- 돌발 상황 (미성년자 신분증 확인) -->
         <div id="posSpecialIncidentArea" class="hidden bg-rose-950/60 border border-rose-500/50 rounded-2xl p-4 text-center space-y-3">
           <div class="text-2xl">🆔⚠️</div>
           <div class="text-xs font-black text-rose-200">손님이 주류/담배를 구매하려고 합니다! 신분증을 확인하세요.</div>
@@ -373,22 +367,20 @@
           </div>
         </div>
 
-        <!-- STEP 1: 바코드 터치 스캔 영역 -->
+        <!-- STEP 1: 바코드 스캔 -->
         <div id="posStep1Area" class="space-y-3">
           <div class="flex items-center justify-between text-xs">
             <span class="text-slate-400 font-bold">장바구니 상품 (터치해서 스캔):</span>
             <span id="scanProgressText" class="font-mono text-emerald-400 font-black">0 / 0개</span>
           </div>
-          <div id="posBasketGrid" class="grid grid-cols-2 md:grid-cols-3 gap-2.5">
-            <!-- 상품 버튼들이 동적으로 생성됨 -->
-          </div>
+          <div id="posBasketGrid" class="grid grid-cols-2 md:grid-cols-3 gap-2.5"></div>
           <div class="flex items-center justify-between bg-slate-950 p-3 rounded-2xl border border-slate-800">
             <span class="text-xs text-slate-400 font-bold">스캔 합계 금액</span>
             <span id="posScannedTotal" class="text-base font-black text-amber-400 font-mono">0원</span>
           </div>
         </div>
 
-        <!-- STEP 2: 카드 결제 진행 영역 -->
+        <!-- STEP 2: 카드 결제 -->
         <div id="posStep2CardArea" class="hidden bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-3">
           <div class="text-xs text-slate-400 font-bold">손님이 IC 신용카드를 제출했습니다.</div>
           <div id="cardPayAmountText" class="text-xl font-black text-emerald-400 font-mono">0원</div>
@@ -397,7 +389,7 @@
           </button>
         </div>
 
-        <!-- STEP 2: 현금 결제 및 거스름돈 정산 영역 -->
+        <!-- STEP 2: 현금 거스름돈 keypad (+100원/+500원 포함 5종) -->
         <div id="posStep2CashArea" class="hidden bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
           <div class="flex items-center justify-between text-xs border-b border-slate-800 pb-2">
             <span class="text-slate-400 font-bold">받은 현금: <span id="cashGivenText" class="text-amber-300 font-black font-mono">0원</span></span>
@@ -407,17 +399,15 @@
             <div class="text-[11px] text-slate-400 font-bold">준비한 거스름돈</div>
             <div id="cashPreparedText" class="text-2xl font-black text-amber-400 font-mono mt-0.5">0원</div>
           </div>
-          <div class="grid grid-cols-3 gap-2">
-            <button onclick="addChangeCash(1000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-black text-xs border border-slate-700 active:scale-95">
-              +1,000원
-            </button>
-            <button onclick="addChangeCash(5000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-black text-xs border border-slate-700 active:scale-95">
-              +5,000원
-            </button>
-            <button onclick="addChangeCash(10000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 font-black text-xs border border-slate-700 active:scale-95">
-              +10,000원
-            </button>
+          
+          <div class="grid grid-cols-5 gap-1.5">
+            <button onclick="addChangeCash(100)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-black text-[11px] border border-slate-700 active:scale-95">+100원</button>
+            <button onclick="addChangeCash(500)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-black text-[11px] border border-slate-700 active:scale-95">+500원</button>
+            <button onclick="addChangeCash(1000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-black text-[11px] border border-slate-700 active:scale-95">+1,000원</button>
+            <button onclick="addChangeCash(5000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-black text-[11px] border border-slate-700 active:scale-95">+5,000원</button>
+            <button onclick="addChangeCash(10000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 font-black text-[11px] border border-slate-700 active:scale-95">+10,000원</button>
           </div>
+
           <div class="flex items-center gap-2">
             <button onclick="resetChangeCash()" class="w-1/3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold text-xs">
               초기화
@@ -428,7 +418,7 @@
           </div>
         </div>
 
-        <!-- 24시간 일차 진행 바 -->
+        <!-- DAY 진행 바 -->
         <div class="space-y-1 pt-1">
           <div class="flex justify-between text-[10px] text-slate-400 font-bold">
             <span>24시간 매장 운영 루프</span>
@@ -441,9 +431,8 @@
       </div>
     </div>
 
-    <!-- B. TAB 2: 업그레이드 & 지점 확장 -->
+    <!-- B. TAB 2: 업그레이드 -->
     <div id="tab-upgrade" class="hidden space-y-3">
-      <!-- 체인점 지점 확장 카드 -->
       <div class="bg-gradient-to-br from-emerald-950 to-slate-900 border-2 border-emerald-500/50 rounded-3xl p-4 space-y-3 shadow-xl">
         <div class="flex items-center justify-between">
           <div>
@@ -458,64 +447,43 @@
         </button>
       </div>
 
-      <!-- 매장 핵심 업그레이드 목록 -->
       <div class="space-y-2">
         <h4 class="text-xs font-black text-slate-400 px-1">🏬 매장 시설 및 알바생 고용 업그레이드</h4>
-        <div id="upgradeListContainer" class="space-y-2">
-          <!-- 업그레이드 요소 동적 생성 -->
-        </div>
+        <div id="upgradeListContainer" class="space-y-2"></div>
       </div>
 
-      <!-- 이벤트 특수 무기/장비 개조 목록 -->
       <div class="space-y-2 pt-2 border-t border-slate-800">
         <h4 class="text-xs font-black text-purple-300 px-1 flex items-center justify-between">
           <span>🔋 이벤트 무기 및 서버 개조</span>
           <span class="text-[10px] text-purple-400 font-normal">보유 재화: <span id="armoryCoreCount" class="font-mono font-bold">0</span>개</span>
         </h4>
-        <div id="coreWeaponList" class="space-y-2">
-          <!-- 코어 무기 개조 동적 생성 -->
-        </div>
+        <div id="coreWeaponList" class="space-y-2"></div>
       </div>
     </div>
 
-    <!-- C. TAB 3: 명예의 전당 & 글로벌 랭킹 -->
+    <!-- C. TAB 3: 명예의 전당 -->
     <div id="tab-ranking" class="hidden space-y-3">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
+            <span class="text-amber-400 text-base">🏆</span>
             <h3 class="text-sm font-black text-white">전 서버 편의점 매출 랭킹</h3>
           </div>
-          <button onclick="fetchLeaderboard()" class="p-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <button onclick="fetchLeaderboard()" class="px-2 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-bold">
+            🔄 새로고침
           </button>
         </div>
-        <div id="leaderboardList" class="space-y-2">
-          <!-- 랭킹 순위 동적 생성 -->
-        </div>
-      </div>
-
-      <!-- 시즌 챔피언 명예의 전당 기록 -->
-      <div id="hallOfFameBox" class="hidden bg-slate-900 border border-amber-500/40 rounded-3xl p-4 space-y-2">
-        <h4 class="text-xs font-black text-amber-300 flex items-center gap-1.5">
-          <span>👑 역대 시즌 챔피언 명예의 전당</span>
-        </h4>
-        <div id="hallOfFameList" class="space-y-1.5 text-xs text-slate-300">
-          <!-- 역대 우승자 동적 생성 -->
-        </div>
+        <div id="leaderboardList" class="space-y-2"></div>
       </div>
     </div>
 
     <!-- D. TAB 4: 광장 & 이벤트 커뮤니티 -->
     <div id="tab-community" class="hidden space-y-3">
-      <!-- 실시간 방명록 (Shoutbox) -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-3">
         <h3 class="text-xs font-black text-white flex items-center gap-1.5">
           <span>💬 편의점 사장님 실시간 방명록</span>
         </h3>
-        <div id="shoutboxList" class="h-40 overflow-y-auto space-y-2 pr-1 text-xs">
-          <!-- 방명록 메시지들 동적 생성 -->
-        </div>
+        <div id="shoutboxList" class="h-40 overflow-y-auto space-y-2 pr-1 text-xs"></div>
         <div class="flex items-center gap-2 pt-1">
           <input id="shoutboxInput" type="text" placeholder="방명록을 작성하세요 (최대 40자)" maxlength="40" class="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white" />
           <button onclick="postShoutboxMessage()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shrink-0">
@@ -524,17 +492,13 @@
         </div>
       </div>
 
-      <!-- 실시간 전체 유저 투표 -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-3">
         <h3 class="text-xs font-black text-amber-300 flex items-center gap-1.5">
           <span>🗳️ 실시간 사장님 아이디어 투표</span>
         </h3>
-        <div id="pollContainer" class="space-y-2">
-          <!-- 투표 동적 생성 -->
-        </div>
+        <div id="pollContainer" class="space-y-2"></div>
       </div>
 
-      <!-- 쿠폰 입력 및 운영진 건의함 -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-2">
           <h4 class="text-xs font-black text-white">🎟️ 이벤트 쿠폰 입력</h4>
@@ -557,9 +521,8 @@
   </main>
 
   <!-- ========================================== -->
-  <!-- 4. 플로팅 오버레이 & 특수 효과 요소들 -->
+  <!-- 4. 플로팅 오버레이 & 특수 효과 -->
   <!-- ========================================== -->
-  <!-- 정전 사태 오버레이 -->
   <div id="blackoutOverlay" class="hidden fixed inset-0 z-[100] bg-black/95 pointer-events-none flex items-center justify-center">
     <div class="text-center space-y-2">
       <div class="text-4xl animate-bounce">⚡</div>
@@ -567,28 +530,27 @@
     </div>
   </div>
 
-  <!-- 화면 슬라임/벌레 닦아내기 오버레이 -->
-  <div id="slimeOverlay" class="hidden fixed inset-0 z-[105] bg-emerald-950/40 backdrop-blur-sm pointer-events-auto">
-    <!-- 클릭 시 제거되는 슬라임 요소들이 JS로 생성됨 -->
-  </div>
+  <div id="slimeOverlay" class="hidden fixed inset-0 z-[105] bg-emerald-950/40 backdrop-blur-sm pointer-events-auto"></div>
 
-  <!-- 토스트 알림 메시지 컨테이너 -->
+  <!-- 불꽃놀이 캔버스 -->
+  <canvas id="fireworksCanvas" class="fixed inset-0 pointer-events-none z-[115] w-full h-full"></canvas>
+
+  <!-- 토스트 컨테이너 -->
   <div id="toastContainer" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[110] flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4"></div>
 
   <!-- ========================================== -->
-  <!-- 5. 모달 팝업들 (로그인 / 점검 / 우편함 / 관리자 / 컷씬) -->
+  <!-- 5. 모달 팝업들 -->
   <!-- ========================================== -->
 
-  <!-- A. 로그인 & 회원가입 모달 -->
+  <!-- A. 로그인 모달 -->
   <div id="loginModal" class="fixed inset-0 z-[130] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl animate-pop">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-2xl animate-pop">
       <div class="text-center space-y-1">
         <div class="w-14 h-14 mx-auto rounded-3xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-3xl">🏬</div>
         <h1 class="text-xl font-black text-white">24시 편의점 타이쿤</h1>
         <p class="text-xs text-slate-400">서버 데이터 연동 & 사장님 계정 로그인</p>
       </div>
 
-      <!-- 로컬 데이터 자동 복구 안내 배너 -->
       <div id="recoveryBanner" class="hidden bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-3 flex items-center justify-between text-xs">
         <div>
           <div class="font-black text-emerald-300">✨ 기기에 저장된 매장 기록을 찾았습니다!</div>
@@ -620,12 +582,12 @@
 
       <div class="text-center pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
         <span id="loginVisitorCount">누적 1명 방문</span>
-        <button onclick="openAdminModal()" class="text-slate-500 hover:text-purple-300">관리자 접속</button>
+        <button onclick="openAdminModal()" class="text-slate-500 hover:text-purple-300 font-bold">관리자 접속</button>
       </div>
     </div>
   </div>
 
-  <!-- B. 서버 업데이트 / 점검 차단 모달 -->
+  <!-- B. 서버 점검 모달 (우회 비밀번호 입력창 탑재) -->
   <div id="maintenanceModal" class="hidden fixed inset-0 z-[150] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-slate-900 border-2 border-amber-500/70 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 mx-auto rounded-2xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-3xl animate-pulse">🛠️</div>
@@ -634,17 +596,24 @@
         <h2 class="text-xl font-black text-white mt-2">현재 편의점 서버 업데이트 중입니다</h2>
         <p id="maintenanceReasonText" class="text-xs text-slate-300 mt-1.5 leading-relaxed">더 쾌적한 매장 운영을 위해 시스템 점검을 진행하고 있습니다.</p>
       </div>
-      <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5">
+      <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3">
         <div class="text-[11px] text-slate-400 font-bold">업데이트 종료 예정 시간</div>
-        <div id="maintenanceEndTimeText" class="text-base font-black text-amber-300 mt-0.5">2026-11-22 20:00</div>
+        <div id="maintenanceEndTimeText" class="text-base font-black text-amber-300 mt-0.5">추후 공지시까지</div>
       </div>
-      <div class="pt-2 border-t border-slate-800">
-        <button onclick="openAdminModal()" class="text-[11px] text-slate-500 hover:text-amber-300 underline font-bold">총괄 운영자 예외 접속 (관리자 패널)</button>
+
+      <!-- 관리자 즉시 우회 입력창 -->
+      <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 space-y-2">
+        <div class="text-[11px] font-bold text-amber-300">👑 총괄 운영자 우회 접속</div>
+        <div class="flex gap-1.5">
+          <input id="maintAdminPassInput" type="password" placeholder="관리자 비밀번호" onkeydown="if(event.key==='Enter') bypassMaintenanceWithPass()" class="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white text-center font-mono" />
+          <button onclick="bypassMaintenanceWithPass()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shrink-0">인증 접속</button>
+        </div>
+        <div id="maintAdminError" class="hidden text-[10px] text-rose-400 font-bold text-center">비밀번호가 일치하지 않습니다.</div>
       </div>
     </div>
   </div>
 
-  <!-- C. 계정 차단(Ban) 안내 모달 -->
+  <!-- C. 계정 차단 모달 -->
   <div id="banLockModal" class="hidden fixed inset-0 z-[160] bg-slate-950/98 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-slate-900 border-2 border-rose-500/70 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 mx-auto rounded-2xl bg-rose-500/20 border border-rose-400/50 flex items-center justify-center text-3xl">🚫</div>
@@ -660,29 +629,22 @@
     <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
         <div class="flex items-center gap-2">
-          <i data-lucide="mail" class="w-5 h-5 text-emerald-400"></i>
+          <span class="text-emerald-400 text-base">✉️</span>
           <h3 class="text-sm font-black text-white">사장님 개인 우편함</h3>
           <span id="mailboxTotalTag" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px] font-bold">0통</span>
         </div>
-        <button onclick="closeMailboxModal()" class="p-1 rounded-xl bg-slate-800 text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+        <button onclick="closeMailboxModal()" class="px-2 py-1 rounded-xl bg-slate-800 text-slate-400 hover:text-white font-bold">✕</button>
       </div>
-      
-      <div id="mailboxListContainer" class="flex-1 overflow-y-auto space-y-2.5 pr-1">
-        <!-- 우편함 항목들이 동적으로 렌더링됨 -->
-      </div>
+      <div id="mailboxListContainer" class="flex-1 overflow-y-auto space-y-2.5 pr-1"></div>
     </div>
   </div>
 
-  <!-- E. 쿠폰 입력 모달 -->
+  <!-- E. 쿠폰 모달 -->
   <div id="couponModal" class="hidden fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2">
         <h3 class="text-sm font-black text-white">🎟️ 이벤트 쿠폰 코드 입력</h3>
-        <button onclick="closeCouponModal()" class="text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+        <button onclick="closeCouponModal()" class="text-slate-400 hover:text-white font-bold">✕</button>
       </div>
       <div class="space-y-3">
         <input id="couponCodeInput" type="text" placeholder="쿠폰 코드를 입력하세요" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white font-mono uppercase" />
@@ -693,10 +655,9 @@
     </div>
   </div>
 
-  <!-- F. 총괄 관리자 패널 모달 -->
+  <!-- F. 관리자 제어판 모달 -->
   <div id="adminModal" class="hidden fixed inset-0 z-[140] bg-black/85 backdrop-blur-md flex items-center justify-center p-3">
     <div class="w-full max-w-xl bg-slate-900 border border-purple-500/50 rounded-3xl p-5 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
-      <!-- 관리자 패널 헤더 -->
       <div class="flex items-center justify-between border-b border-purple-500/30 pb-3 shrink-0">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300">👑</div>
@@ -705,46 +666,44 @@
             <span id="adminCurrentSeasonTag" class="text-[10px] text-purple-300 font-bold">시즌 1 제어 센터</span>
           </div>
         </div>
-        <button onclick="closeAdminModal()" class="p-1 rounded-xl bg-slate-800 text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+        <button onclick="closeAdminModal()" class="px-2 py-1 rounded-xl bg-slate-800 text-slate-400 hover:text-white font-bold">✕</button>
       </div>
 
-      <!-- 비밀번호 인증 게이트 (인증 전) -->
+      <!-- 비밀번호 인증 게이트 -->
       <div id="adminAuthGate" class="space-y-3 py-4">
         <p class="text-xs text-slate-300 text-center">총괄 운영자 비밀번호를 입력하세요.</p>
-        <input id="adminPassInput" type="password" placeholder="비밀번호" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono text-center" />
+        <input id="adminPassInput" type="password" placeholder="비밀번호" onkeydown="if(event.key==='Enter') verifyAdminPass()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono text-center" />
         <div id="adminAuthError" class="hidden text-xs text-rose-400 font-bold text-center">비밀번호가 일치하지 않습니다.</div>
         <button onclick="verifyAdminPass()" class="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs">
           인증 및 제어판 열기
         </button>
       </div>
 
-      <!-- 제어판 본문 (인증 후) -->
+      <!-- 제어판 본문 -->
       <div id="adminDashboard" class="hidden flex-1 overflow-y-auto space-y-4 pr-1">
         
         <!-- 1. 서버 업데이트/점검 제어 -->
         <div class="bg-slate-950 border border-amber-500/40 rounded-2xl p-3.5 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-amber-300">🛠️ 서버 업데이트(점검) 및 로그인 제한</span>
+            <span class="text-xs font-black text-amber-300">🛠️ 서버 업데이트(점검) 제어</span>
             <span id="adminMaintStatusBadge" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px] font-black">정상 운영중</span>
           </div>
           <div class="grid grid-cols-1 gap-2">
             <input id="adminMaintEndInput" type="text" placeholder="종료 예정 시간 (예: 오늘 오후 8시 30분까지)" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
-            <input id="adminMaintReasonInput" type="text" placeholder="점검 내용 (예: 신규 이벤트 및 밸런스 패치)" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminMaintReasonInput" type="text" placeholder="점검 내용" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="setServerMaintenance(true)" class="py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs">🔒 점검 시작 (일반 로그인 차단)</button>
-            <button onclick="setServerMaintenance(false)" class="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs">🔓 점검 종료 (정상 오픈)</button>
+            <button onclick="setServerMaintenance(true)" class="py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs">🔒 점검 시작</button>
+            <button onclick="setServerMaintenance(false)" class="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs">🔓 점검 종료</button>
           </div>
         </div>
 
-        <!-- 2. 전체 사장님 개인/전체 우편 발송기 -->
+        <!-- 2. 전체 사장님 우편 발송기 -->
         <div class="bg-slate-950 border border-purple-500/40 rounded-2xl p-3.5 space-y-2.5">
           <span class="text-xs font-black text-purple-300">📬 개인 / 전체 우편 및 보상 발송기</span>
           <div class="grid grid-cols-2 gap-2">
             <select id="adminMailTargetMode" onchange="toggleAdminMailTargetInput()" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
-              <option value="all">📢 전체 사장님 (일관 발송)</option>
+              <option value="all">📢 전체 사장님 (일괄 발송)</option>
               <option value="single">👤 특정 사장님 (개인 발송)</option>
             </select>
             <select id="adminMailUserSelect" onchange="syncMailUserSelect()" disabled class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white disabled:opacity-50">
@@ -752,8 +711,8 @@
             </select>
           </div>
           <input id="adminMailTargetNick" type="text" disabled placeholder="전체 사장님 모두에게 일괄 발송됩니다" class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white disabled:opacity-50" />
-          <input id="adminMailTitle" type="text" placeholder="우편 제목 (예: 운영진 특별 보상)" class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
-          <textarea id="adminMailBody" rows="2" placeholder="우편 본문 내용을 입력하세요." class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white resize-none"></textarea>
+          <input id="adminMailTitle" type="text" placeholder="우편 제목" class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+          <textarea id="adminMailBody" rows="2" placeholder="우편 본문 내용" class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white resize-none"></textarea>
           <div class="grid grid-cols-2 gap-2">
             <input id="adminMailMoney" type="number" value="0" placeholder="첨부 자금(원)" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-emerald-300 font-mono" />
             <input id="adminMailCores" type="number" value="0" placeholder="첨부 특수재화(개)" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-purple-300 font-mono" />
@@ -773,31 +732,32 @@
             </button>
           </div>
           <div class="flex gap-2">
-            <select id="adminSurpriseSelect" class="flex-1 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
-              <!-- SURPRISE_50_LIST 드롭다운 동적 삽입 -->
-            </select>
+            <select id="adminSurpriseSelect" class="flex-1 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"></select>
             <button onclick="triggerAdminSurprise()" class="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-black text-xs shrink-0">
               ⚡ 선택 이벤트 발동
             </button>
           </div>
-          <button onclick="triggerRandomSurprise()" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-black text-xs border border-slate-700">
-            🎲 50종 이벤트 중 랜덤 1종 즉시 발동
-          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="triggerRandomSurprise()" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-black text-xs border border-slate-700">
+              🎲 50종 이벤트 중 랜덤 1종 발동
+            </button>
+            <button onclick="triggerFireworksShow(6000)" class="py-2 rounded-xl bg-rose-900/60 hover:bg-rose-800 text-amber-300 font-black text-xs border border-rose-500/40">
+              🎆 불꽃놀이 쇼 즉시 발동
+            </button>
+          </div>
         </div>
 
-        <!-- 4. 실시간 동시 접속자 현황 & 사장님 목록 -->
+        <!-- 4. 실시간 동시 접속자 현황 -->
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 space-y-2">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-white">👥 실시간 동시 접속자: <span id="adminOnlineCount" class="text-emerald-400 font-mono">0명</span></span>
-            <span class="text-[10px] text-slate-400">누적 방문: <span id="adminTotalVisits" class="font-mono text-white">0회</span></span>
+            <span class="text-xs font-black text-white">👥 동시 접속자: <span id="adminOnlineCount" class="text-emerald-400 font-mono">0명</span></span>
+            <span class="text-[10px] text-slate-400">누적: <span id="adminTotalVisits" class="font-mono text-white">0회</span> / 사장님: <span id="adminTotalUsers" class="font-mono text-white">0명</span></span>
           </div>
-          <div id="adminOnlineNicknames" class="text-[11px] text-slate-400 truncate">접속자 목록 불어오는 중...</div>
-          <div id="adminUserStatusList" class="max-h-36 overflow-y-auto space-y-1.5 pt-1">
-            <!-- 사장님 계정 목록 동적 생성 -->
-          </div>
+          <div id="adminOnlineNicknames" class="text-[11px] text-slate-400 truncate">접속자 목록 불러오는 중...</div>
+          <div id="adminUserStatusList" class="max-h-36 overflow-y-auto space-y-1.5 pt-1"></div>
         </div>
 
-        <!-- 5. 긴급 공지 & 전 서버 피버타임 제어 -->
+        <!-- 5. 긴급 공지 & 전 서버 피버타임 -->
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
           <span class="text-xs font-black text-white">📢 긴급 공지 등록 & 전 서버 피버 타임</span>
           <div class="flex gap-2">
@@ -808,51 +768,33 @@
           </div>
           <div class="grid grid-cols-2 gap-2">
             <input id="adminFeverMinInput" type="number" value="5" placeholder="피버 지속(분)" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
-            <input id="adminFeverMultInput" type="number" step="0.5" value="2.0" placeholder="배율 (예: 2.0)" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
+            <input id="adminFeverMultInput" type="number" step="0.5" value="2.0" placeholder="배율" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="triggerCustomFever()" class="py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs">
-              🔥 서버 피버타임 시작
-            </button>
-            <button onclick="stopServerFever()" class="py-2 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">
-              피버 종료
-            </button>
+            <button onclick="triggerCustomFever()" class="py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs">🔥 피버타임 시작</button>
+            <button onclick="stopServerFever()" class="py-2 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">피버 종료</button>
           </div>
         </div>
 
-        <!-- 6. 시즌 & 테마 컷씬 이벤트 제어판 -->
+        <!-- 6. 컷씬 즉시 테스트 & 이벤트 제어 -->
         <div class="bg-slate-950 border border-purple-900/60 rounded-2xl p-3.5 space-y-2.5">
-          <span class="text-xs font-black text-purple-300">🛸 시즌 & 컷씬 이벤트 연출 제어</span>
+          <span class="text-xs font-black text-purple-300">🛸 시즌 & 컷씬 이벤트 테스트 제어</span>
           <div class="grid grid-cols-3 gap-2">
-            <button onclick="launchThemeEve('alien')" class="py-2 rounded-xl bg-purple-900/60 hover:bg-purple-800 border border-purple-500/40 text-purple-200 font-black text-xs">
-              👽 외계인 전야제
-            </button>
-            <button onclick="launchThemeEve('cyber')" class="py-2 rounded-xl bg-cyan-900/60 hover:bg-cyan-800 border border-cyan-500/40 text-cyan-200 font-black text-xs">
-              💻 사이버 전야제
-            </button>
-            <button onclick="launchThemeEve('xmas')" class="py-2 rounded-xl bg-rose-900/60 hover:bg-rose-800 border border-rose-500/40 text-rose-200 font-black text-xs">
-              🎄 클스 전야제
-            </button>
+            <button onclick="playCutsceneSequence('alien_eve')" class="py-2 rounded-xl bg-purple-900/80 hover:bg-purple-800 border border-purple-500/40 text-purple-200 font-black text-xs">🎬 외계인 컷씬</button>
+            <button onclick="playCutsceneSequence('cyber_eve')" class="py-2 rounded-xl bg-cyan-900/80 hover:bg-cyan-800 border border-cyan-500/40 text-cyan-200 font-black text-xs">🎬 해킹 컷씬</button>
+            <button onclick="playCutsceneSequence('xmas_eve')" class="py-2 rounded-xl bg-rose-900/80 hover:bg-rose-800 border border-rose-500/40 text-rose-200 font-black text-xs">🎬 클스 컷씬</button>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="adminLaunchBossRaid('alien')" class="py-2 rounded-xl bg-purple-600 text-white font-black text-xs">
-              🛸 외계 모선 레이드
-            </button>
-            <button onclick="adminLaunchBossRaid('cyber')" class="py-2 rounded-xl bg-cyan-600 text-white font-black text-xs">
-              🤖 AI 메인프레임 레이드
-            </button>
+            <button onclick="adminLaunchBossRaid('alien')" class="py-2 rounded-xl bg-purple-600 text-white font-black text-xs">🛸 외계 모선 레이드</button>
+            <button onclick="adminLaunchBossRaid('cyber')" class="py-2 rounded-xl bg-cyan-600 text-white font-black text-xs">🤖 AI 메인프레임 레이드</button>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="adminLaunchXmasTreeFestival()" class="py-2 rounded-xl bg-emerald-600 text-white font-black text-xs">
-              🎄 크리스마스 트리 축제
-            </button>
-            <button onclick="resetAllThemeEvents()" class="py-2 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">
-              🔄 이벤트 일반 복구
-            </button>
+            <button onclick="adminLaunchXmasTreeFestival()" class="py-2 rounded-xl bg-emerald-600 text-white font-black text-xs">🎄 크리스마스 트리 축제</button>
+            <button onclick="resetAllThemeEvents()" class="py-2 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">🔄 일반 모드 복구</button>
           </div>
         </div>
 
-        <!-- 7. 특정 사장님 자금 수정 & 차단 제어 -->
+        <!-- 7. 특정 사장님 자금 수정 & 차단 -->
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
           <span class="text-xs font-black text-white">💰 사장님 자금 수정 & 계정 제재</span>
           <div class="grid grid-cols-2 gap-2">
@@ -877,7 +819,7 @@
           </div>
         </div>
 
-        <!-- 8. 쿠폰 발행 & 실시간 투표 생생 -->
+        <!-- 8. 쿠폰 발행 & 실시간 투표 생성 -->
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
           <span class="text-xs font-black text-white">🎟️ 쿠폰 생성 & 실시간 투표 등록</span>
           <div class="grid grid-cols-2 gap-2">
@@ -888,7 +830,7 @@
             🎟️ 신규 쿠폰 발행하기
           </button>
           <div class="pt-2 border-t border-slate-900 space-y-2">
-            <input id="adminPollQuestion" type="text" placeholder="투표 질문 (예: 다음 신상품 아이디어는?)" class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminPollQuestion" type="text" placeholder="투표 질문" class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
             <div class="grid grid-cols-2 gap-2">
               <input id="adminPollOpt1" type="text" placeholder="선택지 1" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
               <input id="adminPollOpt2" type="text" placeholder="선택지 2" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
@@ -902,30 +844,30 @@
         <!-- 9. 사용자 건의사항 확인 -->
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 space-y-2">
           <span class="text-xs font-black text-white">📨 접수된 사용자 건의사항</span>
-          <div id="adminFeedbackList" class="max-h-36 overflow-y-auto space-y-1.5 text-xs text-slate-300">
-            <!-- 건의함 항목 동적 생성 -->
-          </div>
+          <div id="adminFeedbackList" class="max-h-36 overflow-y-auto space-y-1.5 text-xs text-slate-300"></div>
         </div>
 
       </div>
     </div>
   </div>
 
-  <!-- G. 시네마틱 컷씬 오버레이 (`#ufoCinemaCanvas`) -->
+  <!-- G. 시네마틱 컷씬 오버레이 (스킵 버튼 완비) -->
   <div id="ufoCutsceneOverlay" class="hidden fixed inset-0 z-[200] bg-slate-950 overflow-hidden select-none">
     <canvas id="ufoCinemaCanvas" class="absolute inset-0 w-full h-full block"></canvas>
     
-    <!-- 영화 상하 래터박스 (Letterbox) -->
+    <!-- 영화 상하 래터박스 -->
     <div id="ufoTopLetterbox" class="absolute top-0 left-0 right-0 h-[12vh] bg-black z-10 transition-transform duration-700 -translate-y-full border-b border-purple-500/30 flex items-center justify-between px-6">
       <div class="flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
         <span id="ufoActBadge" class="text-xs font-black tracking-widest text-purple-300 font-mono">ACT 1 · EVENT CINEMA</span>
       </div>
-      <div id="ufoElapsedTimer" class="font-mono text-xs font-bold text-slate-400">00:00 / 00:38</div>
+      <div class="flex items-center gap-3">
+        <div id="ufoElapsedTimer" class="font-mono text-xs font-bold text-slate-400">00:00 / 00:38</div>
+        <button onclick="closeCinemaOverlay()" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-black text-xs active:scale-95 transition z-30">⏭️ 스킵</button>
+      </div>
     </div>
 
     <div id="ufoBottomLetterbox" class="absolute bottom-0 left-0 right-0 h-[14vh] bg-black z-10 transition-transform duration-700 translate-y-full border-t border-purple-500/30 flex flex-col justify-center px-6 md:px-12">
-      <!-- 대사 및 말풍선 자막 -->
       <div id="ufoMainStage" class="space-y-1">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
@@ -939,7 +881,6 @@
         </p>
       </div>
 
-      <!-- 보스 대결 체력바 HUD (전투 컷씬 시) -->
       <div id="ufoBattleHud" class="hidden space-y-1 mt-1">
         <div class="flex justify-between text-[10px] font-bold">
           <span class="text-emerald-400">사장님 방어선 (<span id="heroHpText">100%</span>)</span>
@@ -955,13 +896,12 @@
         </div>
       </div>
 
-      <!-- 타임라인 진행률 바 -->
       <div class="absolute bottom-0 left-0 right-0 h-1 bg-slate-900">
         <div id="ufoTimelineBar" class="h-full bg-gradient-to-r from-purple-500 to-amber-400 transition-all duration-300" style="width: 0%"></div>
       </div>
     </div>
 
-    <!-- 전야제 카운트다운 피날레 오버레이 (3초 카운트다운 스테이지) -->
+    <!-- 전야제 카운트다운 피날레 -->
     <div id="ufoCountdownFinaleStage" class="hidden absolute inset-0 z-20 bg-slate-950/90 flex flex-col items-center justify-center p-6 text-center space-y-6">
       <div id="finaleEventTag" class="px-4 py-1.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-black tracking-widest animate-pulse">
         👽 ALIEN INVASION · 11/28
@@ -969,7 +909,6 @@
       <h2 id="finaleHeadline" class="text-2xl md:text-4xl font-black text-white tracking-tight">대규모 이벤트가 다가옵니다..</h2>
       <div id="finaleTargetDesc" class="text-xs md:text-sm text-slate-300">2026년 11월 28일 오전 11:00 정식 개막!</div>
 
-      <!-- D-DAY 실시간 시계 -->
       <div class="grid grid-cols-4 gap-3 max-w-md w-full">
         <div class="bg-slate-900 border border-purple-500/40 rounded-2xl p-3">
           <div id="cdDays" class="text-xl md:text-2xl font-black text-amber-300 font-mono">00</div>
@@ -991,11 +930,8 @@
     </div>
   </div>
 
-  <!-- 크리스마스 눈 내림 컨테이너 -->
-  <div id="christmasSnowContainer" class="hidden"></div>
-
   <!-- ========================================== -->
-  <!-- 6. 메인 자바스크립트 로직 (전체 통합) -->
+  <!-- 6. 메인 자바스크립트 로직 -->
   <!-- ========================================== -->
   <script>
     // -------------------------------------------------------------------------
@@ -1049,6 +985,9 @@
       if (type === 'crash') {
         playTone(95, 'sawtooth', 0.45, 0.16);
         setTimeout(() => playTone(65, 'square', 0.5, 0.14), 80);
+      } else if (type === 'punch') {
+        playTone(220, 'square', 0.1, 0.12);
+        setTimeout(() => playTone(110, 'sawtooth', 0.18, 0.15), 50);
       } else if (type === 'beam_clash') {
         playTone(440, 'sawtooth', 0.3, 0.1);
         playTone(660, 'square', 0.3, 0.09);
@@ -1067,10 +1006,8 @@
 
     function toggleSound() {
       soundEnabled = !soundEnabled;
-      document.getElementById('soundToggleBtn').innerHTML = soundEnabled
-        ? '<i data-lucide="volume-2" class="w-3.5 h-3.5"></i>'
-        : '<i data-lucide="volume-x" class="w-3.5 h-3.5 text-rose-400"></i>';
-      lucide.createIcons();
+      const sym = document.getElementById('soundIconSymbol');
+      if (sym) sym.textContent = soundEnabled ? '🔊' : '🔇';
       showToast(soundEnabled ? '🔊 효과음이 켜졌습니다.' : '🔇 효과음이 꺼졌습니다.');
     }
 
@@ -1221,8 +1158,6 @@
     let lastSurpriseId = '';
     let currentSeasonNumber = 1;
     let currentBannerText = '대규모 이벤트가 다가옵니다..';
-    let lastSeasonResetId = '';
-    let isInitialSeasonLoad = true;
     let activeThemeMode = 'normal';
     let lastThemeEventId = '';
     let isInitialThemeLoad = true;
@@ -1233,7 +1168,6 @@
     let lastRaidId = '';
     let lastRaidWinId = '';
     let isInitialRaidLoad = true;
-    let auto30MinRaidEnabled = false;
     let cyberFirewallCode = '';
     let cyberFirewallLocked = false;
     let activeXmasTreeState = null;
@@ -1269,12 +1203,17 @@
       targetZoom: 1.0,
       flashAlpha: 0,
       particles: [],
+      matrixCols: [],
       buildings: [],
       stars: []
     };
 
+    function matrixColsX(col, w) {
+      return (col.xRatio || 0.5) * w;
+    }
+
     // -------------------------------------------------------------------------
-    // B. 60FPS 하이엔드 시네마틱 컷씬 엔진 (`#ufoCinemaCanvas`)
+    // B. 60FPS 하이엔드 시네마틱 컷씬 엔진
     // -------------------------------------------------------------------------
     function spawnCinemaParticles(x, y, count, colors, speedMax = 8, sizeMax = 5) {
       for (let i = 0; i < count; i++) {
@@ -1292,6 +1231,30 @@
       }
     }
 
+    function drawCharacterWithBadge(ctx, x, y, emoji, nameTag, isHero = true, scale = 1.0) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+
+      ctx.font = '36px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(emoji, 0, 0);
+
+      ctx.fillStyle = isHero ? 'rgba(16, 185, 129, 0.95)' : 'rgba(244, 63, 94, 0.95)';
+      ctx.strokeStyle = isHero ? '#34d399' : '#fda4af';
+      ctx.lineWidth = 1.5;
+      const tw = Math.max(70, nameTag.length * 9.5);
+      ctx.beginPath();
+      ctx.roundRect(-tw / 2, -50, tw, 20, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 10px Pretendard, sans-serif';
+      ctx.fillText(nameTag, 0, -36);
+      ctx.restore();
+    }
+
     function initCinemaCanvas(mode = 'alien_eve') {
       const canvas = document.getElementById('ufoCinemaCanvas');
       const ctx = canvas.getContext('2d');
@@ -1304,6 +1267,8 @@
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
+      const ownerName = currentUser ? currentUser.nickname : '사장님';
+
       Object.assign(cinemaState, {
         mode,
         elapsedSec: 0,
@@ -1312,6 +1277,12 @@
         targetZoom: 1.0,
         flashAlpha: 0,
         particles: [],
+        matrixCols: Array.from({ length: 32 }, (_, i) => ({
+          xRatio: (i + 0.5) / 32,
+          y: Math.random() * -500,
+          spd: 6 + Math.random() * 12,
+          chars: Array.from({ length: 12 }, () => Math.random() < 0.5 ? '0' : '1')
+        })),
         buildings: Array.from({ length: 16 }, (_, i) => ({
           x: i / 16,
           w: 0.055 + (i % 3) * 0.02,
@@ -1332,8 +1303,6 @@
         const t = performance.now() * 0.001;
         const sec = cinemaState.elapsedSec;
         const cMode = cinemaState.mode;
-        const isCyber = cMode.startsWith('cyber');
-        const isXmas = cMode.startsWith('xmas');
 
         cinemaState.camZoom += (cinemaState.targetZoom - cinemaState.camZoom) * 0.06;
         ctx.save();
@@ -1348,9 +1317,9 @@
 
         // 1. 대기권 배경
         const sky = ctx.createLinearGradient(0, 0, 0, h * 0.74);
-        if (isCyber) {
+        if (cMode.startsWith('cyber')) {
           sky.addColorStop(0, '#010409'); sky.addColorStop(0.6, '#042f2e'); sky.addColorStop(1, '#0e7490');
-        } else if (isXmas) {
+        } else if (cMode.startsWith('xmas')) {
           sky.addColorStop(0, '#050816'); sky.addColorStop(0.6, '#1e1b4b'); sky.addColorStop(1, '#312e81');
         } else {
           sky.addColorStop(0, '#03010a'); sky.addColorStop(0.55, '#190836'); sky.addColorStop(1, '#3b0764');
@@ -1367,104 +1336,246 @@
 
         const groundY = h * 0.74;
 
-        // 2. 원경 빌딩 야경
+        // 2. 야경 빌딩
         cinemaState.buildings.forEach((b, idx) => {
           const bx = b.x * w; const bw = b.w * w; const bh = b.h * h;
           ctx.fillStyle = '#070b14';
           ctx.fillRect(bx, groundY - bh, bw, bh);
-          ctx.fillStyle = isCyber ? 'rgba(34,211,238,0.22)' : 'rgba(253,224,71,0.18)';
+          ctx.fillStyle = cMode.startsWith('cyber') ? 'rgba(34,211,238,0.22)' : 'rgba(253,224,71,0.18)';
           for (let wy = 10; wy < bh - 12; wy += 16) {
             if ((idx + wy) % 3 === 0) ctx.fillRect(bx + 6, groundY - bh + wy, bw - 12, 4);
           }
         });
 
-        // 3. 아스팔트 및 지면 네온 반사
+        // 3. 지면
         const roadGrad = ctx.createLinearGradient(0, groundY, 0, h);
         roadGrad.addColorStop(0, '#0f172a'); roadGrad.addColorStop(1, '#020617');
         ctx.fillStyle = roadGrad;
         ctx.fillRect(-60, groundY, w + 120, h - groundY + 120);
 
-        const glowColor = isCyber ? 'rgba(34,211,238,0.25)' : isXmas ? 'rgba(250,204,21,0.25)' : 'rgba(217,70,239,0.28)';
-        const floorGlow = ctx.createRadialGradient(w * 0.5, groundY, 10, w * 0.5, groundY, w * 0.5);
-        floorGlow.addColorStop(0, glowColor); floorGlow.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = floorGlow;
-        ctx.fillRect(0, groundY - 40, w, 140);
-
-        // 4. 24시 편의점 건동
-        const storeW = Math.min(230, w * 0.36);
-        const storeH = Math.min(130, h * 0.2);
-        const storeX = Math.max(16, w * 0.06);
+        // 4. 편의점
+        const storeW = Math.min(220, w * 0.35);
+        const storeH = Math.min(125, h * 0.2);
+        const storeX = Math.max(16, w * 0.05);
         const storeY = groundY - storeH;
-        const signColor = isCyber ? '#06b6d4' : isXmas ? '#ef4444' : '#10b981';
 
         ctx.save();
         ctx.fillStyle = '#1e293b';
-        ctx.beginPath();
-        ctx.roundRect(storeX, storeY, storeW, storeH, [12, 12, 0, 0]);
-        ctx.fill();
-
-        const winGrad = ctx.createLinearGradient(storeX, storeY + 24, storeX, groundY);
-        winGrad.addColorStop(0, 'rgba(254, 240, 138, 0.85)'); winGrad.addColorStop(1, 'rgba(251, 191, 36, 0.25)');
-        ctx.fillStyle = winGrad;
+        ctx.beginPath(); ctx.roundRect(storeX, storeY, storeW, storeH, [12, 12, 0, 0]); ctx.fill();
+        ctx.fillStyle = 'rgba(254, 240, 138, 0.85)';
         ctx.fillRect(storeX + 12, storeY + 28, storeW - 24, storeH - 36);
 
-        ctx.shadowColor = signColor; ctx.shadowBlur = 22;
-        ctx.fillStyle = signColor;
-        ctx.fillRect(storeX - 6, storeY - 6, storeW + 12, 24);
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#ffffff'; ctx.font = '900 12px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText('24H CONVENIENCE', storeX + storeW * 0.5, storeY + 10);
+        ctx.fillStyle = '#10b981';
+        ctx.fillRect(storeX - 4, storeY - 6, storeW + 8, 22);
+        ctx.fillStyle = '#ffffff'; ctx.font = '900 11px Pretendard, sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('24H CONVENIENCE', storeX + storeW * 0.5, storeY + 9);
         ctx.restore();
 
-        // 5. 보스 & 에너지 빔 연출
-        const heroX = storeX + storeW + Math.min(45, w * 0.08);
-        const bossX = w * 0.74;
-        const bossY = groundY - 125 + Math.sin(t * 3) * 8;
+        // 5. 시나리오별 4막 연출
+        if (cMode === 'alien_eve') {
+          const ufoStartX = w * 0.9;
+          const ufoStartY = -60;
+          const ufoLandX = storeX + storeW + 130;
+          const ufoLandY = groundY - 35;
 
-        ctx.save();
-        ctx.translate(bossX, bossY);
-        const aura = ctx.createRadialGradient(0, 0, 10, 0, 0, 130);
-        aura.addColorStop(0, isCyber ? 'rgba(34,211,238,0.6)' : isXmas ? 'rgba(253,224,71,0.6)' : 'rgba(217,70,239,0.65)');
-        aura.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = aura;
-        ctx.beginPath();
-        ctx.arc(0, 0, 130, 0, Math.PI * 2);
-        ctx.fill();
+          if (sec < 9) {
+            const prog = sec / 9;
+            const ufoCurX = ufoStartX + (ufoLandX - ufoStartX) * prog;
+            const ufoCurY = ufoStartY + (ufoLandY - ufoStartY) * prog;
 
-        if (isCyber) {
-          ctx.rotate(t * 0.8);
-          ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 4;
-          ctx.strokeRect(-42, -42, 84, 84);
-          ctx.rotate(-t * 1.6);
-          ctx.strokeStyle = '#f43f5e';
-          ctx.strokeRect(-30, -30, 60, 60);
-        } else if (isXmas) {
-          ctx.fillStyle = '#10b981';
-          ctx.beginPath(); ctx.moveTo(0, -70); ctx.lineTo(-55, 45); ctx.lineTo(55, 45); ctx.closePath(); ctx.fill();
-          ctx.fillStyle = '#fde047';
-          ctx.beginPath(); ctx.arc(0, -78, 12 + Math.sin(t * 8) * 3, 0, Math.PI * 2); ctx.fill();
-        } else {
-          const tractorGrad = ctx.createLinearGradient(0, 10, 0, 135);
-          tractorGrad.addColorStop(0, 'rgba(217, 70, 239, 0.45)'); tractorGrad.addColorStop(1, 'rgba(217, 70, 239, 0)');
-          ctx.fillStyle = tractorGrad;
-          ctx.beginPath(); ctx.moveTo(-30, 10); ctx.lineTo(30, 10); ctx.lineTo(95, 135); ctx.lineTo(-95, 135); ctx.closePath(); ctx.fill();
+            spawnCinemaParticles(ufoCurX, ufoCurY, 3, ['#f97316', '#ef4444', '#eab308', '#64748b'], 7, 6);
 
-          ctx.fillStyle = '#a855f7';
-          ctx.beginPath(); ctx.ellipse(0, -10, 42, 26, 0, Math.PI, 0); ctx.fill();
-          ctx.fillStyle = '#e2e8f0';
-          ctx.beginPath(); ctx.ellipse(0, 2, 92, 20, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.save();
+            ctx.translate(ufoCurX, ufoCurY);
+            ctx.rotate(t * 12);
+            ctx.fillStyle = '#e2e8f0'; ctx.beginPath(); ctx.ellipse(0, 0, 50, 18, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#c084fc'; ctx.beginPath(); ctx.ellipse(0, -8, 24, 14, 0, Math.PI, 0); ctx.fill();
+            ctx.restore();
+
+            drawCharacterWithBadge(ctx, storeX + storeW + 20, groundY - 20, '🧑‍💼', `★ ${ownerName} 사장님 ★`, true);
+          } else if (sec < 17) {
+            ctx.save();
+            ctx.translate(ufoLandX, ufoLandY);
+            ctx.fillStyle = '#475569'; ctx.beginPath(); ctx.ellipse(0, 0, 55, 20, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#a855f7'; ctx.beginPath(); ctx.ellipse(0, -8, 26, 14, 0, Math.PI, 0); ctx.fill();
+            ctx.restore();
+
+            drawCharacterWithBadge(ctx, ufoLandX - 45, groundY - 20, '👽', '외계인 사령관', false, 1.1);
+            drawCharacterWithBadge(ctx, storeX + storeW + 20, groundY - 20, '🧑‍💼', `★ ${ownerName} 사장님 ★`, true);
+          } else if (sec < 29) {
+            const clashX = storeX + storeW + 85;
+            const clashY = groundY - 25;
+
+            ctx.fillStyle = 'rgba(217, 119, 6, 0.35)';
+            ctx.beginPath();
+            ctx.arc(clashX + Math.sin(t * 20) * 15, clashY + Math.cos(t * 20) * 10, 48 + Math.sin(t * 15) * 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            spawnCinemaParticles(clashX, clashY, 5, ['#fde047', '#f43f5e', '#38bdf8', '#ffffff'], 10, 6);
+
+            drawCharacterWithBadge(ctx, clashX - 15 + Math.sin(t * 30) * 12, clashY, '🧑‍💼', `★ ${ownerName} 사장님 ★`, true, 1.05);
+            drawCharacterWithBadge(ctx, clashX + 15 + Math.cos(t * 30) * 12, clashY, '👽', '외계인 사령관', false, 1.05);
+
+            const punchTexts = ['퍽!', '콰쾅!', '팍!', '💥', '🥊'];
+            const pTxt = punchTexts[Math.floor(t * 6) % punchTexts.length];
+            ctx.fillStyle = '#fde047'; ctx.font = '900 22px Pretendard, sans-serif'; ctx.textAlign = 'center';
+            ctx.shadowColor = '#f43f5e'; ctx.shadowBlur = 12;
+            ctx.fillText(pTxt, clashX + Math.sin(t * 10) * 25, clashY - 55);
+            ctx.shadowBlur = 0;
+          } else {
+            const escapeProg = (sec - 29) / 9;
+            const ufoEscX = ufoLandX + escapeProg * (w * 0.5);
+            const ufoEscY = ufoLandY - escapeProg * (h * 0.8);
+
+            ctx.save();
+            ctx.translate(ufoEscX, ufoEscY);
+            ctx.rotate(-escapeProg * 2);
+            ctx.fillStyle = '#475569'; ctx.beginPath(); ctx.ellipse(0, 0, 40, 14, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+
+            drawCharacterWithBadge(ctx, storeX + storeW + 50, groundY - 20, '🏆🧑‍💼', `★ ${ownerName} 사장님 ★`, true, 1.2);
+          }
+
+        } else if (cMode === 'cyber_eve') {
+          if (sec < 8) {
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+            ctx.fillRect(w * 0.1, h * 0.15, w * 0.8, h * 0.5);
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2; ctx.strokeRect(w * 0.1, h * 0.15, w * 0.8, h * 0.5);
+
+            ctx.fillStyle = '#38bdf8'; ctx.font = '900 18px Pretendard, sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('💻 24H POS MAIN TERMINAL - NORMAL OPERATING', w * 0.5, h * 0.24);
+            drawCharacterWithBadge(ctx, w * 0.5, h * 0.45, '🧑‍💼', `★ ${ownerName} 사장님 ★`, true, 1.3);
+
+          } else if (sec < 17) {
+            cinemaState.matrixCols.forEach(col => {
+              col.y += col.spd;
+              if (col.y > h) col.y = -80;
+              ctx.fillStyle = Math.random() < 0.2 ? '#ef4444' : '#22c55e';
+              ctx.font = '700 13px font-mono';
+              col.chars.forEach((ch, idx) => {
+                ctx.fillText(ch, col.y > 0 ? (matrixColsX(col, w)) : 0, col.y + idx * 14);
+              });
+            });
+
+            ctx.fillStyle = 'rgba(153, 27, 27, 0.88)';
+            ctx.strokeStyle = '#f87171'; ctx.lineWidth = 4;
+            const hBoxW = Math.min(420, w * 0.8);
+            ctx.beginPath(); ctx.roundRect(w * 0.5 - hBoxW / 2, h * 0.22, hBoxW, 160, 16); ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = '#ffffff'; ctx.font = '900 20px Pretendard, sans-serif'; ctx.textAlign = 'center';
+            ctx.shadowColor = '#f43f5e'; ctx.shadowBlur = 15;
+            ctx.fillText('⚠️ 해킹당했습니다 ⚠️', w * 0.5, h * 0.32);
+            ctx.fillText('"이 편의점은 이제 내거다!"', w * 0.5, h * 0.40);
+            ctx.shadowBlur = 0;
+
+          } else if (sec < 24) {
+            const hackerX = w * 0.78;
+            const hackerY = groundY - 20;
+
+            const scanAngle = t * 4;
+            ctx.strokeStyle = 'rgba(34,211,238,0.6)'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(hackerX, hackerY - 20, 70, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(hackerX, hackerY - 20); ctx.lineTo(hackerX + Math.cos(scanAngle) * 70, hackerY - 20 + Math.sin(scanAngle) * 70); ctx.stroke();
+
+            drawCharacterWithBadge(ctx, storeX + storeW + 20, groundY - 20, '🧑‍💼', `★ ${ownerName} 사장님 ★`, true, 1.1);
+            drawCharacterWithBadge(ctx, hackerX, hackerY, '👨‍💻', '🎯 해킹범 포착!', false, 1.15);
+
+          } else {
+            const fightX = w * 0.65;
+            const fightY = groundY - 25;
+
+            spawnCinemaParticles(fightX, fightY, 6, ['#22d3ee', '#f43f5e', '#fde047', '#000000'], 12, 5);
+
+            ctx.fillStyle = 'rgba(6, 182, 212, 0.3)';
+            ctx.beginPath(); ctx.arc(fightX, fightY, 55 + Math.sin(t * 18) * 10, 0, Math.PI * 2); ctx.fill();
+
+            drawCharacterWithBadge(ctx, fightX - 18 + Math.cos(t * 28) * 10, fightY, '🥊🧑‍💼', `★ ${ownerName} 사장님 ★`, true, 1.1);
+            drawCharacterWithBadge(ctx, fightX + 18 + Math.sin(t * 28) * 10, fightY, '💥👨‍💻', '해킹범 노트북 파쇄', false, 1.1);
+
+            ctx.fillStyle = '#22d3ee'; ctx.font = '900 20px Pretendard, sans-serif'; ctx.textAlign = 'center';
+            ctx.shadowColor = '#0891b2'; ctx.shadowBlur = 10;
+            ctx.fillText(sec % 2 === 0 ? '지지직! ⚡' : '콰앙! 💥', fightX, fightY - 55);
+            ctx.shadowBlur = 0;
+          }
+
+        } else if (cMode === 'xmas_eve') {
+          const sleighStartX = w * 0.95;
+          const sleighStartY = -80;
+          const sleighCrashX = storeX + storeW + 110;
+          const sleighCrashY = groundY - 30;
+
+          if (sec < 9) {
+            const prog = sec / 9;
+            const curX = sleighStartX + (sleighCrashX - sleighStartX) * prog;
+            const curY = sleighStartY + (sleighCrashY - sleighStartY) * prog;
+
+            spawnCinemaParticles(curX, curY, 4, ['#ef4444', '#fde047', '#ffffff', '#38bdf8'], 8, 6);
+
+            ctx.save();
+            ctx.translate(curX, curY);
+            ctx.rotate(Math.sin(t * 15) * 0.2 - 0.2);
+            ctx.font = '42px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('🛷🎅🦌', 0, 0);
+            ctx.restore();
+
+            drawCharacterWithBadge(ctx, storeX + storeW + 20, groundY - 20, '🧑‍💼', `★ ${ownerName} 사장님 ★`, true);
+
+          } else if (sec < 18) {
+            ctx.save();
+            ctx.translate(sleighCrashX + 30, sleighCrashY);
+            ctx.font = '40px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('🛷💥', 0, 0);
+            ctx.restore();
+
+            const thiefX = sleighCrashX - 25 + Math.sin(t * 3) * 10;
+            drawCharacterWithBadge(ctx, storeX + storeW + 10, groundY - 20, '🧑‍💼', `★ ${ownerName} 사장님 ★`, true);
+            drawCharacterWithBadge(ctx, sleighCrashX + 50, groundY - 20, '🎅💫', '정신 나간 산타', false);
+            drawCharacterWithBadge(ctx, thiefX, groundY - 25, '⛄😈', '🎯 심술쟁이 눈사람 대장', false, 1.25);
+
+          } else if (sec < 29) {
+            const fightX = storeX + storeW + 70;
+            const fightY = groundY - 25;
+
+            spawnCinemaParticles(fightX, fightY, 6, ['#ffffff', '#f43f5e', '#34d399', '#fde047'], 11, 6);
+
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.35)';
+            ctx.beginPath(); ctx.arc(fightX, fightY, 52 + Math.sin(t * 22) * 12, 0, Math.PI * 2); ctx.fill();
+
+            drawCharacterWithBadge(ctx, fightX - 35 + Math.cos(t * 25) * 10, fightY, '🥊🧑‍💼', `★ ${ownerName} 사장님 ★`, true, 1.1);
+            drawCharacterWithBadge(ctx, fightX - 10 + Math.sin(t * 25) * 10, fightY, '🥊🎅', '산타 할아버지', true, 1.1);
+            drawCharacterWithBadge(ctx, fightX + 30 + Math.cos(t * 20) * 12, fightY, '💥⛄', '눈사람 악당 파쇄!', false, 1.15);
+
+            const xmasPunches = ['눈덩이 퍽! ❄️', '선물 쾅! 🎁', '메리 크리티컬! 💥', '산타 펀치! 🥊'];
+            const xTxt = xmasPunches[Math.floor(t * 5) % xmasPunches.length];
+            ctx.fillStyle = '#fde047'; ctx.font = '900 20px Pretendard, sans-serif'; ctx.textAlign = 'center';
+            ctx.shadowColor = '#ef4444'; ctx.shadowBlur = 12;
+            ctx.fillText(xTxt, fightX, fightY - 60);
+            ctx.shadowBlur = 0;
+
+          } else {
+            const auroraGrad = ctx.createLinearGradient(0, 0, w, h * 0.4);
+            auroraGrad.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
+            auroraGrad.addColorStop(0.5, 'rgba(168, 85, 247, 0.4)');
+            auroraGrad.addColorStop(1, 'rgba(56, 189, 248, 0.35)');
+            ctx.fillStyle = auroraGrad;
+            ctx.fillRect(0, 0, w, h * 0.4);
+
+            const flyProg = (sec - 29) / 9;
+            const flyX = sleighCrashX + flyProg * (w * 0.6);
+            const flyY = groundY - 60 - flyProg * (h * 0.5);
+
+            ctx.save();
+            ctx.translate(flyX, flyY);
+            ctx.font = '44px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('🛷🎅🎁✨', 0, 0);
+            ctx.restore();
+
+            drawCharacterWithBadge(ctx, storeX + storeW + 30, groundY - 20, '🏆🧑‍💼', `★ ${ownerName} 사장님 ★`, true, 1.2);
+            drawCharacterWithBadge(ctx, storeX + storeW + 85, groundY - 20, '🎄⛄', '정화된 눈사람', false);
+          }
         }
-        ctx.restore();
 
-        const isClashing = (cMode.endsWith('_eve') && sec >= 14 && sec < 28) || cMode.endsWith('_raid_win');
-        if (isClashing) {
-          const clashX = (heroX + bossX) * 0.5 + Math.sin(t * 14) * 18;
-          const clashY = (groundY - 50 + bossY) * 0.5;
-          drawVolumetricBeam(ctx, heroX + 20, groundY - 50, clashX, clashY, '#10b981', '#fef08a', t);
-          drawVolumetricBeam(ctx, bossX - 20, bossY, clashX, clashY, isCyber ? '#f43f5e' : '#d946ef', '#ffffff', t);
-          spawnCinemaParticles(clashX, clashY, 4, ['#ffffff', '#fde047', '#e879f9', '#38bdf8'], 9, 5);
-        }
-
+        // 6. 파티클 및 전역 플래시
         for (let i = cinemaState.particles.length - 1; i >= 0; i--) {
           const p = cinemaState.particles[i];
           p.x += p.vx; p.y += p.vy; p.vy += 0.14; p.life -= p.decay;
@@ -1485,18 +1596,6 @@
       renderFrame();
     }
 
-    function drawVolumetricBeam(ctx, x1, y1, x2, y2, outerColor, coreColor, t) {
-      const pulse = 1 + Math.sin(t * 25) * 0.25;
-      ctx.save();
-      ctx.lineCap = 'round';
-      ctx.shadowColor = outerColor; ctx.shadowBlur = 28;
-      ctx.strokeStyle = outerColor; ctx.lineWidth = 24 * pulse;
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-      ctx.strokeStyle = coreColor; ctx.lineWidth = 8 * pulse;
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-      ctx.restore();
-    }
-
     function destroyCinemaCanvas() {
       if (ufoCinemaAnimId) {
         cancelAnimationFrame(ufoCinemaAnimId);
@@ -1506,32 +1605,22 @@
 
     const STORY_SCRIPTS = {
       alien_eve: [
-        { startSec: 0, act: 'ACT 1 · 미확인 비행물체 착륙 경보!', speaker: '📡 기상 관측소 긴급속보', ground: '편의점 상공 밤하늘', text: '거대 UFO가 편의점 앞 공터로 급하강합니다!!', shake: 18, zoom: 1.08, flash: 0.7, sound: 'crash' },
-        { startSec: 17, act: 'ACT 2 · 바코드 광선 vs 플라즈마 대결!', speaker: '⚔️ 정면 에너지 광선 대결', ground: '편의점 앞 방어선', text: '사장님이 바코드 광선으로 맞서지만 방어선이 밀립니다!', shake: 22, zoom: 1.22, flash: 0.5, sound: 'beam_clash', battle: true, heroHp: 28, alienHp: 65 },
-        { startSec: 28, act: 'ACT 3 · 편의점 점령 완료', speaker: '⚠️ SYSTEM OCCUPIED', ground: '외계 점령 구역', text: '11/28 본편 이벤트까지 🔋 에너지 코어를 모으세요!', shake: 16, zoom: 1.0, flash: 0.85, sound: 'explosion' }
-      ],
-      alien_raid_start: [
-        { startSec: 0, act: 'EVENT START · 초대형 모선 등장!', speaker: '🚨 전 서버 총동원령', ground: '성층권', text: '초대형 외계인 모선이 등장했습니다! 에너지 코어로 물리치세요!', shake: 18, zoom: 1.15, flash: 0.7, sound: 'crash' }
-      ],
-      alien_raid_win: [
-        { startSec: 0, act: 'VICTORY · 외계인 모선 후퇴!!', speaker: '🏆 지구 방위 대승리!', ground: '해방된 편의점', text: '외계인 모선이 후퇴했습니다! 승리 보상 지급!', shake: 22, zoom: 1.18, flash: 0.9, sound: 'explosion' }
+        { startSec: 0, act: 'ACT 1 · 미확인 비행물체 추락!', speaker: '📡 기상 관측소 긴급속보', ground: '편의점 앞 공터', text: '불타는 UFO가 편의점 앞으로 추락하며 아스팔트가 대폭발합니다!!', shake: 24, zoom: 1.12, flash: 0.8, sound: 'crash' },
+        { startSec: 9, act: 'ACT 2 · 외계인 지휘관 등장!', speaker: '👽 외계 함대 침략선', ground: '연기 피어오르는 UFO 해치', text: '보라색 증기와 함께 외계인 사령관이 사장님을 위협하며 나옵니다!', shake: 12, zoom: 1.18, flash: 0.4, sound: 'alarm' },
+        { startSec: 17, act: 'ACT 3 · 사장님 vs 외계인 치고박고 난투!!', speaker: '🥊 육탄전 난투 혈투', ground: '편의점 앞 아스팔트', text: '사장님이 바코드 머신을 쥐고 외계인 사령관과 격렬한 난투극을 벌입니다!! (퍽! 콰쾅!)', shake: 28, zoom: 1.3, flash: 0.6, sound: 'punch' },
+        { startSec: 29, act: 'ACT 4 · 외계인 후퇴 및 D-DAY 카운트다운', speaker: '🏆 편의점 수호 성공', ground: '우주선 우주 상공 후퇴', text: '외계인이 패배하여 우주로 후퇴합니다! 11/28 본편 결전을 준비하세요!', shake: 14, zoom: 1.0, flash: 0.85, sound: 'explosion' }
       ],
       cyber_eve: [
-        { startSec: 0, act: 'ACT 1 · POS 네트워크 이상 신호!', speaker: '⚠️ 보안 관제 경보', ground: '결제 단말기', text: '단말기 화면에 붉은 디지털 신호가 쏟아집니다!', shake: 14, zoom: 1.1, flash: 0.6, sound: 'glitch' },
-        { startSec: 14, act: 'ACT 2 · 보안 방어선 대결!', speaker: '🤖 AI 메인프레임', ground: '디지털 방화벽', text: '방화벽이 무너집니다! 💾 데이터 칩을 모으세요!', shake: 18, zoom: 1.2, flash: 0.4, sound: 'beam_clash', battle: true, heroHp: 30, alienHp: 70 }
-      ],
-      cyber_raid_start: [
-        { startSec: 0, act: 'CYBER EVENT · AI 메인프레임 결전!', speaker: '🔐 보안 암호 해독', ground: '메인프레임', text: '4자리 암호를 해제하고 시스템을 정상화하세요!', shake: 16, zoom: 1.15, flash: 0.6, sound: 'glitch' }
-      ],
-      cyber_raid_win: [
-        { startSec: 0, act: 'SYSTEM RESTORED · 네트워크 복구!', speaker: '💻 화이트해커 대승리!', ground: '정상화된 편의점', text: '편의점 서버가 복구되었습니다! [💻화이트해커] 칭호 획득!', shake: 18, zoom: 1.15, flash: 0.85, sound: 'explosion' }
+        { startSec: 0, act: 'ACT 1 · POS 단말기 이상 신호', speaker: '🖥️ 편의점 메인 결제 PC', ground: 'POS 내부 화면', text: '단말기 바코드 스캐너 화면에 이상 전압이 감지됩니다..', shake: 8, zoom: 1.05, flash: 0.2, sound: 'glitch' },
+        { startSec: 8, act: 'ACT 2 · 바이너리 해킹 침투!', speaker: '⚠️ SYSTEM HACKED ALERT', ground: '서버 메인프레임', text: '0과 1의 바이너리 침투!! "이 편의점은 이제 내거다!" 붉은 경고창 점령!', shake: 18, zoom: 1.2, flash: 0.7, sound: 'glitch' },
+        { startSec: 17, act: 'ACT 3 · 🎯 해킹범 위치 포착!', speaker: '📡 사이버 레이더 추적', ground: '편의점 앞 골목길', text: '사장님이 레이더로 편의점 앞 골목에 숨어있는 해킹범 위치를 포착했습니다!', shake: 14, zoom: 1.15, flash: 0.5, sound: 'alarm' },
+        { startSec: 24, act: 'ACT 4 · 사장님 vs 해킹범 육탄 격돌!!', speaker: '⚡ 전자기 박살 난투', ground: '골목길 해킹범 아지트', text: '사장님이 뛰어나가 해킹범의 노트북을 쳐부수며 난투극을 벌입니다! (지지직! 콰앙!)', shake: 25, zoom: 1.28, flash: 0.8, sound: 'punch' }
       ],
       xmas_eve: [
-        { startSec: 0, act: 'ACT 1 · 산타 썰매 비상 착륙!', speaker: '❄️ 기상청 대설 특보', ground: '함박눈 내리는 편의점', text: '산타 썰매가 편의점 앞 눈밭에 착륙했습니다!', shake: 14, zoom: 1.12, flash: 0.4, sound: 'crash' },
-        { startSec: 20, act: 'ACT 2 · 화이트 크리스마스 개막!', speaker: '🎄 축제 준비 시작', ground: '눈 내리는 매장', text: '🎁 선물 상자를 모아 12/25 트리 점등을 준비하세요!', shake: 0, zoom: 1.0, flash: 0.5, sound: 'bells' }
-      ],
-      xmas_win: [
-        { startSec: 0, act: 'MERRY CHRISTMAS · 초대형 트리 점등!!', speaker: '🎅 산타 & 루돌프', ground: '크리스마스 광장', text: '초대형 트리가 황금빛으로 빛납니다! 메리 크리스마스!!', shake: 8, zoom: 1.12, flash: 0.8, sound: 'bells' }
+        { startSec: 0, act: 'ACT 1 · 폭주하는 산타 썰매 불시착!', speaker: '❄️ 기상청 초대형 대설 특보', ground: '함박눈 내리는 편의점 앞 눈밭', text: '제트 부스터가 폭주한 산타 썰매가 눈보라 속을 가르며 편의점 마당에 쾅! 불시착합니다!!', shake: 24, zoom: 1.12, flash: 0.8, sound: 'crash' },
+        { startSec: 9, act: 'ACT 2 · 심술쟁이 눈사람 대장의 훔치기!', speaker: '⛄ 심술쟁이 눈사람 대장 난입', ground: '눈더미 속 황금 선물 보따리', text: '썰매에서 튕겨 나온 산타의 황금 선물 보따리를 도둑 눈사람이 훔쳐 달아나려 합니다!', shake: 12, zoom: 1.18, flash: 0.4, sound: 'alarm' },
+        { startSec: 18, act: 'ACT 3 · 사장님 & 산타 콤비 난투 격돌!!', speaker: '🥊 2v1 협동 메리 크리티컬 난투', ground: '편의점 마당 눈싸움 전장', text: '사장님과 산타 할아버지가 콤비를 이뤄 눈덩이와 선물 상자로 도둑 눈사람을 신나게 두들겨 패버립니다! (눈덩이 퍽! 선물 쾅!)', shake: 28, zoom: 1.3, flash: 0.6, sound: 'punch' },
+        { startSec: 29, act: 'ACT 4 · 북극 오로라 & 12/25 크리스마스 카운트다운', speaker: '✨ 영롱한 북극 오로라 하늘', ground: '다시 날아오르는 제트 썰매', text: '하늘에 영롱한 오로라가 펼쳐지며 썰매가 황금 선물을 쏟아붓습니다! 12/25 축제를 기대하세요!', shake: 14, zoom: 1.0, flash: 0.85, sound: 'bells' }
       ]
     };
 
@@ -1669,7 +1758,7 @@
     function applyDetectedRecovery() {
       if (detectedRecoveryData?.nickname) {
         document.getElementById('loginNickname').value = detectedRecoveryData.nickname;
-        showToast('✨ 닉네임이 입력되었습니다! 기존 PIN 4자리를 입력하세요.');
+        showToast('✨ 닉네임이 입력되었습니다! PIN 번호를 입력하세요.');
       }
     }
 
@@ -1686,7 +1775,7 @@
         reason,
         updatedAt: Date.now()
       });
-      showToast(active ? '🔒 점검 모드가 활성화되어 일반 사장님 접속이 제한됩니다.' : '🔓 점검이 해제되어 모든 사장님이 접속할 수 있습니다.');
+      showToast(active ? '🔒 점검 모드가 활성화되었습니다.' : '🔓 점검이 해제되었습니다.');
     }
 
     function applyMaintenanceGate() {
@@ -1705,6 +1794,19 @@
         modal.classList.remove('hidden');
       } else {
         modal.classList.add('hidden');
+      }
+    }
+
+    function bypassMaintenanceWithPass() {
+      const val = document.getElementById('maintAdminPassInput').value.trim();
+      const err = document.getElementById('maintAdminError');
+      if (val === ADMIN_SECRET) {
+        isAdminAuthenticated = true;
+        if (err) err.classList.add('hidden');
+        document.getElementById('maintenanceModal').classList.add('hidden');
+        showToast('👑 관리자 권한으로 점검 화면을 우회하여 접속했습니다!');
+      } else {
+        if (err) err.classList.remove('hidden');
       }
     }
 
@@ -1808,7 +1910,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // D. 실시간 FIREBASE 데이터 동기화 리스너
+    // D. 실시간 FIREBASE 리스너
     // -------------------------------------------------------------------------
     function setupRealtimeListeners() {
       const myPresenceRef = db.ref(`presence/${currentUser.key}`);
@@ -1830,9 +1932,6 @@
         const namesEl = document.getElementById('adminOnlineNicknames');
         if (countEl) countEl.textContent = `${onlineUsers.length}명`;
         if (namesEl) namesEl.textContent = onlineUsers.length > 0 ? onlineUsers.map(u => u.nickname).join(', ') : '접속자 없음';
-        if (!document.getElementById('adminDashboard').classList.contains('hidden')) {
-          loadAdminUserList();
-        }
       });
 
       db.ref(`mails/${currentUser.key}`).on('value', snap => {
@@ -1850,15 +1949,10 @@
           if (unreadCount > 0) {
             badge.textContent = unreadCount;
             badge.classList.remove('hidden');
-            if (!isInitialMailboxLoad) {
-              playGiftFanfare();
-              showToast('📬 새로운 우편이 도착했습니다! 상단 우편함을 확인하세요.');
-            }
           } else {
             badge.classList.add('hidden');
           }
         }
-        isInitialMailboxLoad = false;
         renderMailboxItems();
       });
 
@@ -1875,7 +1969,7 @@
           gameState.money = Number(val.money ?? gameState.money);
           gameState.energyCores = Number(val.energyCores ?? gameState.energyCores);
           updateAllUI();
-          showToast('💰 관리자에 의해 보유 자금/재화가 갱신되었습니다!');
+          showToast('💰 보유 자금/재화가 갱신되었습니다!');
           setTimeout(() => { isRemoteMoneySyncing = false; }, 500);
         }
       });
@@ -1913,10 +2007,7 @@
         const val = snap.val() || {};
         currentSeasonNumber = Number(val.number || 1);
         currentBannerText = val.bannerText || '대규모 이벤트가 다가옵니다..';
-        auto30MinRaidEnabled = Boolean(val.auto30m);
         document.getElementById('headerSeasonBadge').textContent = `S${currentSeasonNumber}`;
-        const adminTag = document.getElementById('adminCurrentSeasonTag');
-        if (adminTag) adminTag.textContent = `시즌 ${currentSeasonNumber}`;
 
         if (val.themeEventId && val.themeEventId !== lastThemeEventId) {
           lastThemeEventId = val.themeEventId;
@@ -1935,82 +2026,6 @@
         }
       });
 
-      db.ref('global/raid').on('value', snap => {
-        const raid = snap.val();
-        const hud = document.getElementById('mothershipRaidHud');
-        if (!raid || !raid.active) {
-          hud.classList.add('hidden');
-          if (raid?.winId && raid.winId !== lastRaidWinId) {
-            lastRaidWinId = raid.winId;
-            if (!isInitialRaidLoad) {
-              const rType = raid.type || 'alien';
-              playCutsceneSequence(`${rType}_raid_win`, () => {
-                gameState.money += 250000;
-                if (rType === 'cyber' && !gameState.medals.includes('💻화이트해커')) gameState.medals.push('💻화이트해커');
-                if (rType === 'alien' && !gameState.medals.includes('👽우주수호자')) gameState.medals.push('👽우주수호자');
-                saveToCloud();
-                updateAllUI();
-                showToast('🏆 이벤트 승리 보상 +250,000원 & 특별 칭호 지급!');
-              });
-            }
-          }
-          activeRaidState = null;
-          isInitialRaidLoad = false;
-          return;
-        }
-        activeRaidState = raid;
-        hud.classList.remove('hidden');
-        const isCyber = raid.type === 'cyber';
-        document.getElementById('raidBossIcon').textContent = isCyber ? '🤖' : '🛸';
-        document.getElementById('raidBossTitle').textContent = isCyber ? 'AI 메인프레임 결전!' : '외계인 모선 총공세 이벤트!';
-        document.getElementById('bossHpName').textContent = isCyber ? '메인프레임 코어 무결성' : '모선 에너지 코어 HP';
-        document.getElementById('laserBtnLabel').textContent = isCyber ? '백신 광선' : '광선 가동';
-        document.getElementById('coreBtnLabel').textContent = isCyber ? '💾 칩 오버로드' : '🔋 코어 방출';
-        const hp = Math.max(0, Number(raid.hp || 0));
-        const maxHp = Math.max(1, Number(raid.maxHp || 100000));
-        document.getElementById('bossHpLabel').textContent = `${hp.toLocaleString()} / ${maxHp.toLocaleString()}`;
-        document.getElementById('bossHpFill').style.width = `${Math.min(100, (hp / maxHp) * 100)}%`;
-
-        if (raid.id && raid.id !== lastRaidId) {
-          lastRaidId = raid.id;
-          if (!isInitialRaidLoad) playCutsceneSequence(`${raid.type || 'alien'}_raid_start`);
-          if (isCyber) triggerCyberFirewall();
-        }
-        isInitialRaidLoad = false;
-      });
-
-      db.ref('global/xmasTree').on('value', snap => {
-        const tree = snap.val();
-        const hud = document.getElementById('xmasTreeHud');
-        if (!tree || !tree.active) {
-          hud.classList.add('hidden');
-          if (tree?.winId && tree.winId !== lastXmasTreeWinId) {
-            lastXmasTreeWinId = tree.winId;
-            if (!isInitialXmasLoad) {
-              playCutsceneSequence('xmas_win', () => {
-                gameState.money += 300000;
-                if (!gameState.medals.includes('🎄산타파트너')) gameState.medals.push('🎄산타파트너');
-                saveToCloud();
-                updateAllUI();
-                showToast('🎄 크리스마스 트리 점등 완료! +300,000원 & [🎄산타파트너] 칭호!');
-              });
-            }
-          }
-          activeXmasTreeState = null;
-          isInitialXmasLoad = false;
-          return;
-        }
-        activeXmasTreeState = tree;
-        hud.classList.remove('hidden');
-        const pts = Number(tree.points || 0);
-        const goal = Number(tree.goal || 500);
-        const stage = Math.min(5, Math.floor((pts / goal) * 5) + 1);
-        document.getElementById('xmasTreeStageBadge').textContent = `${stage}단계 / 5단계`;
-        document.getElementById('xmasTreeProgressLabel').textContent = `${pts.toLocaleString()} / ${goal.toLocaleString()} 점등 포인트`;
-        document.getElementById('xmasTreeProgressFill').style.width = `${Math.min(100, (pts / goal) * 100)}%`;
-        isInitialXmasLoad = false;
-      });
-
       db.ref('global/surprise').on('value', snap => {
         const ev = snap.val();
         if (!ev || !ev.id || ev.id === lastSurpriseId) return;
@@ -2020,66 +2035,11 @@
         executeSurpriseClientEffect(ev);
       });
 
-      db.ref('global/shoutbox').limitToLast(20).on('value', snap => {
-        const box = document.getElementById('shoutboxList');
-        const val = snap.val();
-        if (!val) {
-          box.innerHTML = '<p class="text-slate-400 text-[11px]">첫 번째 방명록을 남겨보세요!</p>';
-          return;
-        }
-        box.innerHTML = Object.values(val).reverse().map(m =>
-          `<div class="bg-slate-800/70 border border-slate-700/60 rounded-xl px-2.5 py-1.5 flex items-baseline justify-between gap-2">
-            <div class="min-w-0">
-              <span class="font-black text-emerald-300 mr-1.5">${escapeHtml(m.nickname)}</span>
-              <span class="text-slate-200 break-all">${escapeHtml(m.text)}</span>
-            </div>
-            <span class="text-[10px] text-slate-500 shrink-0">${new Date(m.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
-          </div>`
-        ).join('');
-      });
-
-      db.ref('global/poll').on('value', snap => {
-        const poll = snap.val();
-        const container = document.getElementById('pollContainer');
-        if (!poll || !poll.active) {
-          container.innerHTML = '<p class="text-xs text-slate-400">현재 진행 중인 투표가 없습니다.</p>';
-          return;
-        }
-        const v1 = Object.keys(poll.votes1 || {}).length;
-        const v2 = Object.keys(poll.votes2 || {}).length;
-        const total = Math.max(1, v1 + v2);
-        const p1 = Math.round((v1 / total) * 100);
-        const p2 = 100 - p1;
-        const myVote = poll.votes1?.[currentUser.key] ? 1 : poll.votes2?.[currentUser.key] ? 2 : 0;
-
-        container.innerHTML = `<div class="space-y-2">
-          <div class="text-xs font-black text-amber-300">Q. ${escapeHtml(poll.question)}</div>
-          <button onclick="castPollVote(1)" class="w-full p-2.5 rounded-xl border ${myVote === 1 ? 'bg-emerald-500/25 border-emerald-400' : 'bg-slate-800 border-slate-700'} text-left transition">
-            <div class="flex justify-between text-xs font-bold mb-1">
-              <span>${escapeHtml(poll.opt1)} ${myVote === 1 ? '✅' : ''}</span>
-              <span>${v1}표 (${p1}%)</span>
-            </div>
-            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-              <div class="h-full bg-emerald-400" style="width:${p1}%"></div>
-            </div>
-          </button>
-          <button onclick="castPollVote(2)" class="w-full p-2.5 rounded-xl border ${myVote === 2 ? 'bg-sky-500/25 border-sky-400' : 'bg-slate-800 border-slate-700'} text-left transition">
-            <div class="flex justify-between text-xs font-bold mb-1">
-              <span>${escapeHtml(poll.opt2)} ${myVote === 2 ? '✅' : ''}</span>
-              <span>${v2}표 (${p2}%)</span>
-            </div>
-            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-              <div class="h-full bg-sky-400" style="width:${p2}%"></div>
-            </div>
-          </button>
-        </div>`;
-      });
-
       fetchLeaderboard();
     }
 
     // -------------------------------------------------------------------------
-    // E. 개인 우편함 수신 & 보상 수령
+    // E. 우편함 기능
     // -------------------------------------------------------------------------
     function openMailboxModal() {
       document.getElementById('mailboxModal').classList.remove('hidden');
@@ -2102,7 +2062,6 @@
         const hasMoney = Number(m.money || 0) > 0;
         const hasCores = Number(m.cores || 0) > 0;
         const hasReward = hasMoney || hasCores;
-        const dateStr = m.timestamp ? new Date(m.timestamp).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
 
         return `<div class="p-3 rounded-2xl border ${m.claimed ? 'bg-slate-800/40 border-slate-800 opacity-75' : 'bg-slate-800 border-emerald-500/50'} space-y-2">
           <div class="flex items-start justify-between gap-2">
@@ -2113,7 +2072,7 @@
                 </span>
                 <span class="text-xs font-black text-white">${escapeHtml(m.title || '운영진 편지')}</span>
               </div>
-              <div class="text-[10px] text-slate-400 mt-0.5">보낸이: ${escapeHtml(m.sender || '총괄 운영자')} · ${dateStr}</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">보낸이: ${escapeHtml(m.sender || '총괄 운영자')}</div>
             </div>
             ${m.claimed ? `<button onclick="deleteMailboxItem('${m.id}')" class="text-[10px] text-slate-500 hover:text-rose-400 font-bold shrink-0">삭제</button>` : ''}
           </div>
@@ -2129,7 +2088,7 @@
               ? 'bg-slate-700/60 text-slate-400 cursor-default'
               : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 active:scale-95'
           }">
-            ${m.claimed ? '✅ 확인 및 수령 완료' : (hasReward ? '🎁 편지 읽고 보상 수령하기' : '📩 편지 읽음 확인')}
+            ${m.claimed ? '✅ 수령 완료' : '🎁 보상 수령하기'}
           </button>
         </div>`;
       }).join('');
@@ -2149,12 +2108,7 @@
       saveToCloud();
       updateAllUI();
       playGiftFanfare();
-
-      if (addMoney > 0 || addCores > 0) {
-        showToast(`🎁 우편 보상 수령 완료! (${addMoney > 0 ? `+${addMoney.toLocaleString()}원 ` : ''}${addCores > 0 ? `+재화 ${addCores}개` : ''})`);
-      } else {
-        showToast('📩 편지를 확인했습니다.');
-      }
+      showToast('🎁 보상을 수령했습니다!');
     }
 
     function deleteMailboxItem(mailId) {
@@ -2163,7 +2117,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // F. POS 계산대 & 매장 플레이 로직
+    // F. POS 계산대 & 손님 처리
     // -------------------------------------------------------------------------
     function getActiveItemPool() {
       if (activeThemeMode === 'alien') return ALIEN_STORE_ITEMS;
@@ -2194,7 +2148,7 @@
       }
       const total = items.reduce((sum, it) => sum + it.price, 0);
       const isCash = forcedType !== 'incident' && Math.random() < 0.45;
-      const bills = [5000, 10000, 50000];
+      const bills = [1000, 5000, 10000, 50000];
       const cashGiven = isCash ? (bills.find(b => b >= total) || Math.ceil(total / 10000) * 10000) : 0;
 
       return {
@@ -2309,7 +2263,7 @@
         gameState.combo += 2;
         playRegisterComplete();
         if (ev) spawnFloatingText(ev.clientX, ev.clientY, `+${reward.toLocaleString()}원!`, '#fde047');
-        showToast('🛡️ 신분증 확인 철저! 모범 편의점 포상금을 받았습니다.');
+        showToast('🛡️ 신분증 확인 철저! 모범 포상금을 받았습니다.');
       } else {
         gameState.combo = 0;
         gameState.cleanliness = Math.max(0, gameState.cleanliness - 15);
@@ -2338,7 +2292,7 @@
       if (!currentCustomer) return;
       const needed = currentCustomer.cashGiven - currentCustomer.total;
       if (preparedChange !== needed) {
-        showToast(`❌ 거스름돈이 맞지 않습니다! (필요 거스름돈: ${needed.toLocaleString()}원)`);
+        showToast(`❌ 거스름돈이 맞지 않습니다! (필요 금액: ${needed.toLocaleString()}원)`);
         return;
       }
       finalizeCustomerCheckout(1.2, ev);
@@ -2354,8 +2308,7 @@
       gameState.cleanliness = Math.max(20, gameState.cleanliness - 1.5);
 
       if (activeThemeMode !== 'normal' && Math.random() < 0.45) {
-        const gain = Math.floor(Math.random() * 2) + 1;
-        gameState.energyCores += gain;
+        gameState.energyCores += 1;
       }
 
       playRegisterComplete();
@@ -2374,7 +2327,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // G. 업그레이드 & 지점 확장 로직
+    // G. 업그레이드 & 계산식
     // -------------------------------------------------------------------------
     function getPassiveIncomePerSec() {
       let base = 0;
@@ -2409,7 +2362,7 @@
       saveToCloud();
       renderUpgradeList();
       updateAllUI();
-      showToast(`🏢 축하합니다! ${gameState.branchCount}호점 오픈 완료! 영구 매출 +50% 상승!`);
+      showToast(`🏢 축하합니다! ${gameState.branchCount}호점 오픈 완료!`);
     }
 
     function renderUpgradeList() {
@@ -2495,34 +2448,13 @@
       document.getElementById('statMultiplier').textContent = `x${getTotalMultiplier()}`;
       document.getElementById('headerBranchBadge').textContent = `${gameState.branchCount}호점`;
       document.getElementById('storeGradeBadge').textContent = `${gameState.branchCount}호점 · Day ${gameState.day}`;
-      document.getElementById('passiveIncomeLabel').textContent = `자동매출: ${getPassiveIncomePerSec().toLocaleString()}원/초`;
+      document.getElementById('passiveIncomeLabel').textContent = `⚡ ${getPassiveIncomePerSec().toLocaleString()}원/초`;
       document.getElementById('cleanlinessText').textContent = `${Math.round(gameState.cleanliness)}%`;
       document.getElementById('posComboText').textContent = `${gameState.combo}콤보`;
 
-      const medalEl = document.getElementById('headerTitleMedal');
-      if (gameState.medals.length > 0) {
-        medalEl.textContent = gameState.medals[gameState.medals.length - 1];
-        medalEl.classList.remove('hidden');
-      } else {
-        medalEl.classList.add('hidden');
-      }
-
       const nextCost = getNextBranchCost();
       document.getElementById('nextBranchTitle').textContent = `🏢 ${gameState.branchCount + 1}호점 오픈하기 (영구 매출 +50%)`;
-      document.getElementById('currentBranchMultText').textContent = `현재 ${gameState.branchCount}호점 (x${(1 + (gameState.branchCount - 1) * 0.5).toFixed(1)})`;
-      document.getElementById('expandBranchBtn').textContent = `필요 자금: ${nextCost.toLocaleString()}원 (${gameState.money >= nextCost ? '지금 오픈 가능!' : '자금 부족'})`;
-
-      const feverBanner = document.getElementById('globalFeverBanner');
-      if (Date.now() < serverFeverUntil) {
-        feverBanner.classList.remove('hidden');
-        const rem = Math.max(0, Math.ceil((serverFeverUntil - Date.now()) / 1000));
-        const mm = String(Math.floor(rem / 60)).padStart(2, '0');
-        const ss = String(rem % 60).padStart(2, '0');
-        document.getElementById('globalFeverLabel').textContent = `🔥 전 서버 피버 타임 (x${serverFeverMultiplier}배)!`;
-        document.getElementById('globalFeverTimer').textContent = `${mm}:${ss}`;
-      } else {
-        feverBanner.classList.add('hidden');
-      }
+      document.getElementById('expandBranchBtn').textContent = `필요 자금: ${nextCost.toLocaleString()}원`;
     }
 
     function gameLoopTick() {
@@ -2543,16 +2475,8 @@
       document.getElementById('dayProgressBar').style.width = `${Math.min(100, (dayTimer / DAY_DURATION_SEC) * 100)}%`;
 
       if (now < autoRushUntil && currentCustomer) {
-        if (currentCustomer.type === 'incident') {
-          resolveSpecialIncident(true);
-        } else {
-          finalizeCustomerCheckout(1.15);
-        }
-      }
-
-      if (activeRaidState && activeRaidState.active && (gameState.coreWeapons.autoTurret || 0) > 0) {
-        const autoDmg = Math.floor(gameState.coreWeapons.autoTurret * 250 * dt);
-        if (autoDmg > 0) applyDamageToBoss(autoDmg);
+        if (currentCustomer.type === 'incident') resolveSpecialIncident(true);
+        else finalizeCustomerCheckout(1.15);
       }
 
       updateThemeDdayText();
@@ -2560,102 +2484,133 @@
     }
 
     // -------------------------------------------------------------------------
-    // H. 보스 레이드 & 크리스마스 트리 이벤트
+    // H. 불꽃놀이 캔버스 물리 연출
     // -------------------------------------------------------------------------
-    function triggerCyberFirewall() {
-      cyberFirewallCode = String(Math.floor(1000 + Math.random() * 9000));
-      cyberFirewallLocked = true;
-      document.getElementById('cyberFirewallBox').classList.remove('hidden');
-      document.getElementById('cyberCodeDisplay').textContent = cyberFirewallCode;
+    let fireworksAnimId = null;
+    let activeFireworks = [];
+    let activeRockets = [];
+
+    function triggerFireworksShow(durationMs = 5000) {
+      const canvas = document.getElementById('fireworksCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      const resize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      };
+      resize();
+
+      const colors = ['#f43f5e', '#38bdf8', '#fde047', '#a855f7', '#34d399', '#fb923c', '#ffffff'];
+      const endTime = Date.now() + durationMs;
+
+      const launchRocket = () => {
+        const rx = Math.random() * (canvas.width * 0.8) + canvas.width * 0.1;
+        const ty = Math.random() * (canvas.height * 0.4) + canvas.height * 0.1;
+        activeRockets.push({
+          x: rx,
+          y: canvas.height + 10,
+          targetY: ty,
+          vy: -12 - Math.random() * 6,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+        playTone(300 + Math.random() * 400, 'sine', 0.15, 0.04);
+      };
+
+      const explode = (x, y, color) => {
+        playTone(100 + Math.random() * 150, 'sawtooth', 0.3, 0.08);
+        const particleCount = 42 + Math.floor(Math.random() * 30);
+        for (let i = 0; i < particleCount; i++) {
+          const angle = (i / particleCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.2;
+          const spd = 2 + Math.random() * 7;
+          activeFireworks.push({
+            x, y,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd,
+            color: Math.random() < 0.3 ? '#ffffff' : color,
+            life: 1.0,
+            decay: 0.015 + Math.random() * 0.02,
+            size: 2 + Math.random() * 3
+          });
+        }
+      };
+
+      let lastLaunch = 0;
+
+      const loop = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const now = Date.now();
+
+        if (now < endTime && now - lastLaunch > 220 + Math.random() * 220) {
+          launchRocket();
+          lastLaunch = now;
+        }
+
+        for (let i = activeRockets.length - 1; i >= 0; i--) {
+          const r = activeRockets[i];
+          r.y += r.vy;
+          ctx.fillStyle = r.color;
+          ctx.beginPath(); ctx.arc(r.x, r.y, 3, 0, Math.PI * 2); ctx.fill();
+
+          if (r.y <= r.targetY) {
+            explode(r.x, r.y, r.color);
+            activeRockets.splice(i, 1);
+          }
+        }
+
+        for (let i = activeFireworks.length - 1; i >= 0; i--) {
+          const p = activeFireworks[i];
+          p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.vx *= 0.98; p.life -= p.decay;
+
+          if (p.life <= 0) {
+            activeFireworks.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.globalAlpha = p.life;
+          ctx.fillStyle = p.color;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+        }
+
+        if (now < endTime || activeRockets.length > 0 || activeFireworks.length > 0) {
+          fireworksAnimId = requestAnimationFrame(loop);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          fireworksAnimId = null;
+        }
+      };
+
+      if (!fireworksAnimId) loop();
     }
 
-    function submitCyberFirewallCode() {
-      const val = document.getElementById('cyberCodeInput').value.trim();
-      if (val === cyberFirewallCode) {
-        cyberFirewallLocked = false;
-        document.getElementById('cyberFirewallBox').classList.add('hidden');
-        document.getElementById('cyberCodeInput').value = '';
-        showToast('🔓 방화벽 암호 해독 성공! 공격이 활성화되었습니다.');
-      } else {
-        showToast('❌ 암호가 일치하지 않습니다!');
+    function triggerSurpriseVisualFX(iconEmoji = '⚡') {
+      const ring1 = document.createElement('div');
+      ring1.className = 'surprise-shockwave border-emerald-400 shadow-2xl';
+      document.body.appendChild(ring1);
+      setTimeout(() => ring1.remove(), 900);
+
+      for (let i = 0; i < 24; i++) {
+        const p = document.createElement('div');
+        p.className = 'surprise-particle';
+        p.textContent = iconEmoji;
+        const angle = (i / 24) * Math.PI * 2;
+        const dist = 180 + Math.random() * 200;
+        p.style.setProperty('--tw-tx', `${Math.cos(angle) * dist}px`);
+        p.style.setProperty('--tw-ty', `${Math.sin(angle) * dist}px`);
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1100);
       }
     }
 
-    function attackMothership(mode, ev) {
-      if (!activeRaidState || !activeRaidState.active) return;
-      if (activeRaidState.type === 'cyber' && cyberFirewallLocked) {
-        showToast('🔐 먼저 상단 4자리 보안 암호를 입력해 해독하세요!');
-        return;
-      }
-      const laserLv = gameState.coreWeapons.hyperLaser || 0;
-      let dmg = 150 + laserLv * 100;
-      if (mode === 'core') {
-        if (gameState.energyCores < 1) {
-          showToast('보유 재화가 부족합니다!');
-          return;
-        }
-        gameState.energyCores -= 1;
-        dmg = 1200 + laserLv * 250;
-      }
-      playBarcodeBeep();
-      if (ev) spawnFloatingText(ev.clientX, ev.clientY, `-${dmg.toLocaleString()}!`, '#e879f9');
-      applyDamageToBoss(dmg);
-      updateAllUI();
-    }
-
-    function applyDamageToBoss(dmg) {
-      db.ref('global/raid').transaction(raid => {
-        if (!raid || !raid.active) return raid;
-        raid.hp = Math.max(0, Number(raid.hp || 0) - dmg);
-        if (raid.hp <= 0) {
-          raid.active = false;
-          raid.winId = `win_${Date.now()}`;
-        }
-        return raid;
-      });
-    }
-
-    function donateToXmasTree(type, ev) {
-      if (!activeXmasTreeState || !activeXmasTreeState.active) return;
-      let addPts = 0;
-      if (type === 'gift') {
-        if (gameState.energyCores < 1) {
-          showToast('🎁 선물 상자가 부족합니다!');
-          return;
-        }
-        gameState.energyCores -= 1;
-        addPts = 10;
-      } else {
-        if (gameState.money < 10000) {
-          showToast('💸 보유 자금이 10,000원 이상 필요합니다!');
-          return;
-        }
-        gameState.money -= 10000;
-        addPts = 5;
-      }
-      playCoinTap();
-      if (ev) spawnFloatingText(ev.clientX, ev.clientY, `+${addPts}pt 🎄`, '#fde047');
-      updateAllUI();
-      db.ref('global/xmasTree').transaction(tree => {
-        if (!tree || !tree.active) return tree;
-        tree.points = Number(tree.points || 0) + addPts;
-        if (tree.points >= (tree.goal || 500)) {
-          tree.active = false;
-          tree.winId = `xmas_win_${Date.now()}`;
-        }
-        return tree;
-      });
-    }
-
-    // -------------------------------------------------------------------------
-    // I. 깜짝 이벤트 50종 실행기
-    // -------------------------------------------------------------------------
     function executeSurpriseClientEffect(ev) {
       if (ev.type === 'megaphone') {
         const banner = document.getElementById('megaphoneBanner');
-        document.getElementById('megaphoneText').textContent = ev.text || '긴급 방송이 전파되었습니다!';
+        document.getElementById('megaphoneText').textContent = ev.text || '긴급 방송이 송출되었습니다!';
         banner.classList.remove('hidden');
         playGiftFanfare();
+        triggerSurpriseVisualFX('📣');
         setTimeout(() => banner.classList.add('hidden'), 6000);
         return;
       }
@@ -2663,8 +2618,13 @@
       const def = SURPRISE_50_LIST.find(s => s.id === ev.type);
       if (!def) return;
 
-      showToast(`🎪 깜짝 이벤트: ${def.title} (${def.desc})`);
+      showToast(`🎪 깜짝 이벤트: ${def.title}`);
       playGiftFanfare();
+      triggerSurpriseVisualFX(def.rain || '⚡');
+
+      if (def.id === 'festival_firework' || def.id === 'admin_grand_gift') {
+        triggerFireworksShow(5000);
+      }
 
       if (def.money) gameState.money += def.money;
       if (def.core) gameState.energyCores += def.core;
@@ -2672,102 +2632,13 @@
       if (def.combo) gameState.combo += def.combo;
       if (def.rushSec) autoRushUntil = Date.now() + def.rushSec * 1000;
       if (def.zeroG) zeroGravityUntil = Date.now() + def.zeroG;
-      if (def.lottoChance) {
-        if (Math.random() < def.lottoChance) {
-          gameState.money += def.lottoPrize;
-          showToast(`🎉 축하합니다! 로또 당첨 +${def.lottoPrize.toLocaleString()}원!`);
-        } else {
-          showToast('😢 아쉽게도 이번 로또는 꽝입니다!');
-        }
-      }
-      if (def.spawnVip) {
-        for (let i = 0; i < def.spawnVip; i++) waitingQueue.unshift(createCustomerObject('vip'));
-        renderWaitingQueue();
-      }
-      if (def.spawnLarge) {
-        for (let i = 0; i < def.spawnLarge; i++) waitingQueue.unshift(createCustomerObject('normal', 5));
-        renderWaitingQueue();
-      }
-      if (def.rain) {
-        for (let i = 0; i < 24; i++) {
-          const el = document.createElement('div');
-          el.className = 'money-rain-item';
-          el.textContent = def.rain;
-          el.style.left = `${Math.random() * 94}vw`;
-          el.style.animationDelay = `${Math.random() * 1.2}s`;
-          document.body.appendChild(el);
-          setTimeout(() => el.remove(), 4500);
-        }
-      }
-      if (def.bodyClass) {
-        const classes = def.bodyClass.split(' ');
-        document.body.classList.add(...classes);
-        setTimeout(() => document.body.classList.remove(...classes), def.dur || 5000);
-      }
-      if (def.blackout) {
-        const b = document.getElementById('blackoutOverlay');
-        b.classList.remove('hidden');
-        setTimeout(() => b.classList.add('hidden'), def.blackout);
-      }
-      if (def.slime) {
-        const box = document.getElementById('slimeOverlay');
-        box.classList.remove('hidden');
-        box.innerHTML = '';
-        for (let i = 0; i < 12; i++) {
-          const blob = document.createElement('button');
-          blob.textContent = def.slime;
-          blob.className = 'fixed text-5xl animate-bounce';
-          blob.style.left = `${10 + Math.random() * 75}vw`;
-          blob.style.top = `${15 + Math.random() * 65}vh`;
-          blob.onclick = () => {
-            playCoinTap();
-            blob.remove();
-            if (box.children.length === 0) box.classList.add('hidden');
-          };
-          box.appendChild(blob);
-        }
-      }
+
       updateAllUI();
       saveToCloud();
     }
 
     function applyThemeVisuals(theme) {
       activeThemeMode = theme || 'normal';
-      const banner = document.getElementById('alienOccupationBanner');
-      const snow = document.getElementById('christmasSnowContainer');
-      const tokenLabel = document.getElementById('statTokenLabel');
-      banner.classList.add('hidden');
-      snow.classList.add('hidden');
-      snow.innerHTML = '';
-
-      if (activeThemeMode === 'alien') {
-        banner.classList.remove('hidden');
-        document.getElementById('occupationBannerIcon').textContent = '👽';
-        document.getElementById('occupationBannerTitle').textContent = currentBannerText || '대규모 이벤트가 다가옵니다..';
-        tokenLabel.textContent = '🔋 코어';
-      } else if (activeThemeMode === 'cyber') {
-        banner.classList.remove('hidden');
-        document.getElementById('occupationBannerIcon').textContent = '💻';
-        document.getElementById('occupationBannerTitle').textContent = currentBannerText || '시스템 결전의 날이 다가옵니다..';
-        tokenLabel.textContent = '💾 칩';
-      } else if (activeThemeMode === 'xmas') {
-        banner.classList.remove('hidden');
-        document.getElementById('occupationBannerIcon').textContent = '🎅';
-        document.getElementById('occupationBannerTitle').textContent = currentBannerText || '크리스마스 대축제가 다가옵니다!';
-        tokenLabel.textContent = '🎁 선물';
-        snow.classList.remove('hidden');
-        for (let i = 0; i < 28; i++) {
-          const flake = document.createElement('div');
-          flake.className = 'snow-flake';
-          flake.textContent = i % 2 === 0 ? '❄️' : '❅';
-          flake.style.left = `${Math.random() * 100}vw`;
-          flake.style.animationDuration = `${4 + Math.random() * 4}s`;
-          flake.style.animationDelay = `${Math.random() * 5}s`;
-          snow.appendChild(flake);
-        }
-      } else {
-        tokenLabel.textContent = '🔋 코어';
-      }
       refillWaitingQueue();
       spawnNextCustomer();
       updateAllUI();
@@ -2784,7 +2655,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // J. 탭 전환 & 랭킹 & 사장님 커뮤니티
+    // I. 탭 전환 & 랭킹 & 커뮤니티
     // -------------------------------------------------------------------------
     function switchTab(tabName) {
       ['store', 'upgrade', 'ranking', 'community'].forEach(t => {
@@ -2842,15 +2713,7 @@
         timestamp: Date.now()
       });
       input.value = '';
-      showToast('📨 운영자에게 건의사항이 전달되었습니다!');
-    }
-
-    function castPollVote(opt) {
-      if (!currentUser) return;
-      db.ref(`global/poll/votes1/${currentUser.key}`).remove();
-      db.ref(`global/poll/votes2/${currentUser.key}`).remove();
-      db.ref(`global/poll/votes${opt}/${currentUser.key}`).set(true);
-      playCoinTap();
+      showToast('📨 건의사항이 전달되었습니다!');
     }
 
     function openCouponModal() { document.getElementById('couponModal').classList.remove('hidden'); }
@@ -2870,13 +2733,13 @@
         updateAllUI();
         playGiftFanfare();
         closeCouponModal();
-        showToast(`🎁 오픈 기념 쿠폰 보상 +${LAUNCH_COUPON_REWARD.toLocaleString()}원 수령!`);
+        showToast(`🎁 쿠폰 보상 +${LAUNCH_COUPON_REWARD.toLocaleString()}원 수령!`);
         return;
       }
       db.ref(`global/coupons/${sanitizeKey(code)}`).once('value', snap => {
         const c = snap.val();
         if (!c || !c.active) {
-          showToast('❌ 유효하지 않거나 만료된 쿠폰입니다.');
+          showToast('❌ 유효하지 않은 쿠폰입니다.');
           return;
         }
         gameState.usedCoupons[code] = true;
@@ -2890,7 +2753,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // K. 총괄 관리자 패널 제어 함수들
+    // J. 관리자 제어판
     // -------------------------------------------------------------------------
     function openAdminModal() {
       document.getElementById('adminModal').classList.remove('hidden');
@@ -2912,89 +2775,10 @@
         document.getElementById('adminDashboard').classList.remove('hidden');
         document.getElementById('maintenanceModal').classList.add('hidden');
         loadAdminUserList();
-        loadAdminFeedback();
-        showToast('👑 총괄 운영자 권한으로 인증되었습니다.');
+        showToast('👑 총괄 운영자로 인증되었습니다.');
       } else {
         document.getElementById('adminAuthError').classList.remove('hidden');
       }
-    }
-
-    function toggleAdminMailTargetInput() {
-      const mode = document.getElementById('adminMailTargetMode').value;
-      const userSel = document.getElementById('adminMailUserSelect');
-      const nickInput = document.getElementById('adminMailTargetNick');
-      const isAll = mode === 'all';
-      userSel.disabled = isAll;
-      nickInput.disabled = isAll;
-      nickInput.placeholder = isAll ? '전체 사장님 모두에게 일괄 발송됩니다' : '받는 사람 닉네임 직접 입력 (개인 발송 시)';
-    }
-
-    function syncMailUserSelect() {
-      const val = document.getElementById('adminMailUserSelect').value;
-      if (val) document.getElementById('adminMailTargetNick').value = val;
-    }
-
-    function sendAdminMail() {
-      const mode = document.getElementById('adminMailTargetMode').value;
-      const targetNick = document.getElementById('adminMailTargetNick').value.trim();
-      const title = document.getElementById('adminMailTitle').value.trim() || '운영진 특별 편지';
-      const body = document.getElementById('adminMailBody').value.trim();
-      const money = Math.max(0, Number(document.getElementById('adminMailMoney').value || 0));
-      const cores = Math.max(0, Number(document.getElementById('adminMailCores').value || 0));
-
-      if (!body && money === 0 && cores === 0) {
-        showToast('❌ 편지 내용이나 첨부할 보상을 입력해주세요!');
-        return;
-      }
-
-      const mailPayload = {
-        sender: '총괄 운영자',
-        title,
-        body: body || '운영진이 보낸 선물이 도착했습니다!',
-        money,
-        cores,
-        claimed: false,
-        isGlobal: mode === 'all',
-        timestamp: Date.now()
-      };
-
-      if (mode === 'all') {
-        db.ref('users').once('value', snap => {
-          const users = snap.val() || {};
-          const keys = Object.keys(users);
-          if (keys.length === 0) {
-            showToast('발송할 등록 유저가 없습니다.');
-            return;
-          }
-          keys.forEach(uKey => {
-            db.ref(`mails/${uKey}`).push(mailPayload);
-          });
-          showToast(`📢 전체 사장님(${keys.length}명)에게 우편 및 보상을 발송했습니다!`);
-          clearAdminMailInputs();
-        });
-      } else {
-        if (!targetNick) {
-          showToast('❌ 받는 사람 닉네임을 선택하거나 입력해주세요!');
-          return;
-        }
-        const targetKey = sanitizeKey(targetNick);
-        db.ref(`users/${targetKey}`).once('value', snap => {
-          if (!snap.exists()) {
-            showToast(`❌ [${targetNick}] 닉네임을 찾을 수 없습니다.`);
-            return;
-          }
-          db.ref(`mails/${targetKey}`).push(mailPayload);
-          showToast(`👤 [${targetNick}] 사장님 개인 우편함으로 발송 완료!`);
-          clearAdminMailInputs();
-        });
-      }
-    }
-
-    function clearAdminMailInputs() {
-      document.getElementById('adminMailTitle').value = '';
-      document.getElementById('adminMailBody').value = '';
-      document.getElementById('adminMailMoney').value = '0';
-      document.getElementById('adminMailCores').value = '0';
     }
 
     function triggerAdminSurprise(forcedType) {
@@ -3002,23 +2786,13 @@
       const megaInput = document.getElementById('adminMegaphoneInput');
       const text = megaInput ? megaInput.value.trim() : '';
 
-      if (type === 'megaphone' && !text) {
-        showToast('❌ 확성기로 전파할 메시지를 먼저 입력하세요!');
-        return;
-      }
-
       db.ref('global/surprise').set({
         id: `surp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         type,
         text,
         timestamp: Date.now()
       }).then(() => {
-        if (type === 'megaphone') {
-          if (megaInput) megaInput.value = '';
-          showToast('📣 전체 서버에 확성기 방송을 송출했습니다!');
-        } else {
-          showToast('⚡ 깜짝 이벤트를 전체 서버에 발동했습니다!');
-        }
+        showToast('⚡ 이벤트를 전 서버에 발동했습니다!');
       });
     }
 
@@ -3039,50 +2813,13 @@
 
         document.getElementById('adminUserSelect').innerHTML = userOptions;
         document.getElementById('adminMailUserSelect').innerHTML = userOptions;
-
-        entries.sort((a, b) => {
-          const aOn = onlineUserKeys.has(a[0]) ? 1 : 0;
-          const bOn = onlineUserKeys.has(b[0]) ? 1 : 0;
-          return bOn - aOn || (b[1].updatedAt || 0) - (a[1].updatedAt || 0);
-        });
-
-        document.getElementById('adminUserStatusList').innerHTML = entries.map(([key, u]) => {
-          const isOnline = onlineUserKeys.has(key);
-          const lastSeen = u.updatedAt ? new Date(u.updatedAt).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '기록없음';
-          return `<div class="p-2 rounded-xl bg-slate-900 border ${isOnline ? 'border-emerald-500/50' : 'border-slate-800'} flex items-center justify-between gap-2 text-xs">
-            <div class="min-w-0">
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400' : 'bg-slate-600'}"></span>
-                <span class="font-black text-white truncate">${escapeHtml(u.nickname)}</span>
-                <span class="text-[10px] text-amber-300 font-mono">PIN:${escapeHtml(String(u.pin || '????'))}</span>
-              </div>
-              <div class="text-[10px] text-slate-400">${u.branchCount || 1}호점 · ${Number(u.money || 0).toLocaleString()}원 · ${isOnline ? '🟢 접속중' : lastSeen}</div>
-            </div>
-            <button onclick="quickSelectAdminTarget('${escapeHtml(u.nickname)}')" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 text-[10px] font-black shrink-0">선택</button>
-          </div>`;
-        }).join('');
       });
-    }
-
-    function quickSelectAdminTarget(nick) {
-      document.getElementById('adminTargetNickname').value = nick;
-      document.getElementById('adminMailTargetMode').value = 'single';
-      toggleAdminMailTargetInput();
-      document.getElementById('adminMailTargetNick').value = nick;
-      showToast(`📌 [${nick}] 사장님이 선택되었습니다.`);
-    }
-
-    function syncSelectedUserToInput() {
-      const val = document.getElementById('adminUserSelect').value;
-      if (val) document.getElementById('adminTargetNickname').value = val;
     }
 
     function postGlobalNotice() {
       const text = document.getElementById('adminNoticeInput').value.trim();
       if (!text) return;
-      const payload = { text, timestamp: Date.now() };
-      db.ref('global/notice').set(payload);
-      db.ref('global/noticeHistory').push(payload);
+      db.ref('global/notice').set({ text, timestamp: Date.now() });
       document.getElementById('adminNoticeInput').value = '';
       showToast('📢 긴급 공지를 발송했습니다!');
     }
@@ -3090,11 +2827,8 @@
     function triggerCustomFever() {
       const mins = Math.max(1, Number(document.getElementById('adminFeverMinInput').value || 5));
       const mult = Math.max(1.5, Number(document.getElementById('adminFeverMultInput').value || 2.0));
-      db.ref('global/fever').set({
-        until: Date.now() + mins * 60000,
-        multiplier: mult
-      });
-      showToast(`🔥 ${mins}분간 ${mult}배 서버 피버가 시작되었습니다!`);
+      db.ref('global/fever').set({ until: Date.now() + mins * 60000, multiplier: mult });
+      showToast(`🔥 ${mins}분간 피버가 시작되었습니다!`);
     }
 
     function stopServerFever() {
@@ -3102,41 +2836,17 @@
       showToast('피버 타임이 종료되었습니다.');
     }
 
-    function launchThemeEve(theme) {
-      db.ref('global/season').update({
-        activeTheme: theme,
-        playCutscene: true,
-        themeEventId: `eve_${theme}_${Date.now()}`
-      });
-    }
-
     function resetAllThemeEvents() {
-      db.ref('global/season').update({
-        activeTheme: 'normal',
-        playCutscene: false,
-        themeEventId: `norm_${Date.now()}`
-      });
-      db.ref('global/raid').remove();
-      db.ref('global/xmasTree').remove();
-      showToast('🔄 모든 테마와 보스 이벤트가 일반 모드로 초기화되었습니다.');
+      db.ref('global/season').update({ activeTheme: 'normal', playCutscene: false });
+      showToast('🔄 일반 모드로 복구되었습니다.');
     }
 
     function adminLaunchBossRaid(type) {
-      db.ref('global/raid').set({
-        id: `raid_${type}_${Date.now()}`,
-        active: true,
-        type,
-        hp: 100000,
-        maxHp: 100000
-      });
+      db.ref('global/raid').set({ id: `raid_${type}_${Date.now()}`, active: true, type, hp: 100000, maxHp: 100000 });
     }
 
     function adminLaunchXmasTreeFestival() {
-      db.ref('global/xmasTree').set({
-        active: true,
-        points: 0,
-        goal: 500
-      });
+      db.ref('global/xmasTree').set({ active: true, points: 0, goal: 500 });
     }
 
     function adminModifyUserMoney(mode) {
@@ -3146,24 +2856,17 @@
       const key = sanitizeKey(nick);
       db.ref(`users/${key}`).once('value', snap => {
         const u = snap.val();
-        if (!u) {
-          showToast('유저를 찾을 수 없습니다.');
-          return;
-        }
+        if (!u) return;
         const nextMoney = mode === 'add' ? Number(u.money || 0) + amt : amt;
-        db.ref(`users/${key}`).update({
-          money: nextMoney,
-          adminSyncFlag: Date.now()
-        });
+        db.ref(`users/${key}`).update({ money: nextMoney, adminSyncFlag: Date.now() });
         showToast(`💸 [${nick}] 자금 변경 완료!`);
       });
     }
 
     function adminSetUserBan(banned) {
       const nick = document.getElementById('adminTargetNickname').value.trim();
-      const reason = document.getElementById('adminBanReasonInput').value.trim();
       if (!nick) return;
-      db.ref(`users/${sanitizeKey(nick)}`).update({ banned, banReason: reason });
+      db.ref(`users/${sanitizeKey(nick)}`).update({ banned });
       showToast(banned ? `🚫 [${nick}] 차단 완료` : `✅ [${nick}] 차단 해제`);
     }
 
@@ -3172,31 +2875,20 @@
       const reward = Number(document.getElementById('adminNewCouponReward').value || 50000);
       if (!code) return;
       db.ref(`global/coupons/${sanitizeKey(code)}`).set({ active: true, reward });
-      showToast(`🎟️ 쿠폰 [${code}] (${reward.toLocaleString()}원) 발행 완료!`);
+      showToast(`🎟️ 쿠폰 [${code}] 발행 완료!`);
     }
 
     function createAdminPoll() {
       const question = document.getElementById('adminPollQuestion').value.trim();
       const opt1 = document.getElementById('adminPollOpt1').value.trim();
       const opt2 = document.getElementById('adminPollOpt2').value.trim();
-      if (!question || !opt1 || !opt2) return;
+      if (!question) return;
       db.ref('global/poll').set({ active: true, question, opt1, opt2 });
-      showToast('🗳️ 실시간 투표가 시작되었습니다!');
-    }
-
-    function loadAdminFeedback() {
-      db.ref('global/feedback').limitToLast(20).once('value', snap => {
-        const val = snap.val() || {};
-        document.getElementById('adminFeedbackList').innerHTML = Object.values(val).reverse().map(f =>
-          `<div class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-[11px]">
-            <strong class="text-sky-300">${escapeHtml(f.nickname)}</strong>: <span class="text-slate-200">${escapeHtml(f.text)}</span>
-          </div>`
-        ).join('') || '<p class="text-[11px] text-slate-500">접수된 건의가 없습니다.</p>';
-      });
+      showToast('🗳️ 실시간 투표 개시 완료!');
     }
 
     // -------------------------------------------------------------------------
-    // L. 유틸리티 & 앱 초기 로드
+    // K. 공통 유틸리티
     // -------------------------------------------------------------------------
     function showToast(msg) {
       const box = document.getElementById('toastContainer');
@@ -3223,22 +2915,18 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
+      try { lucide.createIcons(); } catch (e) {}
       scanForRecoverableData();
 
-      // 서버 점검 상태 실시간 감지
       db.ref('global/maintenance').on('value', snap => {
         currentMaintenanceState = snap.val() || { active: false, endTime: '', reason: '' };
         applyMaintenanceGate();
       });
 
-      // 누적 방문 수 연동 복구 (global/visitCount)
       db.ref('global/visitCount').transaction(v => (v || 0) + 1);
       db.ref('global/visitCount').on('value', snap => {
         const cnt = Number(snap.val() || 1).toLocaleString();
         document.getElementById('loginVisitorCount').textContent = `누적 ${cnt}명 방문`;
-        const adminVisits = document.getElementById('adminTotalVisits');
-        if (adminVisits) adminVisits.textContent = `${cnt}회`;
       });
     });
   </script>
