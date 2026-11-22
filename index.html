@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -125,7 +127,7 @@
       <div class="text-center mb-4">
         <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-3xl shadow-lg mb-2">🏪</div>
         <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">편의점 타이쿤</h1>
-        <p class="text-xs text-slate-400 mt-0.5">시즌제 · 보스 레이드 · 크리스마스 축제</p>
+        <p class="text-xs text-slate-400 mt-0.5">시즌제 · 보스 이벤트 · 크리스마스 축제</p>
       </div>
       <div id="recoveryBanner" class="hidden mb-3.5 p-3 rounded-2xl bg-amber-500/15 border border-amber-400/60 space-y-2">
         <div class="flex items-start gap-2">
@@ -191,10 +193,10 @@
         </div>
         <span id="liveInvasionDdayText" class="shrink-0 font-black text-amber-300 bg-black/50 px-2 py-0.5 rounded-lg border border-purple-500/40 text-[10px]">D-7 00:00:00</span>
       </div>
-      <!-- BOSS RAID HUD -->
+      <!-- BOSS HUD -->
       <div id="mothershipRaidHud" class="hidden bg-gradient-to-r from-rose-950 via-purple-950 to-rose-950 border-2 border-rose-400 rounded-2xl p-2.5 space-y-2 shadow-[0_0_25px_rgba(244,63,94,0.45)] animate-pop">
         <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-1.5 min-w-0"><span id="raidBossIcon" class="text-base animate-bounce">🛸</span><span id="raidBossTitle" class="text-xs font-black text-white truncate">외계인 모선 총공세 레이드!</span></div>
+          <div class="flex items-center gap-1.5 min-w-0"><span id="raidBossIcon" class="text-base animate-bounce">🛸</span><span id="raidBossTitle" class="text-xs font-black text-white truncate">외계인 모선 총공세 이벤트!</span></div>
           <span id="raidTimerBadge" class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black shrink-0">03:00</span>
         </div>
         <div>
@@ -204,7 +206,7 @@
         <div id="cyberFirewallBox" class="hidden bg-cyan-950/90 border border-cyan-400 rounded-xl p-2 space-y-1.5 animate-pop">
           <div class="flex items-center justify-between text-[11px] font-black text-cyan-200">
             <span>🔐 AI 방화벽 가동! 보안 암호 입력: <strong id="cyberCodeDisplay" class="text-amber-300 tracking-widest text-sm">0000</strong></span>
-            <span class="text-[10px] text-rose-300">해제 시 방어막 붕괴!</span>
+            <span class="text-[10px] text-rose-300">해제 시 방어막 해제!</span>
           </div>
           <div class="flex gap-1.5">
             <input id="cyberCodeInput" type="text" inputmode="numeric" maxlength="4" placeholder="위 4자리 숫자 입력" class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-950 border border-cyan-500 text-center text-xs font-black text-white tracking-widest" />
@@ -212,7 +214,7 @@
           </div>
         </div>
         <div class="grid grid-cols-2 gap-1.5">
-          <button onclick="attackMothership('laser', event)" class="py-2 px-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-[11px] active:scale-95 transition shadow">🔫 <span id="laserBtnLabel">레이저 가동</span> (<span id="laserDmgText">150</span>)</button>
+          <button onclick="attackMothership('laser', event)" class="py-2 px-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-[11px] active:scale-95 transition shadow">🔫 <span id="laserBtnLabel">광선 가동</span> (<span id="laserDmgText">150</span>)</button>
           <button onclick="attackMothership('core', event)" class="py-2 px-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-[11px] active:scale-95 transition shadow"><span id="coreBtnLabel">🔋 코어 방출</span> (-1 · <span id="coreDmgText">1,200</span>)</button>
         </div>
       </div>
@@ -563,7 +565,6 @@
       </div>
     </div>
   </div>
-
   <!-- SCRIPT -->
   <script>
     const firebaseConfig = { databaseURL: "https://game-7b7db-default-rtdb.firebaseio.com/" };
@@ -721,7 +722,7 @@
         const isCorrupted = (cMode === 'alien_eve' && sec >= 28) || (cMode === 'cyber_eve' && sec >= 24);
         drawDetailedStore(ctx, storeX, storeY, storeW, storeH, cMode, isCorrupted);
 
-        const heroX = storeX + storeW + Math.min(48, w * 0.08), enemyX = w * 0.70;
+        const heroX = storeX + storeW + Math.min(48, w * 0.08), enemyX = w * 0.72;
 
         if (cMode.startsWith('alien')) {
           let ufoX = enemyX, ufoY = groundY - 105 + Math.sin(t * 3.5) * 7, ufoScale = cMode === 'alien_raid_start' ? 1.75 : 1.15, ufoTilt = Math.sin(t * 2.5) * 0.05;
@@ -767,15 +768,11 @@
             spawnCinemaParticles(enemyX, groundY - 92, 4, ['#22d3ee', '#fde047', '#ffffff'], 9, 6);
           }
         } else if (cMode.startsWith('xmas')) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
-          for (let i = 0; i < 55; i++) { ctx.beginPath(); ctx.arc((i * 97 + t * 35) % w, (i * 53 + t * 110) % (h * 0.74), 2.5, 0, Math.PI * 2); ctx.fill(); }
-          drawHeroCharacter(ctx, heroX, groundY, false, false, true);
-          drawSantaAndTree(ctx, enemyX, groundY, cMode === 'xmas_win', t);
-          if (cMode === 'xmas_eve' && sec < 12) {
-            const sleighX = enemyX - 75 + Math.sin(t * 3) * 4;
-            ctx.font = '36px sans-serif'; ctx.fillText('🛷', sleighX, groundY - 8); ctx.fillText('🎅', sleighX + 28, groundY - 12);
-          }
-          if (cMode === 'xmas_win' && Math.random() < 0.14) spawnCinemaParticles(w * (0.25 + Math.random() * 0.5), h * (0.15 + Math.random() * 0.25), 28, ['#fde047', '#f43f5e', '#34d399', '#38bdf8'], 7, 5);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          for (let i = 0; i < 60; i++) { ctx.beginPath(); ctx.arc((i * 97 + t * 40) % w, (i * 53 + t * 115) % (h * 0.74), 2.5, 0, Math.PI * 2); ctx.fill(); }
+          drawHeroCharacter(ctx, heroX, groundY, false, false, sec < 12);
+          drawDetailedSantaSleigh(ctx, enemyX, groundY, cMode, sec, t);
+          if (cMode === 'xmas_win' && Math.random() < 0.16) spawnCinemaParticles(w * (0.25 + Math.random() * 0.5), h * (0.14 + Math.random() * 0.25), 28, ['#fde047', '#f43f5e', '#34d399', '#38bdf8'], 7, 5);
         }
 
         for (let i = cinemaState.particles.length - 1; i >= 0; i--) {
@@ -828,12 +825,48 @@
       ctx.fillStyle = '#090d16'; ctx.beginPath(); ctx.arc(0, 0, 40, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(0, 0, 17 + Math.sin(t * 10) * 4, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     }
-    function drawSantaAndTree(ctx, x, y, litTree, t) {
-      ctx.save(); ctx.translate(x, y); ctx.fillStyle = '#78350f'; ctx.fillRect(-12, -26, 24, 26); ctx.fillStyle = litTree ? '#10b981' : '#065f46';
+    function drawDetailedSantaSleigh(ctx, x, y, cMode, sec, t) {
+      const litTree = cMode === 'xmas_win';
+      // 1. Giant Christmas Tree on Right
+      ctx.save(); ctx.translate(x + 28, y);
+      ctx.fillStyle = '#78350f'; ctx.fillRect(-12, -26, 24, 26);
+      ctx.fillStyle = litTree ? '#10b981' : '#065f46';
       for (let tier = 0; tier < 3; tier++) { ctx.beginPath(); ctx.moveTo(0, -155 + tier * 30); ctx.lineTo(-60 + tier * 11, -90 + tier * 32); ctx.lineTo(60 - tier * 11, -90 + tier * 32); ctx.closePath(); ctx.fill(); }
       const orbColors = ['#ef4444', '#fbbf24', '#38bdf8', '#f472b6'];
       for (let i = 0; i < 9; i++) { ctx.fillStyle = litTree ? orbColors[i % 4] : '#64748b'; ctx.beginPath(); ctx.arc(((i % 3) - 1) * 22, -55 - Math.floor(i / 3) * 28, 4.5, 0, Math.PI * 2); ctx.fill(); }
-      ctx.fillStyle = litTree ? '#fde047' : '#94a3b8'; ctx.beginPath(); ctx.arc(0, -162, 11 + (litTree ? Math.sin(t * 9) * 3 : 0), 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      ctx.fillStyle = litTree ? '#fde047' : '#94a3b8'; ctx.beginPath(); ctx.arc(0, -162, 11 + (litTree ? Math.sin(t * 9) * 3 : 0), 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+      // 2. Custom Vector Santa, Red Sleigh & Glowing-Nose Rudolph
+      const prog = cMode === 'xmas_eve' ? Math.min(1, sec / 7) : 1;
+      const sx = x - 65 + (1 - prog) * 180;
+      const sy = y - (1 - prog) * 95 + Math.sin(t * 5) * 2;
+      ctx.save(); ctx.translate(sx, sy);
+      // Rudolph Reindeer
+      ctx.fillStyle = '#92400e'; ctx.beginPath(); ctx.roundRect(-64, -34, 26, 15, 6); ctx.fill();
+      ctx.fillRect(-62, -20, 4, 18); ctx.fillRect(-45, -20, 4, 18);
+      ctx.beginPath(); ctx.arc(-66, -40, 9, 0, Math.PI * 2); ctx.fill();
+      // Antlers
+      ctx.strokeStyle = '#fde68a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-66, -48); ctx.lineTo(-70, -58); ctx.moveTo(-64, -48); ctx.lineTo(-60, -58); ctx.stroke();
+      // Glowing Red Nose
+      ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(-75, -40, 4 + Math.sin(t * 10) * 1.2, 0, Math.PI * 2); ctx.fill();
+      // Reins
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(-38, -28); ctx.lineTo(-18, -24); ctx.stroke();
+      // Sleigh Runners & Red Body
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-22, -3); ctx.lineTo(36, -3); ctx.quadraticCurveTo(44, -3, 46, -11); ctx.stroke();
+      ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.roundRect(-18, -28, 52, 21, [4, 4, 12, 12]); ctx.fill();
+      ctx.fillStyle = '#fbbf24'; ctx.fillRect(-18, -28, 52, 4);
+      // Santa Claus inside Sleigh
+      ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(6, -36, 13, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fde68a'; ctx.beginPath(); ctx.arc(4, -50, 9, 0, Math.PI * 2); ctx.fill();
+      // Fluffy White Beard & Hat
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(2, -46, 9, 0.1 * Math.PI, 0.9 * Math.PI); ctx.fill();
+      ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.moveTo(-5, -56); ctx.lineTo(13, -56); ctx.lineTo(16, -68); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(16, -68, 3.5, 0, Math.PI * 2); ctx.fill();
+      // Gift Boxes Stacked in Back
+      ctx.fillStyle = '#38bdf8'; ctx.fillRect(18, -42, 12, 12);
+      ctx.fillStyle = '#fbbf24'; ctx.fillRect(22, -42, 4, 12);
+      ctx.restore();
     }
     function drawHeroCharacter(ctx, x, y, knocked, firing, surprised = false) {
       ctx.save(); ctx.translate(x, y);
@@ -872,7 +905,7 @@
       cyber_raid_start: [{ startSec: 0, act: 'CYBER EVENT · AI 메인프레임 결전!', speaker: '🔐 보안 암호 해독 작전', ground: '메인프레임 코어', text: 'AI 코어가 방화벽 암호를 가동했습니다! 4자리 암호를 해제하고 시스템을 정상화하세요!', shake: 16, zoom: 1.15, flash: 0.6, sound: 'glitch' }],
       cyber_raid_win: [{ startSec: 0, act: 'SYSTEM RESTORED · 네트워크 완전 복구!', speaker: '💻 화이트해커 대승리!', ground: '정상화된 편의점', text: '오류 코드가 완전히 사라지고 편의점 서버가 복구되었습니다! [💻화이트해커] 칭호 획득!', shake: 18, zoom: 1.15, flash: 0.85, sound: 'explosion' }],
       xmas_eve: [
-        { startSec: 0, act: 'ACT 1 · 눈보라 속 산타 썰매 비상 착륙!', speaker: '❄️ 기상청 대설 특보', ground: '함박눈 내리는 편의점 앞', text: '거센 눈보라를 뚫고 붉은 산타 썰매가 편의점 앞 눈밭에 미끄러지며 착륙했습니다!', shake: 14, zoom: 1.12, flash: 0.4, sound: 'crash' },
+        { startSec: 0, act: 'ACT 1 · 눈보라 속 산타 썰매 비상 착륙!', speaker: '❄️ 기상청 대설 특보', ground: '함박눈 내리는 편의점 앞', text: '거센 눈보라를 뚫고 빨간코 루돌프와 산타 썰매가 편의점 앞 눈밭에 착륙했습니다!', shake: 14, zoom: 1.12, flash: 0.4, sound: 'crash' },
         { startSec: 13, act: 'ACT 2 · 산타 할아버지의 긴급 부탁', speaker: '🎅 산타클로스', ground: '편의점 정문 앞', text: '산타: "허허, 눈보라에 선물 상자들이 흩어졌구나! 크리스마스까지 잃어버린 선물을 모아주겠니?"', shake: 0, zoom: 1.16, flash: 0, sound: 'bells' },
         { startSec: 25, act: 'ACT 3 · 화이트 크리스마스 전야제 개막!', speaker: '🎄 축제 준비 시작', ground: '눈 내리는 매장', text: '매장에 함박눈이 내립니다! 손님을 응대하고 🎁 선물 상자를 모아 12/25 트리 점등을 준비하세요!', shake: 0, zoom: 1.0, flash: 0.5, sound: 'bells' }
       ],
@@ -1099,7 +1132,7 @@
         activeRaidState = raid; hud.classList.remove('hidden');
         const isCyber = raid.type === 'cyber';
         document.getElementById('raidBossIcon').textContent = isCyber ? '🤖' : '🛸';
-        document.getElementById('raidBossTitle').textContent = isCyber ? 'AI 메인프레임 결전!' : '외계인 모선 총공세 레이드!';
+        document.getElementById('raidBossTitle').textContent = isCyber ? 'AI 메인프레임 결전!' : '외계인 모선 총공세 이벤트!';
         document.getElementById('bossHpName').textContent = isCyber ? '메인프레임 코어 무결성' : '모선 에너지 코어 HP';
         document.getElementById('laserBtnLabel').textContent = isCyber ? '백신 광선' : '광선 가동';
         document.getElementById('coreBtnLabel').textContent = isCyber ? '💾 칩 오버로드' : '🔋 코어 방출';
@@ -1412,66 +1445,28 @@
       if (ev.type === 'money_rain') {
         gameState.money += 30000;
         for (let i = 0; i < 24; i++) {
-          const el = document.createElement('div');
-          el.className = 'money-rain-item';
-          el.textContent = i % 2 === 0 ? '💵' : '💰';
-          el.style.left = `${Math.random() * 95}vw`;
-          el.style.animationDelay = `${Math.random() * 1.2}s`;
-          document.body.appendChild(el);
-          setTimeout(() => el.remove(), 3500);
+          const el = document.createElement('div'); el.className = 'money-rain-item'; el.textContent = i % 2 === 0 ? '💵' : '💰';
+          el.style.left = `${Math.random() * 95}vw`; el.style.animationDelay = `${Math.random() * 1.2}s`;
+          document.body.appendChild(el); setTimeout(() => el.remove(), 3500);
         }
         showToast('💸 하늘에서 돈비가 내립니다! 전원 +30,000원!');
-      } else if (ev.type === 'core_drop') {
-        gameState.energyCores += 15;
-        showToast('🔋 이벤트 재화 보급 투하! +15개 지급!');
-      } else if (ev.type === 'auto_rush') {
-        autoRushUntil = Date.now() + 10000;
-        showToast('🚀 10초간 초고속 자동 정산 러시 발동!');
-      } else if (ev.type === 'server_lotto') {
-        if (Math.random() < 0.35) {
-          gameState.money += 500000;
-          showToast('🎰 대박!! 전 서버 로또에 당첨되어 +500,000원을 획득했습니다!');
-        } else {
-          showToast('🎰 전 서버 로또 추첨이 진행되었습니다! 다음 기회에!');
-        }
-      } else if (ev.type === 'vip_spawn') {
-        waitingQueue.unshift(createCustomerObject(true, false));
-        renderWaitingLine();
-        showToast('👑 초특급 VIP 재벌 손님이 대기줄 맨 앞에 도착했습니다!');
-      } else if (ev.type === 'golden_broom') {
-        gameState.cleanliness = 100;
-        gameState.money += 20000;
-        showToast('🧹 황금 빗자루 타임! 청결도 100% + 보너스 20,000원!');
-      } else if (ev.type === 'flip_psycho') {
-        document.body.classList.add('admin-flip', 'admin-psycho');
-        setTimeout(() => document.body.classList.remove('admin-flip', 'admin-psycho'), 5000);
-        showToast('🙃 운영자의 장난! 5초간 화면이 뒤집힙니다!');
-      } else if (ev.type === 'zero_gravity') {
-        zeroGravityUntil = Date.now() + 7000;
-        renderBasketItems();
-        showToast('🛸 7초간 매장 내부가 무중력 상태가 됩니다!');
-      } else if (ev.type === 'alien_slime') {
-        const slime = document.getElementById('slimeOverlay');
-        slime.classList.remove('hidden', 'pointer-events-none');
+      } else if (ev.type === 'core_drop') { gameState.energyCores += 15; showToast('🔋 이벤트 재화 보급 투하! +15개 지급!'); }
+      else if (ev.type === 'auto_rush') { autoRushUntil = Date.now() + 10000; showToast('🚀 10초간 초고속 자동 정산 러시 발동!'); }
+      else if (ev.type === 'server_lotto') { if (Math.random() < 0.35) { gameState.money += 500000; showToast('🎰 대박!! 전 서버 로또에 당첨되어 +500,000원을 획득했습니다!'); } else showToast('🎰 전 서버 로또 추첨이 진행되었습니다! 다음 기회에!'); }
+      else if (ev.type === 'vip_spawn') { waitingQueue.unshift(createCustomerObject(true, false)); renderWaitingLine(); showToast('👑 초특급 VIP 재벌 손님이 대기줄 맨 앞에 도착했습니다!'); }
+      else if (ev.type === 'golden_broom') { gameState.cleanliness = 100; gameState.money += 20000; showToast('🧹 황금 빗자루 타임! 청결도 100% + 보너스 20,000원!'); }
+      else if (ev.type === 'flip_psycho') { document.body.classList.add('admin-flip', 'admin-psycho'); setTimeout(() => document.body.classList.remove('admin-flip', 'admin-psycho'), 5000); showToast('🙃 운영자의 장난! 5초간 화면이 뒤집힙니다!'); }
+      else if (ev.type === 'zero_gravity') { zeroGravityUntil = Date.now() + 7000; renderBasketItems(); showToast('🛸 7초간 매장 내부가 무중력 상태가 됩니다!'); }
+      else if (ev.type === 'alien_slime') {
+        const slime = document.getElementById('slimeOverlay'); slime.classList.remove('hidden', 'pointer-events-none');
         slime.innerHTML = Array.from({ length: 12 }, () => `<div onclick="this.remove()" style="position:fixed;left:${10 + Math.random() * 75}vw;top:${15 + Math.random() * 65}vh;font-size:54px;cursor:pointer;">🧪</div>`).join('');
-        setTimeout(() => { slime.innerHTML = ''; slime.classList.add('hidden', 'pointer-events-none'); }, 8000);
-        showToast('🧪 화면에 묻은 점액을 터치해서 닦아내세요!');
+        setTimeout(() => { slime.innerHTML = ''; slime.classList.add('hidden', 'pointer-events-none'); }, 8000); showToast('🧪 화면에 묻은 점액을 터치해서 닦아내세요!');
       } else if (ev.type === 'megaphone') {
-        const banner = document.getElementById('megaphoneBanner');
-        document.getElementById('megaphoneText').textContent = ev.text || '장사 잘 되고 있나 사장님들?!';
-        banner.classList.remove('hidden');
-        document.body.classList.add('admin-shake');
+        const banner = document.getElementById('megaphoneBanner'); document.getElementById('megaphoneText').textContent = ev.text || '장사 잘 되고 있나 사장님들?!';
+        banner.classList.remove('hidden'); document.body.classList.add('admin-shake');
         setTimeout(() => { banner.classList.add('hidden'); document.body.classList.remove('admin-shake'); }, 4500);
-      } else if (ev.type === 'blackout') {
-        const bo = document.getElementById('blackoutOverlay');
-        bo.classList.remove('hidden');
-        setTimeout(() => bo.classList.add('hidden'), 5000);
-        showToast('⚡ 깜짝 정전! 5초 뒤 비상 발전기가 가동됩니다!');
-      } else if (ev.type === 'rush_queue') {
-        waitingQueue.unshift(createCustomerObject(false, true), createCustomerObject(false, true));
-        renderWaitingLine();
-        showToast('🏃 대량 구매 손님 러시! 장바구니 폭탄 손님 등장!');
-      }
+      } else if (ev.type === 'blackout') { const bo = document.getElementById('blackoutOverlay'); bo.classList.remove('hidden'); setTimeout(() => bo.classList.add('hidden'), 5000); showToast('⚡ 깜짝 정전! 5초 뒤 비상 발전기가 가동됩니다!'); }
+      else if (ev.type === 'rush_queue') { waitingQueue.unshift(createCustomerObject(false, true), createCustomerObject(false, true)); renderWaitingLine(); showToast('🏃 대량 구매 손님 러시! 장바구니 폭탄 손님 등장!'); }
       updateAllUI();
     }
 
@@ -1557,4 +1552,3 @@
   </script>
 </body>
 </html>
-
