@@ -3,613 +3,551 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>편의점 타이쿤 - 올인원 시즌 & 이벤트 에디션</title>
+  <title>24시 편의점 타이쿤 ONLINE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" />
   <style>
-    * { font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; width: 100%; min-height: 100%; overflow-x: hidden; background-color: #080c14; color: #f8fafc; user-select: none; transition: transform 0.6s ease, filter 0.4s ease; }
-    body.admin-flip { transform: rotate(180deg); }
-    body.admin-psycho { animation: rainbowHue 0.5s infinite linear; }
-    body.admin-blur { filter: blur(3px); }
-    body.admin-grayscale { filter: grayscale(100%); }
-    body.admin-invert { filter: invert(100%); }
-    body.admin-shake { animation: screenShake 0.45s infinite ease-in-out; }
-    @keyframes screenShake { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-6px, 4px); } 50% { transform: translate(6px, -4px); } 75% { transform: translate(-4px, -4px); } }
-    @keyframes zeroGravity { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-9px) rotate(2deg); } }
-    .zero-gravity-item { animation: zeroGravity 1.2s infinite ease-in-out; }
-    @keyframes rainbowHue { 0% { filter: hue-rotate(0deg) saturate(1.7); } 50% { filter: hue-rotate(180deg) saturate(2.1); } 100% { filter: hue-rotate(360deg) saturate(1.7); } }
-    @keyframes sirenFlash { 0%, 100% { opacity: 0.1; } 50% { opacity: 0.35; } }
-    .animate-siren { animation: sirenFlash 0.85s infinite ease-in-out; }
-    @keyframes moneyFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(105vh) rotate(720deg); opacity: 0; } }
-    .money-rain-item { position: fixed; top: -40px; font-size: 26px; pointer-events: none; z-index: 9999; animation: moneyFall 2.8s linear forwards; }
-    @keyframes snowFall { 0% { transform: translateY(-10vh) translateX(0px); opacity: 0.9; } 100% { transform: translateY(105vh) translateX(25px); opacity: 0.2; } }
-    .snow-flake { position: fixed; top: -20px; color: #ffffff; pointer-events: none; z-index: 25; animation: snowFall 5.5s linear infinite; }
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); }
-    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 9999px; }
-    @keyframes popIn { 0% { transform: scale(0.92); opacity: 0; } 70% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-    @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-38px) scale(1.1); opacity: 0; } }
-    @keyframes laserSweep { 0% { top: 12%; opacity: 0.4; } 50% { top: 84%; opacity: 1; } 100% { top: 12%; opacity: 0.4; } }
-    @keyframes feverGlow { 0%, 100% { box-shadow: 0 0 12px rgba(251, 191, 36, 0.35); } 50% { box-shadow: 0 0 24px rgba(251, 191, 36, 0.75); } }
-    .animate-pop { animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .fever-pulse { animation: feverGlow 1.5s infinite ease-in-out; }
-    .floating-text { position: fixed; pointer-events: none; font-weight: 900; z-index: 9999; animation: floatUp 0.9s ease-out forwards; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9); }
-    .scanner-laser { position: absolute; left: 8%; right: 8%; height: 2px; background: #ef4444; box-shadow: 0 0 8px #ef4444, 0 0 14px #f87171; animation: laserSweep 1.6s infinite ease-in-out; pointer-events: none; }
-    .pb-nav-safe { padding-bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px)); }
+    * { font-family: 'Noto Sans KR', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: #090d16; color: #f8fafc; overflow-x: hidden; user-select: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .animate-pop { animation: popIn 0.22s ease-out forwards; }
+    @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-48px) scale(1.1); opacity: 0; } }
+    .floating-text { position: fixed; pointer-events: none; z-index: 9999; font-weight: 900; animation: floatUp 0.9s ease-out forwards; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+    @keyframes shakeBody { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-5px, 4px); } 50% { transform: translate(5px, -4px); } 75% { transform: translate(-4px, -3px); } }
+    .admin-shake { animation: shakeBody 0.35s infinite; }
+    .admin-flip { transform: rotate(180deg); transition: transform 0.5s; }
+    .admin-psycho { filter: hue-rotate(140deg) saturate(1.8); }
+    .admin-blur { filter: blur(2.5px); }
+    .admin-grayscale { filter: grayscale(100%); }
+    .admin-invert { filter: invert(100%); }
+    @keyframes zeroFloat { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-9px) rotate(2deg); } }
+    .zero-gravity-item { animation: zeroFloat 1.6s ease-in-out infinite; }
+    @keyframes fallDown { 0% { transform: translateY(-40px) rotate(0deg); opacity: 1; } 100% { transform: translateY(105vh) rotate(360deg); opacity: 0.7; } }
+    .money-rain-item, .snow-flake { position: fixed; top: -30px; z-index: 9998; pointer-events: none; font-size: 22px; animation: fallDown 3.2s linear forwards; }
+    .snow-flake { animation-iteration-count: infinite; font-size: 14px; opacity: 0.85; }
   </style>
 </head>
-<body class="flex flex-col min-h-screen bg-[#080c14] text-slate-100">
-  <div id="christmasSnowContainer" class="hidden fixed inset-0 pointer-events-none z-[25]"></div>
+<body class="min-h-screen flex flex-col max-w-lg mx-auto relative pb-20">
 
-  <!-- 60FPS MULTI-THEME CINEMA CUTSCENE OVERLAY -->
-  <div id="ufoCutsceneOverlay" class="hidden fixed inset-0 z-[130] flex flex-col justify-between bg-[#03050a] overflow-hidden">
-    <canvas id="ufoCinemaCanvas" class="absolute inset-0 w-full h-full z-0 block"></canvas>
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(2,4,10,0.85)_100%)] pointer-events-none z-[1]"></div>
-    <div id="ufoSirenGlow" class="absolute inset-0 bg-gradient-to-b from-purple-600/15 via-transparent to-rose-600/15 animate-siren pointer-events-none z-[1]"></div>
-    <div id="ufoTopLetterbox" class="w-full h-14 sm:h-16 bg-black/95 border-b border-purple-500/60 flex items-center justify-between px-4 z-20 transition-transform duration-500 -translate-y-full">
-      <div class="flex items-center gap-2 min-w-0">
-        <span class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-ping shrink-0"></span>
-        <span id="ufoActBadge" class="text-xs sm:text-sm font-black tracking-wider text-purple-200 truncate">ACT 1 · 긴급 상황</span>
-      </div>
-      <div class="flex items-center gap-1.5 shrink-0">
-        <span class="px-2 py-0.5 rounded bg-purple-500/25 border border-purple-400/50 text-[10px] font-black text-purple-200">CINEMA 60FPS</span>
-        <span id="ufoElapsedTimer" class="text-xs font-black text-amber-300 bg-slate-900 px-2.5 py-0.5 rounded-full border border-slate-700">00:00 / 00:38</span>
-      </div>
-    </div>
-    <div id="ufoMainStage" class="relative flex-1 flex flex-col justify-between p-3.5 sm:p-5 z-10 max-w-2xl mx-auto w-full pointer-events-none">
-      <div class="w-full flex flex-col items-center">
-        <div id="ufoBattleHud" class="hidden w-full flex items-center justify-between gap-3 bg-slate-950/85 backdrop-blur-md border border-purple-400/60 rounded-2xl px-4 py-2.5 shadow-[0_0_25px_rgba(168,85,247,0.35)]">
-          <div class="flex-1 text-left">
-            <div class="flex justify-between text-[11px] font-black text-emerald-300 mb-1">
-              <span>🧑‍💼 나 (편의점 사장님)</span><span id="heroHpText">100%</span>
-            </div>
-            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden"><div id="heroHpBar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-300 transition-all duration-300" style="width: 100%"></div></div>
-          </div>
-          <span class="text-xs font-black text-amber-400 px-1.5">VS</span>
-          <div class="flex-1 text-right">
-            <div class="flex justify-between text-[11px] font-black text-purple-300 mb-1">
-              <span id="alienHpText">100%</span><span id="enemyHudLabel">👽 적 세력</span>
-            </div>
-            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden"><div id="alienHpBar" class="h-full bg-gradient-to-l from-purple-500 to-fuchsia-400 transition-all duration-300" style="width: 100%"></div></div>
-          </div>
-        </div>
-      </div>
-      <div class="w-full bg-slate-950/88 backdrop-blur-md border border-purple-400/70 rounded-2xl p-4 text-left shadow-[0_10px_35px_rgba(0,0,0,0.85)]">
-        <div class="flex items-center justify-between text-[11px] font-black text-purple-300 mb-1.5 border-b border-purple-500/30 pb-1">
-          <span id="ufoSpeakerName">📡 긴급 속보</span><span id="ufoGroundLabel" class="text-amber-300">편의점 앞 공터</span>
-        </div>
-        <p id="ufoDialogueText" class="text-sm sm:text-base font-black text-white min-h-[3.2rem] leading-relaxed break-keep"></p>
-      </div>
-    </div>
-    <div id="ufoCountdownFinaleStage" class="hidden relative flex-1 flex flex-col items-center justify-center px-4 text-center z-20 bg-black/80 backdrop-blur-md animate-pop">
-      <div id="finaleEventTag" class="px-4 py-1 rounded-full bg-rose-600 border border-rose-300 text-xs sm:text-sm font-black tracking-widest text-white mb-4 animate-pulse shadow-[0_0_20px_rgba(244,63,94,0.8)]">MAIN EVENT · D-DAY</div>
-      <h2 id="finaleHeadline" class="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2 drop-shadow-[0_0_20px_rgba(192,132,252,0.9)]">대규모 이벤트가 다가옵니다..</h2>
-      <p id="finaleTargetDesc" class="text-xs sm:text-sm font-bold text-amber-300 mb-6">2026년 11월 28일 (토) 오전 11:00 (KST)</p>
-      <div class="grid grid-cols-4 gap-2 sm:gap-3 w-full max-w-md bg-slate-900/95 border-2 border-purple-400 rounded-3xl p-4 shadow-[0_0_60px_rgba(168,85,247,0.75)]">
-        <div class="bg-slate-950 border border-purple-500/50 rounded-2xl py-3 px-1"><div id="cdDays" class="text-2xl sm:text-4xl font-black text-amber-400">00</div><div class="text-[11px] font-bold text-slate-400 mt-1">일 (DAYS)</div></div>
-        <div class="bg-slate-950 border border-purple-500/50 rounded-2xl py-3 px-1"><div id="cdHours" class="text-2xl sm:text-4xl font-black text-white">00</div><div class="text-[11px] font-bold text-slate-400 mt-1">시간 (HRS)</div></div>
-        <div class="bg-slate-950 border border-purple-500/50 rounded-2xl py-3 px-1"><div id="cdMinutes" class="text-2xl sm:text-4xl font-black text-white">00</div><div class="text-[11px] font-bold text-slate-400 mt-1">분 (MIN)</div></div>
-        <div class="bg-slate-950 border border-purple-500/50 rounded-2xl py-3 px-1"><div id="cdSeconds" class="text-2xl sm:text-4xl font-black text-rose-400">00</div><div class="text-[11px] font-bold text-slate-400 mt-1">초 (SEC)</div></div>
-      </div>
-    </div>
-    <div id="ufoBottomLetterbox" class="w-full h-14 sm:h-16 bg-black/95 border-t border-purple-500/60 flex items-center justify-center px-4 z-20 transition-transform duration-500 translate-y-full">
-      <div class="w-full max-w-md flex items-center gap-3">
-        <div class="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden"><div id="ufoTimelineBar" class="h-full bg-gradient-to-r from-purple-500 via-fuchsia-500 to-amber-400 transition-all duration-300" style="width: 0%"></div></div>
-        <span id="ufoSceneProgressText" class="text-[11px] font-black text-purple-300 shrink-0">0%</span>
-      </div>
-    </div>
+  <!-- TOAST & OVERLAYS -->
+  <div id="toastContainer" class="fixed top-14 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-1.5 w-[92%] max-w-md pointer-events-none"></div>
+  <div id="christmasSnowContainer" class="hidden fixed inset-0 pointer-events-none z-40 overflow-hidden"></div>
+  <div id="blackoutOverlay" class="hidden fixed inset-0 bg-black/95 z-[90] flex items-center justify-center text-amber-300 font-black text-lg pointer-events-none">⚡ 일시 정전! 예비 전력 복구 중...</div>
+  <div id="slimeOverlay" class="hidden fixed inset-0 z-[95] pointer-events-none"></div>
+
+  <!-- MEGAPHONE BANNER -->
+  <div id="megaphoneBanner" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-[96] w-[92%] max-w-md bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 rounded-2xl p-3 shadow-2xl border-2 border-white text-center animate-pop">
+    <div class="text-[10px] font-black uppercase tracking-wider">📣 운영자 긴급 확성기</div>
+    <div id="megaphoneText" class="text-sm sm:text-base font-black mt-0.5"></div>
   </div>
 
-  <!-- SURPRISE OVERLAYS (운영자 확성기는 텍스트만 출력) -->
-  <div id="slimeOverlay" class="hidden fixed inset-0 z-[85] pointer-events-none"></div>
-  <div id="blackoutOverlay" class="hidden fixed inset-0 z-[84] pointer-events-none bg-black/95 transition-opacity duration-300"></div>
-  <div id="megaphoneBanner" class="hidden fixed inset-x-4 top-24 z-[95] bg-slate-900/95 border border-amber-400/80 rounded-2xl px-4 py-3 text-center shadow-xl animate-pop pointer-events-none">
-    <div id="megaphoneText" class="text-sm sm:text-base font-black text-amber-200 break-keep"></div>
+  <!-- GLOBAL NOTICE BANNER -->
+  <div id="globalNoticeBanner" class="hidden fixed top-14 left-1/2 -translate-x-1/2 z-[95] w-[92%] max-w-md bg-rose-600/95 border border-rose-300 text-white px-3.5 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 animate-pop">
+    <span class="text-base shrink-0">📢</span>
+    <span id="globalNoticeText" class="text-xs font-black leading-snug"></span>
   </div>
 
-  <!-- BAN LOCK MODAL -->
-  <div id="banLockModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/98 backdrop-blur-lg p-4">
-    <div class="w-full max-w-sm bg-rose-950/90 border-2 border-rose-500 rounded-3xl p-6 text-center shadow-2xl space-y-3 animate-pop">
-      <div class="text-5xl">🚫</div>
-      <h2 class="text-xl font-black text-white">이용이 정지된 계정입니다</h2>
-      <p id="banReasonDisplay" class="text-xs text-rose-200 bg-rose-900/60 border border-rose-700/70 rounded-xl p-3 leading-relaxed">운영 정책 위반으로 인해 관리자에 의해 접근이 제한되었습니다.</p>
-      <p class="text-[11px] text-rose-300/80">이의 제기는 관리자에게 직접 문의해주세요.</p>
+  <!-- 60FPS CINEMA CUTSCENE OVERLAY -->
+  <div id="ufoCutsceneOverlay" class="hidden fixed inset-0 z-[120] bg-black flex flex-col justify-between overflow-hidden">
+    <div id="ufoTopLetterbox" class="h-14 bg-black border-b border-slate-800 px-4 flex items-center justify-between z-20 transition-transform duration-500 -translate-y-full">
+      <div class="flex items-center gap-2">
+        <span id="ufoActBadge" class="px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-black">ACT 1</span>
+        <span id="ufoGroundLabel" class="text-xs font-bold text-slate-300">현장 중계</span>
+      </div>
+      <div class="flex items-center gap-2 text-[11px] font-mono text-amber-300">
+        <span id="ufoElapsedTimer">00:00 / 00:38</span>
+        <span id="ufoSceneProgressText">0%</span>
+      </div>
+    </div>
+
+    <div id="ufoMainStage" class="relative flex-1 w-full h-full">
+      <canvas id="ufoCinemaCanvas" class="absolute inset-0 w-full h-full block"></canvas>
+      <div id="ufoBattleHud" class="hidden absolute top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-slate-950/85 border border-purple-500/50 rounded-2xl p-2.5 z-10 backdrop-blur">
+        <div class="flex justify-between text-[11px] font-black mb-1">
+          <span class="text-emerald-400">사장님 방어선 <span id="heroHpText">100%</span></span>
+          <span class="text-purple-400">침공 세력 <span id="alienHpText">100%</span></span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div id="heroHpBar" class="h-full bg-emerald-400 transition-all" style="width:100%"></div></div>
+          <div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div id="alienHpBar" class="h-full bg-purple-500 transition-all" style="width:100%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ufoCountdownFinaleStage" class="hidden flex-1 flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-slate-950 via-purple-950/40 to-slate-950 z-10">
+      <div id="finaleEventTag" class="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400 text-purple-200 text-xs font-black mb-3">MAIN EVENT</div>
+      <h2 id="finaleHeadline" class="text-2xl sm:text-3xl font-black text-white mb-2">대규모 이벤트가 다가옵니다..</h2>
+      <p id="finaleTargetDesc" class="text-xs text-slate-300 mb-6"></p>
+      <div class="grid grid-cols-4 gap-2.5 w-full max-w-sm">
+        <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3"><div id="cdDays" class="text-2xl font-black text-amber-300">00</div><div class="text-[10px] text-slate-400">DAYS</div></div>
+        <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3"><div id="cdHours" class="text-2xl font-black text-emerald-300">00</div><div class="text-[10px] text-slate-400">HOURS</div></div>
+        <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3"><div id="cdMinutes" class="text-2xl font-black text-sky-300">00</div><div class="text-[10px] text-slate-400">MINS</div></div>
+        <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3"><div id="cdSeconds" class="text-2xl font-black text-rose-400">00</div><div class="text-[10px] text-slate-400">SECS</div></div>
+      </div>
+    </div>
+
+    <div id="ufoBottomLetterbox" class="bg-slate-950/95 border-t border-slate-800 p-4 z-20 transition-transform duration-500 translate-y-full">
+      <div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden mb-2.5"><div id="ufoTimelineBar" class="h-full bg-amber-400 transition-all duration-300" style="width:0%"></div></div>
+      <div id="ufoSpeakerName" class="text-xs font-black text-amber-300 mb-1">📡 긴급 속보</div>
+      <p id="ufoDialogueText" class="text-xs sm:text-sm text-white font-bold leading-relaxed min-h-[2.5rem]"></p>
     </div>
   </div>
 
   <!-- LOGIN MODAL -->
-  <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-3.5 overflow-y-auto">
-    <div class="w-full max-w-sm bg-slate-900 border border-slate-700/80 rounded-3xl p-5 shadow-2xl animate-pop my-auto">
-      <div class="text-center mb-4">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-3xl shadow-lg mb-2">🏪</div>
-        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">편의점 타이쿤</h1>
-        <p class="text-xs text-slate-400 mt-0.5">시즌제 · 보스 이벤트 · 크리스마스 축제</p>
-      </div>
-      <div id="recoveryBanner" class="hidden mb-3.5 p-3 rounded-2xl bg-amber-500/15 border border-amber-400/60 space-y-2">
-        <div class="flex items-start gap-2">
-          <span class="text-lg shrink-0">🔄</span>
-          <div class="min-w-0">
-            <div class="text-xs font-black text-amber-300">기존 매장 기록이 발견되었습니다!</div>
-            <p id="recoverySummaryText" class="text-[11px] text-amber-100/90 mt-0.5 leading-snug"></p>
-          </div>
+  <div id="loginModal" class="fixed inset-0 z-[110] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-2xl space-y-4">
+      <div class="text-center">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-[11px] font-black mb-2">
+          <span>🏪 24시 편의점 타이쿤 ONLINE</span>
+          <span id="loginVisitorCount" class="text-amber-300">집계중...</span>
         </div>
-        <button type="button" onclick="applyDetectedRecovery()" class="w-full py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs active:scale-[0.98] transition">✨ 발견된 기록 불러와서 자동 복구하기</button>
+        <h1 class="text-xl font-black text-white">사장님 매장 오픈 로그인</h1>
+        <p class="text-xs text-slate-400 mt-1">닉네임과 숫자 4자리 PIN으로 클라우드에 자동 저장됩니다.</p>
       </div>
-      <div class="space-y-3">
+
+      <div id="recoveryBanner" class="hidden p-3 rounded-2xl bg-amber-500/15 border border-amber-400/40 flex items-center justify-between gap-2">
+        <div class="min-w-0">
+          <div class="text-[11px] font-black text-amber-300">✨ 이전 접속 기록 발견!</div>
+          <div id="recoverySummaryText" class="text-[11px] text-slate-200 truncate"></div>
+        </div>
+        <button onclick="applyDetectedRecovery()" class="shrink-0 px-2.5 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-black text-xs">불러오기</button>
+      </div>
+
+      <div class="space-y-2.5">
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1">사장님 닉네임 (2~10자)</label>
-          <input id="loginNickname" type="text" maxlength="10" placeholder="닉네임 입력" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-400 transition" />
+          <label class="text-[11px] font-bold text-slate-300 block mb-1">사장님 닉네임 (2~10자)</label>
+          <input id="loginNickname" type="text" maxlength="10" placeholder="예: 편의점왕재하" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-600 text-white text-sm font-bold focus:outline-none focus:border-emerald-400" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1">보안 PIN (숫자 4자리)</label>
-          <input id="loginPin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-center text-lg tracking-[0.5em] font-bold focus:outline-none focus:border-emerald-400 transition" />
+          <label class="text-[11px] font-bold text-slate-300 block mb-1">보안 비밀번호 PIN (숫자 4자리)</label>
+          <input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-600 text-white text-sm font-bold tracking-widest focus:outline-none focus:border-emerald-400" />
         </div>
-        <div id="loginError" class="hidden text-xs font-semibold text-rose-400 bg-rose-950/70 border border-rose-800/70 rounded-xl px-3 py-2 text-center"></div>
-        <button id="loginSubmitBtn" onclick="handleAccountLogin()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 active:scale-[0.98] text-slate-950 font-black text-sm shadow-lg shadow-emerald-500/20 transition">매장 오픈 & 데이터 연결 🚀</button>
-      </div>
-      <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-        <span>🌐 Firebase 실시간 서버</span><span id="loginVisitorCount">방문자 집계중...</span>
+        <p id="loginError" class="hidden text-xs font-bold text-rose-400"></p>
+        <button id="loginSubmitBtn" onclick="handleAccountLogin()" class="w-full py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm shadow-lg active:scale-95 transition">매장 오픈 & 데이터 연결 🚀</button>
       </div>
     </div>
   </div>
 
-  <div id="toastContainer" class="fixed top-6 left-1/2 -translate-x-1/2 z-[90] flex flex-col items-center gap-1.5 w-[92%] max-w-sm pointer-events-none"></div>
+  <!-- BAN MODAL -->
+  <div id="banLockModal" class="hidden fixed inset-0 z-[130] bg-slate-950 flex items-center justify-center p-5 text-center">
+    <div class="max-w-sm w-full bg-rose-950/50 border border-rose-500 rounded-3xl p-6 space-y-3">
+      <div class="text-4xl">🚫</div>
+      <h2 class="text-lg font-black text-rose-300">계정 이용이 제한되었습니다</h2>
+      <p id="banReasonDisplay" class="text-xs text-slate-200"></p>
+    </div>
+  </div>
 
-  <!-- HEADER -->
-  <header class="sticky top-0 z-30 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-2.5 py-2">
-    <div class="max-w-3xl mx-auto flex flex-col gap-1.5">
-      <div class="flex items-center justify-between gap-1 min-w-0">
-        <div class="flex items-center gap-1.5 min-w-0">
-          <span id="headerSeasonBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-purple-500/25 border border-purple-400/50 text-[10px] font-black text-purple-200 whitespace-nowrap">S1</span>
-          <span id="headerBranchBadge" class="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[10px] font-black text-amber-300 whitespace-nowrap">1호점</span>
-          <span id="headerNickname" class="font-black text-xs sm:text-sm text-white truncate max-w-[75px] sm:max-w-[140px]">로딩중</span>
-          <span id="headerTitleMedal" class="hidden shrink-0 px-1.5 py-0.5 rounded-md bg-rose-500/20 border border-rose-400/50 text-[10px] font-black text-rose-200 whitespace-nowrap">🏅</span>
-        </div>
-        <div class="flex items-center gap-1 shrink-0">
-          <button onclick="toggleSound()" id="soundToggleBtn" aria-label="효과음 토글" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 active:scale-95 transition"><i data-lucide="volume-2" class="w-3.5 h-3.5"></i></button>
-          <button onclick="openCouponModal()" class="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-[11px] font-extrabold text-amber-300 whitespace-nowrap active:scale-95 transition">🎁 쿠폰</button>
-          <button onclick="manualCloudSave()" class="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-[11px] font-extrabold text-emerald-300 whitespace-nowrap active:scale-95 transition">☁️ 저장</button>
-          <button onclick="openAdminModal()" class="px-2 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-[11px] font-extrabold text-indigo-300 whitespace-nowrap active:scale-95 transition">🛡️</button>
-        </div>
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-30 bg-slate-950/90 backdrop-blur border-b border-slate-800 px-3 py-2.5">
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center gap-1.5 min-w-0">
+        <span id="headerSeasonBadge" class="px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] font-black shrink-0">S1</span>
+        <span id="headerBranchBadge" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-black shrink-0">1호점</span>
+        <span id="headerNickname" class="text-xs font-black text-white truncate">사장님</span>
+        <span id="headerTitleMedal" class="hidden px-1.5 py-0.5 rounded bg-purple-500/25 text-purple-200 text-[10px] font-black shrink-0"></span>
       </div>
-      <div class="grid grid-cols-3 gap-1.5">
-        <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-2 py-1 flex items-center justify-between min-w-0">
-          <span class="text-[10px] text-slate-400 shrink-0">💰 자금</span><span id="statMoney" class="text-[11px] sm:text-xs font-black text-amber-400 truncate ml-1">0원</span>
-        </div>
-        <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-2 py-1 flex items-center justify-between min-w-0">
-          <span id="statTokenLabel" class="text-[10px] text-slate-400 shrink-0">🔋 코어</span><span id="statEnergyCores" class="text-[11px] sm:text-xs font-black text-emerald-300 truncate ml-1">0개</span>
-        </div>
-        <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-2 py-1 flex items-center justify-between min-w-0">
-          <span class="text-[10px] text-slate-400 shrink-0">🔥 배율</span><span id="statMultiplier" class="text-[11px] sm:text-xs font-black text-rose-400 truncate ml-1">x1.0</span>
-        </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button onclick="openCouponModal()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700" title="쿠폰"><i data-lucide="ticket" class="w-3.5 h-3.5"></i></button>
+        <button onclick="manualCloudSave()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700" title="클라우드 저장"><i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i></button>
+        <button id="soundToggleBtn" onclick="toggleSound()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"><i data-lucide="volume-2" class="w-3.5 h-3.5"></i></button>
+        <button onclick="openAdminModal()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700" title="관리자"><i data-lucide="shield" class="w-3.5 h-3.5"></i></button>
       </div>
-      <div id="alienOccupationBanner" class="hidden bg-gradient-to-r from-purple-950 via-fuchsia-950 to-purple-950 border border-purple-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md">
-        <div class="flex items-center gap-1.5 min-w-0">
-          <span id="occupationBannerIcon" class="shrink-0">👽</span><span id="occupationBannerTitle" class="font-black text-purple-200 truncate">대규모 이벤트가 다가옵니다..</span>
-        </div>
-        <span id="liveInvasionDdayText" class="shrink-0 font-black text-amber-300 bg-black/50 px-2 py-0.5 rounded-lg border border-purple-500/40 text-[10px]">D-7 00:00:00</span>
+    </div>
+
+    <div class="grid grid-cols-3 gap-1.5 mt-2">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5">
+        <div class="text-[10px] text-slate-400">보유 자금</div>
+        <div id="statMoney" class="text-xs sm:text-sm font-black text-emerald-400 truncate">15,000원</div>
       </div>
-      <!-- BOSS HUD -->
-      <div id="mothershipRaidHud" class="hidden bg-gradient-to-r from-rose-950 via-purple-950 to-rose-950 border-2 border-rose-400 rounded-2xl p-2.5 space-y-2 shadow-[0_0_25px_rgba(244,63,94,0.45)] animate-pop">
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-1.5 min-w-0"><span id="raidBossIcon" class="text-base animate-bounce">🛸</span><span id="raidBossTitle" class="text-xs font-black text-white truncate">외계인 모선 총공세 이벤트!</span></div>
-          <span id="raidTimerBadge" class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black shrink-0">03:00</span>
-        </div>
-        <div>
-          <div class="flex justify-between text-[10px] font-black text-rose-200 mb-0.5"><span id="bossHpName">모선 에너지 코어 HP</span><span id="bossHpLabel">100,000 / 100,000</span></div>
-          <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-rose-500/50"><div id="bossHpFill" class="h-full bg-gradient-to-r from-rose-500 via-fuchsia-500 to-amber-400 transition-all duration-200" style="width: 100%"></div></div>
-        </div>
-        <div id="cyberFirewallBox" class="hidden bg-cyan-950/90 border border-cyan-400 rounded-xl p-2 space-y-1.5 animate-pop">
-          <div class="flex items-center justify-between text-[11px] font-black text-cyan-200">
-            <span>🔐 AI 방화벽 가동! 보안 암호 입력: <strong id="cyberCodeDisplay" class="text-amber-300 tracking-widest text-sm">0000</strong></span>
-            <span class="text-[10px] text-rose-300">해제 시 방어막 해제!</span>
-          </div>
-          <div class="flex gap-1.5">
-            <input id="cyberCodeInput" type="text" inputmode="numeric" maxlength="4" placeholder="위 4자리 숫자 입력" class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-950 border border-cyan-500 text-center text-xs font-black text-white tracking-widest" />
-            <button onclick="submitCyberFirewallCode()" class="px-3 py-1.5 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black text-xs active:scale-95">해독 실행!</button>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-1.5">
-          <button onclick="attackMothership('laser', event)" class="py-2 px-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-[11px] active:scale-95 transition shadow">🔫 <span id="laserBtnLabel">광선 가동</span> (<span id="laserDmgText">150</span>)</button>
-          <button onclick="attackMothership('core', event)" class="py-2 px-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-[11px] active:scale-95 transition shadow"><span id="coreBtnLabel">🔋 코어 방출</span> (-1 · <span id="coreDmgText">1,200</span>)</button>
-        </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5">
+        <div id="statTokenLabel" class="text-[10px] text-slate-400">🔋 코어</div>
+        <div id="statEnergyCores" class="text-xs sm:text-sm font-black text-purple-300 truncate">0개</div>
       </div>
-      <!-- XMAS TREE HUD -->
-      <div id="xmasTreeHud" class="hidden bg-gradient-to-r from-red-950 via-emerald-950 to-red-950 border-2 border-amber-400 rounded-2xl p-2.5 space-y-2 shadow-[0_0_25px_rgba(251,191,36,0.45)] animate-pop">
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-1.5 min-w-0"><span class="text-base animate-bounce">🎄</span><span class="text-xs font-black text-amber-200 truncate">전 서버 초대형 크리스마스 트리 점등 대작전!</span></div>
-          <span id="xmasTreeStageBadge" class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black shrink-0">1단계 / 5단계</span>
-        </div>
-        <div>
-          <div class="flex justify-between text-[10px] font-black text-amber-200 mb-0.5"><span>전 서버 누적 트리 점등 게이지</span><span id="xmasTreeProgressLabel">0 / 500 선물</span></div>
-          <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-amber-400/50"><div id="xmasTreeProgressFill" class="h-full bg-gradient-to-r from-red-500 via-amber-400 to-emerald-400 transition-all duration-300" style="width: 0%"></div></div>
-        </div>
-        <div class="grid grid-cols-2 gap-1.5">
-          <button onclick="donateToXmasTree('gift', event)" class="py-2 px-2 rounded-xl bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400 text-white font-black text-[11px] active:scale-95 transition shadow">🎁 선물 상자 장식 (-1 선물 · +10점)</button>
-          <button onclick="donateToXmasTree('money', event)" class="py-2 px-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-[11px] active:scale-95 transition shadow">✨ 황금 전구 기부 (-10,000원 · +5점)</button>
-        </div>
-      </div>
-      <div id="globalFeverBanner" class="hidden bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-amber-500/25 border border-amber-400 rounded-lg px-2.5 py-1 flex items-center justify-between text-[11px] text-amber-200 fever-pulse">
-        <span id="globalFeverLabel" class="font-black text-amber-300">🔥 전체 서버 피버 타임! (모든 매출 2배!)</span><span id="globalFeverTimer" class="font-black text-white bg-amber-600/60 px-1.5 py-0.2 rounded">05:00</span>
-      </div>
-      <div id="globalNoticeBanner" class="hidden bg-gradient-to-r from-indigo-600/95 via-purple-600/95 to-indigo-600/95 border border-indigo-300/80 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 text-[11px] text-white shadow-lg animate-pop">
-        <span class="shrink-0 font-black text-amber-300">📢 긴급 공지</span><span id="globalNoticeText" class="truncate font-bold"></span>
+      <div class="bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5">
+        <div class="text-[10px] text-slate-400">매출 배율</div>
+        <div id="statMultiplier" class="text-xs sm:text-sm font-black text-amber-300">x1.0</div>
       </div>
     </div>
   </header>
 
   <!-- MAIN CONTENT -->
-  <main class="flex-1 w-full max-w-3xl mx-auto px-3 pt-3 pb-nav-safe">
-    <!-- TAB 1: STORE -->
-    <section id="tab-store" class="space-y-3">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between gap-2">
-        <div class="min-w-0 flex-1">
-          <div class="flex items-center gap-1.5">
-            <span id="storeGradeBadge" class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[11px] font-black whitespace-nowrap">1호점 · 동네 편의점</span>
-            <span id="passiveIncomeLabel" class="text-[11px] text-slate-400 truncate">알바 자동매출: 0원/초</span>
-          </div>
-          <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2"><div id="dayProgressBar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-300" style="width: 0%"></div></div>
-        </div>
-        <button onclick="cleanStoreFloor(event)" class="shrink-0 px-2.5 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[11px] font-extrabold whitespace-nowrap active:scale-95 transition">🧹 청소 (<span id="cleanlinessText">100%</span>)</button>
+  <main class="flex-1 p-3 space-y-3">
+    <!-- FEVER & THEME BANNERS -->
+    <div id="globalFeverBanner" class="hidden bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600 text-slate-950 rounded-xl px-3 py-1.5 flex items-center justify-between text-xs font-black shadow-lg">
+      <span id="globalFeverLabel">🔥 전체 서버 피버 타임!</span>
+      <span id="globalFeverTimer" class="font-mono bg-black/20 px-2 py-0.5 rounded-lg text-white">05:00</span>
+    </div>
+
+    <div id="alienOccupationBanner" class="hidden bg-gradient-to-r from-purple-950 via-fuchsia-950 to-purple-950 border border-purple-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px]">
+      <div class="flex items-center gap-1.5 min-w-0">
+        <span id="occupationBannerIcon">👽</span>
+        <span id="occupationBannerTitle" class="font-black text-white truncate">대규모 이벤트가 다가옵니다..</span>
       </div>
-      <div id="posRegisterCard" class="bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-700/80 rounded-3xl p-3.5 shadow-xl relative overflow-hidden">
-        <div class="flex items-center justify-between mb-2.5 gap-2">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 text-[10px] font-black shrink-0">POS 1번기</span>
-            <h2 id="posCustomerTitle" class="text-xs sm:text-sm font-black text-white truncate">손님 입장 대기중...</h2>
-          </div>
-          <span id="posStepBadge" class="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-black shrink-0">STEP 1 · 바코드 스캔</span>
+      <span id="liveInvasionDdayText" class="font-mono font-black text-amber-300 shrink-0">D-00</span>
+    </div>
+
+    <!-- BOSS RAID HUD -->
+    <div id="mothershipRaidHud" class="hidden bg-slate-900 border-2 border-purple-500 rounded-2xl p-3 space-y-2.5 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span id="raidBossIcon" class="text-lg">🛸</span>
+          <span id="raidBossTitle" class="text-xs font-black text-purple-200">외계인 모선 총공세 이벤트!</span>
         </div>
-        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 mb-3 relative overflow-hidden">
-          <div id="scannerLaserLine" class="scanner-laser"></div>
-          <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-            <span>스캔 진행도: <strong id="scanProgressText" class="text-emerald-400">0 / 0개</strong></span>
-            <span>연속 콤보: <strong id="posComboText" class="text-amber-400">0콤보</strong></span>
-          </div>
-          <div class="flex items-baseline justify-between pt-1 border-t border-slate-800/80">
-            <span class="text-xs font-bold text-slate-300">스캔 합계 금액</span><span id="posScannedTotal" class="text-xl sm:text-2xl font-black text-emerald-400 tracking-tight">0원</span>
-          </div>
+        <span id="raidTimerBadge" class="px-2 py-0.5 rounded bg-rose-600 text-white font-mono text-[11px] font-black">03:00</span>
+      </div>
+      <div>
+        <div class="flex justify-between text-[11px] font-bold mb-1">
+          <span id="bossHpName" class="text-slate-300">모선 에너지 코어 HP</span>
+          <span id="bossHpLabel" class="text-amber-300">100,000 / 100,000</span>
         </div>
-        <div id="posSpecialIncidentArea" class="hidden space-y-2.5 animate-pop">
-          <div class="p-3.5 rounded-2xl bg-rose-950/60 border border-rose-500/60 space-y-1.5">
-            <div class="flex items-center gap-2"><span class="text-xl">🚨</span><span id="incidentTitle" class="text-xs sm:text-sm font-black text-rose-300">돌발 상황! 신분증 미소지 손님</span></div>
-            <p id="incidentDesc" class="text-xs text-slate-200 leading-relaxed">주류·담배를 계산대에 올렸지만 신분증이 없다고 합니다! 어떻게 처리할까요?</p>
+        <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden"><div id="bossHpFill" class="h-full bg-gradient-to-r from-purple-500 to-rose-500 transition-all" style="width:100%"></div></div>
+      </div>
+      <div id="cyberFirewallBox" class="hidden p-2 rounded-xl bg-cyan-950/70 border border-cyan-400/50 flex items-center justify-between gap-2">
+        <span class="text-[11px] font-black text-cyan-200">🔐 암호: <span id="cyberCodeDisplay" class="text-amber-300 font-mono">0000</span></span>
+        <div class="flex gap-1">
+          <input id="cyberCodeInput" type="text" maxlength="4" placeholder="4자리" class="w-16 px-2 py-1 rounded bg-slate-900 border border-cyan-500 text-xs text-center font-mono text-white" />
+          <button onclick="submitCyberFirewallCode()" class="px-2.5 py-1 rounded bg-cyan-400 text-slate-950 font-black text-xs">해독</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="attackMothership('laser', event)" class="py-2 px-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs active:scale-95 transition">
+          🔫 <span id="laserBtnLabel">광선 가동</span> (-<span id="laserDmgText">150</span>)
+        </button>
+        <button onclick="attackMothership('core', event)" class="py-2 px-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-white font-black text-xs active:scale-95 transition">
+          <span id="coreBtnLabel">🔋 코어 방출</span> (-<span id="coreDmgText">1,200</span>)
+        </button>
+      </div>
+    </div>
+
+    <!-- XMAS TREE HUD -->
+    <div id="xmasTreeHud" class="hidden bg-gradient-to-r from-red-950 to-emerald-950 border-2 border-amber-400 rounded-2xl p-3 space-y-2 shadow-xl">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-black text-amber-300">🎄 전 서버 초대형 트리 점등 축제</span>
+        <span id="xmasTreeStageBadge" class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-black">1단계 / 5단계</span>
+      </div>
+      <div class="text-[11px] text-slate-200 font-bold" id="xmasTreeProgressLabel">0 / 500 점등 포인트</div>
+      <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden"><div id="xmasTreeProgressFill" class="h-full bg-gradient-to-r from-emerald-400 to-amber-300 transition-all" style="width:0%"></div></div>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="donateToXmasTree('gift', event)" class="py-2 rounded-xl bg-amber-400 text-slate-950 font-black text-xs active:scale-95">🎁 선물 기부 (+10pt)</button>
+        <button onclick="donateToXmasTree('money', event)" class="py-2 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs active:scale-95">💸 10,000원 후원 (+5pt)</button>
+      </div>
+    </div>
+
+    <!-- TAB 1: STORE POS -->
+    <section id="tab-store" class="space-y-3">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span id="storeGradeBadge" class="font-black text-emerald-300">1호점 · Day 1</span>
+          <span id="passiveIncomeLabel" class="text-[11px] font-bold text-slate-400">알바 자동매출: 0원/초</span>
+        </div>
+        <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden"><div id="dayProgressBar" class="h-full bg-emerald-400 transition-all" style="width:0%"></div></div>
+        <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center gap-3 text-xs font-bold">
+            <span>🧹 청결도: <strong id="cleanlinessText" class="text-sky-300">100%</strong></span>
+            <span>🔥 <strong id="posComboText" class="text-amber-300">0콤보</strong></span>
           </div>
+          <button onclick="cleanStoreFloor(event)" class="px-2.5 py-1 rounded-xl bg-sky-500/20 border border-sky-400/40 text-sky-300 text-[11px] font-black active:scale-95">매장 청소 ✨</button>
+        </div>
+      </div>
+
+      <!-- WAITING QUEUE -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-2.5">
+        <div class="flex items-center justify-between text-[11px] text-slate-400 font-bold mb-1.5">
+          <span>🚶 계산대 대기 줄</span>
+          <span id="waitingLineCount" class="text-emerald-300">4명 대기중</span>
+        </div>
+        <div id="waitingLineBar" class="flex gap-1.5 overflow-x-auto no-scrollbar"></div>
+      </div>
+
+      <!-- POS COUNTER -->
+      <div class="bg-slate-900 border border-slate-700 rounded-3xl p-3.5 space-y-3 shadow-xl">
+        <div class="flex items-center justify-between gap-2">
+          <div id="posCustomerTitle" class="text-sm font-black text-white truncate">🧑‍🎓 손님 입장중...</div>
+          <span id="posStepBadge" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-black shrink-0">STEP 1 · 바코드 스캔</span>
+        </div>
+
+        <div id="posSpecialIncidentArea" class="hidden p-3.5 rounded-2xl bg-rose-950/50 border border-rose-500/50 text-center space-y-2.5">
+          <div class="text-2xl">🪪⚠️</div>
+          <div class="text-xs font-black text-rose-200">청소년 주류·담배 구매 시도 의심! 신분증 미소지 손님입니다.</div>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="resolveSpecialIncident(true, event)" class="py-3 px-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs active:scale-95 transition shadow-lg">🚫 판매 거부하기 (포상금!)</button>
-            <button onclick="resolveSpecialIncident(false, event)" class="py-3 px-2 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-rose-500/40 text-rose-300 font-bold text-xs active:scale-95 transition">그냥 판매하기 (과태료 위험)</button>
+            <button onclick="resolveSpecialIncident(true, event)" class="py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs">🛡️ 판매 거절 (포상금)</button>
+            <button onclick="resolveSpecialIncident(false, event)" class="py-2.5 rounded-xl bg-slate-800 text-slate-300 font-black text-xs">그냥 판매하기</button>
           </div>
         </div>
-        <div id="posStep1Area" class="space-y-2">
-          <p class="text-[11px] text-slate-400 font-medium">👇 손님이 올린 상품을 하나씩 터치해 바코드를 찍으세요!</p>
+
+        <div id="posStep1Area" class="space-y-2.5">
+          <div class="flex justify-between text-[11px] font-bold text-slate-400">
+            <span>스캔 진행: <strong id="scanProgressText" class="text-white">0 / 0개</strong></span>
+            <span>합계: <strong id="posScannedTotal" class="text-amber-300">0원</strong></span>
+          </div>
           <div id="posBasketGrid" class="grid grid-cols-2 gap-2"></div>
         </div>
-        <div id="posStep2CardArea" class="hidden space-y-2.5 animate-pop">
-          <div class="p-3 rounded-2xl bg-sky-950/50 border border-sky-500/40 flex items-center justify-between">
-            <div><div class="text-xs font-black text-sky-300">💳 카드 / 삼성페이 결제 손님</div><div class="text-[11px] text-slate-300 mt-0.5">단말기 승인 버튼을 눌러 결제를 완료하세요!</div></div>
-            <span class="text-2xl">📱</span>
-          </div>
-          <button onclick="completeCardPayment(event)" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-300 hover:to-indigo-400 active:scale-[0.98] text-slate-950 font-black text-sm shadow-lg shadow-sky-500/20 transition">💳 카드/페이 단말기 승인하기 (<span id="cardPayAmountText">0원</span>)</button>
+
+        <div id="posStep2CardArea" class="hidden p-4 rounded-2xl bg-sky-950/40 border border-sky-400/40 text-center space-y-2.5">
+          <div class="text-xs font-bold text-sky-200">💳 IC카드 결제 요청 금액</div>
+          <div id="cardPayAmountText" class="text-2xl font-black text-white">0원</div>
+          <button onclick="completeCardPayment(event)" class="w-full py-3 rounded-2xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-black text-sm active:scale-95 transition">카드 결제 승인 완료 ✅</button>
         </div>
-        <div id="posStep2CashArea" class="hidden space-y-2.5 animate-pop">
-          <div class="p-3 rounded-2xl bg-amber-950/40 border border-amber-500/40 space-y-1.5">
-            <div class="flex items-center justify-between text-xs"><span class="text-slate-300">💵 손님이 낸 현금</span><span id="cashGivenText" class="font-black text-white">10,000원</span></div>
-            <div class="flex items-center justify-between text-xs"><span class="text-slate-300">🧾 물건 합계 금액</span><span id="cashTotalText" class="font-bold text-slate-200">0원</span></div>
-            <div class="pt-1.5 border-t border-amber-500/30 flex items-center justify-between"><span class="text-xs font-black text-amber-300">🪙 내가 준비한 거스름돈</span><span id="cashPreparedText" class="text-base font-black text-emerald-400">0원</span></div>
+
+        <div id="posStep2CashArea" class="hidden p-3 rounded-2xl bg-amber-950/30 border border-amber-400/40 space-y-2.5">
+          <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
+            <div class="bg-slate-950/70 p-2 rounded-xl"><div class="text-[10px] text-slate-400">받은 돈</div><div id="cashGivenText" class="font-black text-white">0원</div></div>
+            <div class="bg-slate-950/70 p-2 rounded-xl"><div class="text-[10px] text-slate-400">상품 합계</div><div id="cashTotalText" class="font-black text-amber-300">0원</div></div>
+            <div class="bg-slate-950/70 p-2 rounded-xl"><div class="text-[10px] text-slate-400">준비한 거스름돈</div><div id="cashPreparedText" class="font-black text-emerald-400">0원</div></div>
           </div>
-          <div class="grid grid-cols-5 gap-1.5">
-            <button onclick="addChangeCash(5000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-amber-300 active:scale-95">+5,000</button>
-            <button onclick="addChangeCash(1000)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-sky-300 active:scale-95">+1,000</button>
-            <button onclick="addChangeCash(500)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-emerald-300 active:scale-95">+500</button>
-            <button onclick="addChangeCash(100)" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-[11px] font-black text-slate-200 active:scale-95">+100</button>
-            <button onclick="resetChangeCash()" class="py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-[11px] font-black text-rose-300 active:scale-95">초기화</button>
+          <div class="grid grid-cols-4 gap-1.5 text-xs font-black">
+            <button onclick="addChangeCash(100)" class="py-2 rounded-xl bg-slate-800 border border-slate-600">+100</button>
+            <button onclick="addChangeCash(500)" class="py-2 rounded-xl bg-slate-800 border border-slate-600">+500</button>
+            <button onclick="addChangeCash(1000)" class="py-2 rounded-xl bg-slate-800 border border-slate-600">+1,000</button>
+            <button onclick="addChangeCash(5000)" class="py-2 rounded-xl bg-slate-800 border border-slate-600">+5,000</button>
           </div>
-          <button onclick="completeCashPayment(event)" class="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 active:scale-[0.98] text-slate-950 font-black text-sm shadow-lg shadow-emerald-500/20 transition">🤝 거스름돈 건네고 정산 완료!</button>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="resetChangeCash()" class="py-2.5 rounded-xl bg-slate-800 text-slate-300 font-black text-xs">초기화</button>
+            <button onclick="completeCashPayment(event)" class="col-span-2 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-black text-xs active:scale-95">거스름돈 전달 & 정산 (1.2배) 💰</button>
+          </div>
         </div>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3">
-        <div class="flex items-center justify-between text-xs mb-2"><span class="font-black text-slate-200">🚶 다음 대기 손님 줄</span><span id="waitingLineCount" class="text-[11px] text-slate-400">3명 대기중</span></div>
-        <div id="waitingLineBar" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
       </div>
     </section>
 
-    <!-- TAB 2: UPGRADE -->
+    <!-- TAB 2: UPGRADE & EXPANSION -->
     <section id="tab-upgrade" class="hidden space-y-3">
-      <div class="bg-gradient-to-br from-purple-950/80 via-slate-900 to-slate-900 border border-purple-500/60 rounded-2xl p-3.5 space-y-2.5">
+      <div class="bg-gradient-to-br from-amber-500/20 to-slate-900 border border-amber-400/40 rounded-2xl p-3.5 space-y-2">
         <div class="flex items-center justify-between">
-          <div><span class="px-2 py-0.5 rounded bg-purple-500 text-white text-[10px] font-black">이벤트 연구소</span><h2 class="text-sm font-black text-white mt-1">🔋 코어 · 데이터 칩 장치 강화</h2></div>
-          <span class="text-xs font-black text-emerald-300 bg-purple-950 px-2.5 py-1 rounded-xl border border-purple-400/50">보유 재화: <span id="armoryCoreCount">0</span>개</span>
+          <span id="nextBranchTitle" class="text-xs font-black text-amber-300">🏢 2호점 오픈하기 (영구 매출 +50%)</span>
+          <span id="currentBranchMultText" class="text-[11px] font-bold text-slate-300">현재 1호점 (x1.0)</span>
         </div>
-        <p class="text-[11px] text-slate-300">전야제 기간 동안 모은 이벤트 재화로 레이드 장비를 강화해 두세요!</p>
+        <button id="expandBranchBtn" onclick="expandNewBranch()" class="w-full py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs active:scale-95 transition">필요 자금: 500,000원 달성 시 오픈 가능</button>
+      </div>
+
+      <div class="space-y-2" id="upgradeListContainer"></div>
+
+      <div class="bg-purple-950/30 border border-purple-500/40 rounded-2xl p-3 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black text-purple-300">🔋 이벤트 특수 무기 연구소</span>
+          <span class="text-[11px] font-bold text-slate-300">보유 재화: <strong id="armoryCoreCount" class="text-amber-300">0</strong>개</span>
+        </div>
         <div id="coreWeaponList" class="space-y-2"></div>
-      </div>
-      <div class="bg-gradient-to-br from-amber-950/60 via-slate-900 to-slate-900 border border-amber-500/50 rounded-2xl p-3.5 space-y-2">
-        <div class="flex items-center justify-between">
-          <div><span class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-black">다점포 가맹 확장</span><h2 id="nextBranchTitle" class="text-sm font-black text-white mt-1">🏢 2호점 오픈하기 (영구 매출 +50%)</h2></div>
-          <span id="currentBranchMultText" class="text-xs font-black text-amber-300 bg-amber-500/15 px-2.5 py-1 rounded-xl border border-amber-400/40">현재 1호점 (x1.0)</span>
-        </div>
-        <p class="text-[11px] text-slate-300 leading-relaxed">목표 자금을 달성하면 새로운 점포를 추가 오픈합니다! 현재 보유 자금과 일반 시설이 초기화되는 대신, <strong class="text-amber-300">모든 수익 영구 +50% 배율</strong>과 <strong class="text-amber-300">랭킹 점포 등급</strong>이 영구 상승합니다.</p>
-        <button id="expandBranchBtn" onclick="expandNewBranch()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs active:scale-[0.98] transition shadow-lg">필요 자금: 500,000원 달성 시 오픈 가능</button>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
-        <h2 class="text-sm font-black text-white mb-1">👥 아르바이트 고용 & POS 시설 업그레이드</h2>
-        <p class="text-xs text-slate-400 mb-3">알바생을 고용하면 계산대를 보지 않을 때도 초당 자동 수익이 쌓입니다!</p>
-        <div id="upgradeListContainer" class="space-y-2.5"></div>
       </div>
     </section>
 
     <!-- TAB 3: RANKING -->
     <section id="tab-ranking" class="hidden space-y-3">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
-        <div class="flex items-center justify-between"><h2 class="text-sm font-black text-white">💬 실시간 사장님 한줄 방명록</h2><span class="text-[10px] text-emerald-400 font-bold">● LIVE</span></div>
-        <div id="shoutboxList" class="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-xs"><p class="text-slate-400 text-[11px]">방명록을 불러오는 중...</p></div>
-        <div class="flex gap-1.5 pt-1">
-          <input id="shoutboxInput" type="text" maxlength="50" placeholder="친구들에게 한마디 남기기 (최대 50자)" class="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-400" />
-          <button onclick="postShoutboxMessage()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs whitespace-nowrap active:scale-95 transition">등록</button>
-        </div>
+      <div id="hallOfFameBox" class="hidden bg-slate-900 border border-amber-500/40 rounded-2xl p-3 space-y-2">
+        <div class="text-xs font-black text-amber-300">🏛️ 역대 시즌 명예의 전당</div>
+        <div id="hallOfFameList" class="space-y-1.5"></div>
       </div>
-      <div id="hallOfFameBox" class="hidden bg-gradient-to-br from-amber-950/60 to-slate-900 border border-amber-500/40 rounded-2xl p-3.5 space-y-2">
-        <h2 class="text-sm font-black text-amber-300">👑 역대 시즌 명예의 전당</h2><div id="hallOfFameList" class="space-y-1.5 text-xs"></div>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
-        <div class="flex items-center justify-between mb-3">
-          <div><h2 class="text-sm font-black text-white">🏆 현 시즌 편의점 재벌 랭킹</h2><p class="text-[11px] text-slate-400">다점포 수 및 보유 자산 기준 실시간 순위</p></div>
-          <button onclick="fetchLeaderboard()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 whitespace-nowrap active:scale-95">🔄 새로고침</button>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black text-white">🏆 실시간 전국 편의점 매출 랭킹</span>
+          <button onclick="fetchLeaderboard()" class="text-[11px] text-emerald-400 font-bold">새로고침</button>
         </div>
-        <div id="leaderboardList" class="space-y-2"><div class="text-center text-xs text-slate-400 py-8">순위를 불러오는 중...</div></div>
+        <div id="leaderboardList" class="space-y-1.5"></div>
       </div>
     </section>
 
     <!-- TAB 4: COMMUNITY -->
     <section id="tab-community" class="hidden space-y-3">
-      <div class="bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/50 rounded-2xl p-3.5 flex items-center justify-between gap-2">
-        <div><div class="text-xs font-black text-amber-300">🎁 비밀 쿠폰 교환소</div><div class="text-[11px] text-slate-300 mt-0.5">이벤트나 공지로 받은 비밀 코드를 입력하고 보상을 받으세요!</div></div>
-        <button onclick="openCouponModal()" class="shrink-0 px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs whitespace-nowrap active:scale-95">쿠폰 입력</button>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
+        <div class="text-xs font-black text-amber-300">🗳️ 실시간 사장님 투표</div>
+        <div id="pollContainer"></div>
       </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5"><h2 class="text-sm font-black text-white mb-2">🗳️ 실시간 유저 투표</h2><div id="pollContainer"><p class="text-xs text-slate-400">현재 진행 중인 투표가 없습니다.</p></div></div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5"><h2 class="text-sm font-black text-white mb-2">📢 전체 공지사항 기록</h2><div id="noticeHistoryList" class="space-y-2 text-xs text-slate-300"><p class="text-slate-400">등록된 공지가 없습니다.</p></div></div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
-        <h2 class="text-sm font-black text-white mb-1">🐞 버그신고 & 개선사항 보내기</h2>
-        <p class="text-[11px] text-slate-400 mb-2">보낸 내용은 오직 관리자만 수신함에서 확인할 수 있습니다.</p>
-        <textarea id="feedbackInput" rows="3" maxlength="300" placeholder="버그 제보나 건의사항을 자유롭게 적어주세요!" class="w-full p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-400 resize-none"></textarea>
-        <button onclick="submitFeedback()" class="mt-2 w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs active:scale-[0.98] transition">관리자에게 비공개 전송하기 📨</button>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
+        <div class="text-xs font-black text-emerald-300">💬 실시간 사장님 방명록</div>
+        <div class="flex gap-1.5">
+          <input id="shoutboxInput" type="text" maxlength="60" placeholder="한줄 응원이나 자랑을 남겨보세요!" class="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+          <button onclick="postShoutboxMessage()" class="px-3 py-2 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs">등록</button>
+        </div>
+        <div id="shoutboxList" class="space-y-1.5 max-h-48 overflow-y-auto"></div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
+        <div class="text-xs font-black text-rose-300">📢 운영진 공지 히스토리</div>
+        <div id="noticeHistoryList" class="space-y-1.5 text-xs"></div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
+        <div class="text-xs font-black text-sky-300">📨 버그 제보 & 건의함</div>
+        <div class="flex gap-1.5">
+          <input id="feedbackInput" type="text" maxlength="100" placeholder="운영자에게 보낼 건의사항을 입력하세요" class="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+          <button onclick="submitFeedback()" class="px-3 py-2 rounded-xl bg-sky-400 text-slate-950 font-black text-xs">전송</button>
+        </div>
       </div>
     </section>
   </main>
 
   <!-- BOTTOM NAV -->
-  <nav class="fixed bottom-0 inset-x-0 z-30 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-1.5 py-1.5">
-    <div class="max-w-3xl mx-auto grid grid-cols-4 gap-1">
-      <button onclick="switchTab('store')" id="nav-store" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition"><span class="text-base leading-none mb-0.5">🏪</span><span class="text-[11px] font-extrabold whitespace-nowrap">매장/계산대</span></button>
-      <button onclick="switchTab('upgrade')" id="nav-upgrade" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition"><span class="text-base leading-none mb-0.5">🏢</span><span class="text-[11px] font-extrabold whitespace-nowrap">알바/장치/확장</span></button>
-      <button onclick="switchTab('ranking')" id="nav-ranking" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition"><span class="text-base leading-none mb-0.5">🏆</span><span class="text-[11px] font-extrabold whitespace-nowrap">랭킹/전당</span></button>
-      <button onclick="switchTab('community')" id="nav-community" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition"><span class="text-base leading-none mb-0.5">📢</span><span class="text-[11px] font-extrabold whitespace-nowrap">공지/투표</span></button>
-    </div>
+  <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-slate-950/95 backdrop-blur border-t border-slate-800 px-2 py-1.5 grid grid-cols-4 gap-1 z-30">
+    <button id="nav-store" onclick="switchTab('store')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition"><i data-lucide="store" class="w-4 h-4"></i><span class="text-[10px] font-black mt-0.5">계산대</span></button>
+    <button id="nav-upgrade" onclick="switchTab('upgrade')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition"><i data-lucide="trending-up" class="w-4 h-4"></i><span class="text-[10px] font-black mt-0.5">매장관리</span></button>
+    <button id="nav-ranking" onclick="switchTab('ranking')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition"><i data-lucide="trophy" class="w-4 h-4"></i><span class="text-[10px] font-black mt-0.5">랭킹</span></button>
+    <button id="nav-community" onclick="switchTab('community')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-transparent text-slate-400 border border-transparent hover:bg-slate-800/60 transition"><i data-lucide="message-square" class="w-4 h-4"></i><span class="text-[10px] font-black mt-0.5">광장</span></button>
   </nav>
 
   <!-- COUPON MODAL -->
-  <div id="couponModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-3.5">
-    <div class="w-full max-w-sm bg-slate-900 border border-amber-500/50 rounded-3xl p-5 shadow-2xl space-y-3 animate-pop">
-      <div class="flex items-center justify-between"><h3 class="text-base font-black text-white">🎁 쿠폰 코드 입력</h3><button onclick="closeCouponModal()" class="px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-bold text-slate-300">✕</button></div>
-      <p class="text-xs text-slate-300">이벤트 또는 공지로 전달받은 비밀 쿠폰 코드를 입력하세요.</p>
-      <input id="couponCodeInput" type="text" placeholder="쿠폰 코드를 입력하세요" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm font-bold text-white focus:outline-none focus:border-amber-400" />
-      <button onclick="redeemCouponCode()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-sm active:scale-95 transition">보상 수령하기 🎉</button>
+  <div id="couponModal" class="hidden fixed inset-0 z-[105] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-slate-900 border border-slate-700 rounded-3xl p-5 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-black text-amber-300">🎟️ 이벤트 쿠폰 입력</h3>
+        <button onclick="closeCouponModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <input id="couponCodeInput" type="text" placeholder="쿠폰 코드를 입력하세요" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-600 text-sm text-white font-bold" />
+      <button onclick="redeemCouponCode()" class="w-full py-2.5 rounded-xl bg-amber-400 text-slate-950 font-black text-xs">보상 수령하기 🎁</button>
     </div>
   </div>
 
-  <!-- ADMIN MODAL -->
-  <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-3">
-    <div class="w-full max-w-lg max-h-[92vh] flex flex-col bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-pop">
-      <div class="px-4 py-3 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2"><span class="text-lg">🛡️</span><h3 class="text-sm font-black text-white">총괄 관리자 올인원 마스터 패널</h3></div>
-        <button onclick="closeAdminModal()" class="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-bold text-slate-200">닫기 ✕</button>
+  <!-- ADMIN MODAL (실시간 동접 + 50종 선택 + 전체 명부 포함) -->
+  <div id="adminModal" class="hidden fixed inset-0 z-[115] bg-black/90 backdrop-blur-md flex items-center justify-center p-3">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-700 rounded-3xl p-4 max-h-[88vh] overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+        <span class="text-sm font-black text-rose-400">🛡️ 총괄 운영자 컨트롤 패널</span>
+        <button onclick="closeAdminModal()" class="p-1 rounded-lg bg-slate-800 text-slate-300"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
-      <div id="adminAuthGate" class="p-5 space-y-3">
-        <p class="text-xs text-slate-300">관리자 전용 비밀번호를 입력하세요.</p>
-        <input id="adminPassInput" type="password" placeholder="비밀번호 입력" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-indigo-400" />
-        <div id="adminAuthError" class="hidden text-xs text-rose-400 font-bold">비밀번호가 일치하지 않습니다.</div>
-        <button onclick="verifyAdminPass()" class="w-full py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-black text-xs transition">관리자 로그인</button>
+
+      <div id="adminAuthGate" class="space-y-2.5">
+        <input id="adminPassInput" type="password" placeholder="관리자 보안 키 입력" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-600 text-sm text-white" />
+        <p id="adminAuthError" class="hidden text-xs text-rose-400 font-bold">보안 키가 일치하지 않습니다.</p>
+        <button onclick="verifyAdminPass()" class="w-full py-2.5 rounded-xl bg-rose-500 text-white font-black text-xs">관리자 인증</button>
       </div>
-      <div id="adminDashboard" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
-        <!-- 0. LIVE STATS & ONLINE COUNT -->
+
+      <div id="adminDashboard" class="hidden space-y-4">
+        <!-- 실시간 동접 + 누적 통계 -->
         <div class="grid grid-cols-3 gap-2">
           <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-2.5">
-            <div class="text-[10px] text-slate-400">총 누적 접속</div>
+            <div class="text-[10px] text-slate-400">총 누적 접속수</div>
             <div id="adminTotalVisits" class="text-sm font-black text-emerald-400">0회</div>
           </div>
           <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-2.5">
-            <div class="text-[10px] text-slate-400">전체 가입 사장</div>
+            <div class="text-[10px] text-slate-400">등록된 사장님</div>
             <div id="adminTotalUsers" class="text-sm font-black text-sky-400">0명</div>
           </div>
-          <div class="bg-emerald-950/70 border border-emerald-500/60 rounded-xl p-2.5">
+          <div class="bg-emerald-950/60 border border-emerald-500/50 rounded-xl p-2.5">
             <div class="text-[10px] text-emerald-300 font-bold flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>현재 온라인 사장
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>실시간 동접
             </div>
             <div id="adminOnlineCount" class="text-sm font-black text-amber-300">0명</div>
           </div>
         </div>
-        <div class="bg-slate-800/60 border border-emerald-500/40 rounded-xl px-3 py-2 flex items-center justify-between gap-2 text-[11px]">
-          <span class="text-emerald-300 shrink-0 font-black">🟢 실시간 접속중:</span>
-          <div id="adminOnlineNicknames" class="text-white font-bold truncate text-right">집계중...</div>
+        <div class="bg-slate-800/50 border border-slate-700/70 rounded-xl px-3 py-2 flex items-center justify-between gap-2 text-[11px]">
+          <span class="text-slate-400 shrink-0 font-bold">🟢 현재 접속자:</span>
+          <div id="adminOnlineNicknames" class="text-emerald-300 font-black truncate text-right">집계중...</div>
         </div>
 
-        <!-- 0-1. ALL OWNERS DIRECTORY (닉네임, 비밀번호 PIN, 접속상태/최근 플레이) -->
-        <div class="bg-slate-800/70 border border-sky-500/50 rounded-2xl p-3 space-y-2">
-          <div class="flex items-center justify-between">
-            <h4 class="text-xs font-black text-sky-300">📋 전체 사장님 명부 (비밀번호 PIN · 최근 접속일)</h4>
-            <button onclick="loadAdminUserList()" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-bold text-slate-200">🔄 새로고침</button>
-          </div>
-          <div id="adminAllOwnersDirectory" class="max-h-56 overflow-y-auto space-y-1.5 pr-1 text-[11px]">
-            <p class="text-slate-400">데이터를 불러오는 중...</p>
-          </div>
-        </div>
-
-        <!-- 1. SEASON & EVENT -->
-        <div class="bg-gradient-to-br from-purple-950/90 via-slate-900 to-rose-950/80 border-2 border-purple-400/80 rounded-2xl p-3.5 space-y-3 shadow-lg">
-          <div class="flex items-center justify-between"><h4 class="text-xs font-black text-purple-200">🎛️ 2026 연말 시즌 & 이벤트 마스터 컨트롤러</h4><span id="adminCurrentSeasonTag" class="px-2 py-0.5 rounded bg-purple-500/40 text-[10px] font-black text-white">시즌 1</span></div>
-          <div class="grid grid-cols-3 gap-1.5">
-            <input id="adminSeasonNumInput" type="number" min="1" max="99" value="1" placeholder="시즌 번호" class="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-bold text-amber-300" />
-            <input id="adminBannerMsgInput" type="text" value="대규모 이벤트가 다가옵니다.." placeholder="상단 배너 문구" class="col-span-2 px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white" />
-          </div>
-          <button type="button" onclick="saveSeasonConfig()" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs active:scale-95 transition">💾 시즌 번호 & 배너 문구 즉시 반영</button>
-          <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
-            <div class="flex items-center justify-between"><span class="text-[11px] font-black text-purple-300">👽 [시즌 1 · 테마 A] 외계인 대작전 (11/28)</span><span id="auto30mStatusBadge" class="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-bold text-slate-400">30분 자동: OFF</span></div>
-            <div class="grid grid-cols-2 gap-1.5">
-              <button type="button" onclick="launchThemeEve('alien')" class="py-2 px-2 rounded-xl bg-purple-600/80 hover:bg-purple-500 text-white font-black text-[11px] active:scale-95">🎬 외계인 전야제 컷씬</button>
-              <button type="button" onclick="adminLaunchBossRaid('alien')" class="py-2 px-2 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 text-slate-950 font-black text-[11px] active:scale-95">⚔️ 외계 모선 보스전!</button>
-            </div>
-          </div>
-          <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
-            <div class="text-[11px] font-black text-cyan-300">💻 [시즌 1 · 테마 B] 사이버 AI 결전 (12/5 · 12/12)</div>
-            <div class="grid grid-cols-2 gap-1.5">
-              <button type="button" onclick="launchThemeEve('cyber')" class="py-2 px-2 rounded-xl bg-cyan-600/80 hover:bg-cyan-500 text-white font-black text-[11px] active:scale-95">🎬 12/5 사이버 전야제 컷씬</button>
-              <button type="button" onclick="adminLaunchBossRaid('cyber')" class="py-2 px-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-black text-[11px] active:scale-95">🔐 12/12 AI 보스전 발동!</button>
-            </div>
-          </div>
-          <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
-            <div class="text-[11px] font-black text-emerald-300">🎄 [시즌 2 · 크리스마스] 산타 썰매 & 트리 점등 (12/19 · 12/25)</div>
-            <div class="grid grid-cols-2 gap-1.5">
-              <button type="button" onclick="launchThemeEve('xmas')" class="py-2 px-2 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white font-black text-[11px] active:scale-95">🎅 12/19 산타 전야제 컷씬</button>
-              <button type="button" onclick="adminLaunchXmasTreeFestival()" class="py-2 px-2 rounded-xl bg-gradient-to-r from-red-500 via-amber-400 to-emerald-500 text-slate-950 font-black text-[11px] active:scale-95">🎄 12/25 트리 점등 축제!</button>
-            </div>
-          </div>
-          <div class="pt-2 border-t border-purple-500/30 space-y-1.5">
-            <div class="grid grid-cols-3 gap-1.5">
-              <button type="button" onclick="toggleAuto30MinRaid()" class="py-1.5 px-1.5 rounded-lg bg-slate-800 border border-amber-400/50 text-amber-300 font-bold text-[10px]">🕒 30분 자동 토글</button>
-              <button type="button" onclick="adminForceWinCurrentEvent()" class="py-1.5 px-1.5 rounded-lg bg-emerald-600/30 border border-emerald-400/50 text-emerald-200 font-bold text-[10px]">🏆 즉시 승리 컷씬</button>
-              <button type="button" onclick="resetAllThemeEvents()" class="py-1.5 px-1.5 rounded-lg bg-slate-800 border border-slate-600 text-slate-300 font-bold text-[10px]">🔄 일반 매장 복구</button>
-            </div>
-            <button type="button" onclick="adminEndSeasonAndAdvance()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-xs active:scale-95 transition shadow">👑 현 시즌 종료 → 명예의 전당 박제 & 다음 시즌 개막</button>
-          </div>
-        </div>
-
-        <!-- 2. SURPRISE EVENTS (50종 확장팩 + 텍스트 전용 확성기) -->
-        <div class="bg-gradient-to-r from-purple-950/70 to-fuchsia-950/70 border border-purple-500/50 rounded-2xl p-3 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <h4 class="text-xs font-black text-purple-300">🎪 즉시 발동 깜짝 이벤트 50종 마스터팩</h4>
-            <button onclick="triggerRandomSurprise50()" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 font-black text-[10px] active:scale-95">🎲 50종 중 랜덤 발동!</button>
+        <!-- 깜짝 이벤트 50종 마스터팩 -->
+        <div class="bg-purple-950/40 border border-purple-500/50 rounded-2xl p-3 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-black text-purple-200">🎪 즉시 발동 깜짝 이벤트 50종 마스터팩</span>
+            <button onclick="triggerRandomSurprise()" class="px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 font-black text-[11px] shrink-0">🎲 50종 중 랜덤 발동!</button>
           </div>
           <div class="flex gap-1.5">
-            <input id="adminMegaphoneInput" type="text" placeholder="확성기 글자만 출력할 멘트 입력" class="flex-1 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
-            <button onclick="triggerAdminSurprise('megaphone')" class="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shrink-0 active:scale-95">📢 글만 띄우기</button>
+            <input id="adminMegaphoneInput" type="text" placeholder="확성기 문구 입력..." class="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <button onclick="triggerAdminSurprise('megaphone')" class="px-3 py-2 rounded-xl bg-amber-400 text-slate-950 font-black text-xs shrink-0">📣 글만 띄우기</button>
           </div>
           <div class="flex gap-1.5">
-            <select id="adminSurprise50Select" class="flex-1 px-2.5 py-2 rounded-xl bg-slate-900 border border-purple-400/50 text-xs font-bold text-white"></select>
-            <button onclick="triggerSelectedSurprise50()" class="px-3.5 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-white font-black text-xs shrink-0 active:scale-95">⚡ 발동!</button>
-          </div>
-          <div id="surpriseQuickGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-48 overflow-y-auto pr-1"></div>
-        </div>
-
-        <!-- 3. INDIVIDUAL MONEY & EVENT CURRENCY GRANT -->
-        <div class="bg-slate-800/70 border border-amber-500/50 rounded-2xl p-3 space-y-2.5">
-          <h4 class="text-xs font-black text-amber-300">💸 개별 사장님 자금 & 이벤트 재화 지급/수정</h4>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <select id="adminUserSelect" onchange="syncSelectedUserToInput()" class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"><option value="">-- 가입 사장님 선택 --</option></select>
-            <input id="adminTargetNickname" type="text" placeholder="대상 사장님 닉네임 입력" class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] font-bold text-amber-300 mb-1">💰 지급/설정할 돈 (원)</label>
-              <input id="adminMoneyAmount" type="number" value="100000" step="10000" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-amber-300" />
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-emerald-300 mb-1">🔋 지급/설정할 재화 (개)</label>
-              <input id="adminCoreAmount" type="number" value="10" step="1" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-emerald-300" />
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-1.5">
-            <button onclick="adminModifyUserResource('money', 'add')" class="py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] active:scale-95">💰 돈 추가 지급 (+)</button>
-            <button onclick="adminModifyUserResource('money', 'set')" class="py-2 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-200 font-black text-[11px] active:scale-95">💰 돈 금액 고정 (=)</button>
-            <button onclick="adminModifyUserResource('core', 'add')" class="py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] active:scale-95">🔋 재화 추가 지급 (+)</button>
-            <button onclick="adminModifyUserResource('core', 'set')" class="py-2 rounded-xl bg-emerald-500/20 border border-emerald-400 text-emerald-200 font-black text-[11px] active:scale-95">🔋 재화 개수 고정 (=)</button>
+            <select id="adminSurpriseSelect" class="flex-1 px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-bold"></select>
+            <button onclick="triggerAdminSurprise()" class="px-3.5 py-2 rounded-xl bg-purple-500 text-white font-black text-xs shrink-0">⚡ 발동!</button>
           </div>
         </div>
 
-        <!-- 4. ALL-IN-ONE COUPON CREATOR (돈 + 재화 + 피버타임) -->
-        <div class="bg-slate-800/70 border border-emerald-500/50 rounded-2xl p-3 space-y-2.5">
-          <h4 class="text-xs font-black text-emerald-300">🎁 만능 쿠폰 코드 발행 (자금 · 재화 · 피버타임)</h4>
-          <div class="grid grid-cols-2 gap-1.5">
-            <input id="adminNewCouponCode" type="text" placeholder="쿠폰 코드 (예: super_gift)" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-bold" />
-            <input id="adminNewCouponReward" type="number" placeholder="보상 자금 (원)" value="100000" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-amber-300 font-bold" />
+        <!-- 시즌 & 대규모 컷씬 이벤트 -->
+        <div class="bg-slate-800/70 border border-slate-700 rounded-2xl p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-amber-300">🎬 시즌 & 대규모 컷씬 제어</span>
+            <span id="adminCurrentSeasonTag" class="text-[11px] font-black text-emerald-300">시즌 1</span>
           </div>
           <div class="grid grid-cols-3 gap-1.5">
-            <div>
-              <label class="block text-[9px] text-emerald-300 font-bold mb-0.5">🔋 재화 보너스(개)</label>
-              <input id="adminNewCouponCore" type="number" min="0" value="0" class="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-emerald-300 font-bold" />
-            </div>
-            <div>
-              <label class="block text-[9px] text-rose-300 font-bold mb-0.5">🔥 피버 배수(배)</label>
-              <input id="adminNewCouponFeverMult" type="number" step="0.5" min="1" value="2" class="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-rose-300 font-bold" />
-            </div>
-            <div>
-              <label class="block text-[9px] text-sky-300 font-bold mb-0.5">⏱️ 피버 시간(분)</label>
-              <input id="adminNewCouponFeverMin" type="number" min="0" value="0" class="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-sky-300 font-bold" />
-            </div>
+            <input id="adminSeasonNumInput" type="number" value="1" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminBannerMsgInput" type="text" placeholder="배너 문구" class="col-span-2 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
           </div>
-          <button onclick="createAdminCoupon()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-slate-950 font-black text-xs active:scale-95">🎁 만능 쿠폰 코드 등록하기</button>
+          <button onclick="saveSeasonConfig()" class="w-full py-1.5 rounded-xl bg-slate-700 text-white font-black text-xs">시즌 번호/배너 저장</button>
+          <div class="grid grid-cols-3 gap-1.5 text-[11px] font-black">
+            <button onclick="launchThemeEve('alien')" class="py-2 rounded-xl bg-purple-600 text-white">👽 외계인 전야제</button>
+            <button onclick="launchThemeEve('cyber')" class="py-2 rounded-xl bg-cyan-600 text-white">💻 사이버 전야제</button>
+            <button onclick="launchThemeEve('xmas')" class="py-2 rounded-xl bg-red-600 text-white">🎄 클스 전야제</button>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 text-[11px] font-black">
+            <button onclick="adminLaunchBossRaid('alien')" class="py-2 rounded-xl bg-fuchsia-700 text-white">🛸 외계인 보스 시작</button>
+            <button onclick="adminLaunchBossRaid('cyber')" class="py-2 rounded-xl bg-blue-700 text-white">🤖 AI 보스 시작</button>
+            <button onclick="adminLaunchXmasTreeFestival()" class="py-2 rounded-xl bg-emerald-700 text-white">🎁 트리 점등 축제</button>
+            <button onclick="adminForceWinCurrentEvent()" class="py-2 rounded-xl bg-amber-500 text-slate-950">🏆 승리 컷씬 발동</button>
+          </div>
+          <div class="grid grid-cols-3 gap-1.5 text-[10px] font-black">
+            <button id="auto30mStatusBadge" onclick="toggleAuto30MinRaid()" class="py-1.5 rounded-xl bg-slate-900 border border-slate-600 text-slate-200">30분 자동: OFF</button>
+            <button onclick="resetAllThemeEvents()" class="py-1.5 rounded-xl bg-slate-900 border border-slate-600 text-sky-300">🔄 일반 복구</button>
+            <button onclick="adminEndSeasonAndAdvance()" class="py-1.5 rounded-xl bg-rose-900/70 border border-rose-500 text-rose-200">👑 시즌 종료/다음</button>
+          </div>
         </div>
 
-        <!-- 5. NOTICE -->
-        <div class="bg-slate-800/60 border border-indigo-500/50 rounded-2xl p-3 space-y-2">
-          <h4 class="text-xs font-black text-indigo-300">📢 전체 긴급 공지 발송</h4>
+        <!-- 전체 공지 & 피버 -->
+        <div class="bg-slate-800/70 border border-slate-700 rounded-2xl p-3 space-y-2">
+          <div class="text-xs font-black text-rose-300">📢 전체 공지 & 서버 피버</div>
           <div class="flex gap-1.5">
-            <input id="adminNoticeInput" type="text" placeholder="모든 접속자 화면 상단에 띄울 글씨 입력" class="flex-1 px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
-            <button type="button" onclick="postGlobalNotice()" class="px-3.5 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-black text-xs whitespace-nowrap active:scale-95">발송</button>
+            <input id="adminNoticeInput" type="text" placeholder="전체 유저에게 띄울 긴급 공지" class="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <button onclick="postGlobalNotice()" class="px-3 py-1.5 rounded-xl bg-rose-500 text-white font-black text-xs">발송</button>
           </div>
-          <button type="button" onclick="clearGlobalNotice()" class="text-[11px] text-rose-400 hover:underline">상단 공지 배너 즉시 내리기</button>
-        </div>
-
-        <!-- 6. FEVER -->
-        <div class="bg-gradient-to-r from-amber-950/60 to-orange-950/60 border border-amber-500/50 rounded-2xl p-3 space-y-2">
-          <div class="flex items-center justify-between"><h4 class="text-xs font-black text-amber-300">🔥 전체 서버 피버 이벤트</h4><button onclick="stopServerFever()" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-600 text-slate-300 font-bold text-[11px]">종료</button></div>
           <div class="grid grid-cols-4 gap-1.5">
-            <button onclick="triggerServerFever(5, 1.5)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] font-black text-amber-200">1.5배</button>
-            <button onclick="triggerServerFever(5, 2)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] font-black text-amber-200">2배</button>
-            <button onclick="triggerServerFever(5, 3)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] font-black text-amber-200">3배</button>
-            <button onclick="triggerServerFever(5, 5)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] font-black text-amber-200">5배</button>
-          </div>
-          <div class="grid grid-cols-3 gap-1.5">
-            <input id="adminFeverMultInput" type="number" step="0.5" min="0.5" max="100" value="2" placeholder="배수" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-amber-300" />
-            <input id="adminFeverMinInput" type="number" min="1" max="120" value="5" placeholder="시간(분)" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-white" />
-            <button onclick="triggerCustomFever()" class="py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs active:scale-95">⚡ 피버 발동!</button>
+            <input id="adminFeverMinInput" type="number" value="5" class="px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white text-center" />
+            <input id="adminFeverMultInput" type="number" step="0.5" value="2.0" class="px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white text-center" />
+            <button onclick="triggerCustomFever()" class="py-1.5 rounded-xl bg-amber-400 text-slate-950 font-black text-xs">🔥 피버 시작</button>
+            <button onclick="stopServerFever()" class="py-1.5 rounded-xl bg-slate-700 text-slate-200 font-black text-xs">종료</button>
           </div>
         </div>
 
-        <!-- 7. BAN -->
-        <div class="bg-slate-800/60 border border-rose-500/40 rounded-2xl p-3 space-y-2.5">
-          <h4 class="text-xs font-black text-rose-300">🚫 유저 차단(밴) 및 해제 관리</h4>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <input id="adminBanTargetInput" type="text" placeholder="차단/해제할 닉네임" class="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
-            <input id="adminBanReasonInput" type="text" placeholder="차단 사유 (선택)" class="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="adminSetUserBan(true)" class="py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs active:scale-95">🚫 즉시 차단 (강제 퇴장)</button>
-            <button onclick="adminSetUserBan(false)" class="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs active:scale-95">✅ 차단 해제</button>
-          </div>
-        </div>
-
-        <!-- 8. POLL -->
-        <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-3 space-y-2">
-          <h4 class="text-xs font-black text-white">🗳️ 실시간 투표 시작 (0표 시작)</h4>
-          <input id="adminPollQuestion" type="text" placeholder="투표 질문 입력" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+        <!-- 유저 자금 지급 & 차단 -->
+        <div class="bg-slate-800/70 border border-slate-700 rounded-2xl p-3 space-y-2">
+          <div class="text-xs font-black text-emerald-300">💸 유저 자금 지급 & 제재</div>
+          <select id="adminUserSelect" onchange="syncSelectedUserToInput()" class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"></select>
           <div class="grid grid-cols-2 gap-1.5">
-            <input id="adminPollOpt1" type="text" placeholder="선택지 1" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
-            <input id="adminPollOpt2" type="text" placeholder="선택지 2" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminTargetNickname" type="text" placeholder="대상 닉네임" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminMoneyAmount" type="number" value="100000" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
           </div>
-          <div class="flex gap-2">
-            <button onclick="createAdminPoll()" class="flex-1 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs">투표 시작하기</button>
-            <button onclick="closeAdminPoll()" class="px-3 py-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold text-xs">투표 종료</button>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button onclick="adminModifyUserMoney('add')" class="py-1.5 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs">+ 금액 추가</button>
+            <button onclick="adminModifyUserMoney('set')" class="py-1.5 rounded-xl bg-sky-400 text-slate-950 font-black text-xs">= 금액 고정</button>
+          </div>
+          <div class="grid grid-cols-3 gap-1.5 pt-1">
+            <input id="adminBanTargetInput" type="text" placeholder="차단 닉네임" class="px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminBanReasonInput" type="text" placeholder="사유" class="px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <div class="flex gap-1">
+              <button onclick="adminSetUserBan(true)" class="flex-1 py-1.5 rounded-xl bg-rose-600 text-white font-black text-[11px]">차단</button>
+              <button onclick="adminSetUserBan(false)" class="flex-1 py-1.5 rounded-xl bg-slate-700 text-white font-black text-[11px]">해제</button>
+            </div>
           </div>
         </div>
 
-        <!-- 9. FEEDBACK -->
-        <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-3 space-y-2">
-          <div class="flex items-center justify-between"><h4 class="text-xs font-black text-white">🐞 버그신고 & 개선사항 수신함</h4><button onclick="loadAdminFeedbacks()" class="text-[10px] text-slate-400 underline">새로고침</button></div>
-          <div id="adminFeedbackList" class="space-y-1.5 max-h-40 overflow-y-auto text-xs"><p class="text-slate-400 text-[11px]">제보 내역이 없습니다.</p></div>
+        <!-- 전체 사장님 명부 -->
+        <div class="bg-slate-800/70 border border-slate-700 rounded-2xl p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-sky-300">📋 전체 사장님 명부 (PIN · 최근 접속일)</span>
+            <button onclick="loadAdminUserList()" class="px-2.5 py-1 rounded-lg bg-slate-700 text-white text-[11px] font-bold">🔄 새로고침</button>
+          </div>
+          <div id="adminUserStatusList" class="space-y-1.5 max-h-56 overflow-y-auto text-xs text-slate-400">데이터를 불러오는 중...</div>
+        </div>
+
+        <!-- 쿠폰 & 투표 & 건의함 -->
+        <div class="bg-slate-800/70 border border-slate-700 rounded-2xl p-3 space-y-2">
+          <div class="text-xs font-black text-amber-300">🎟️ 쿠폰 발행 & 🗳️ 투표 생성</div>
+          <div class="grid grid-cols-3 gap-1.5">
+            <input id="adminNewCouponCode" type="text" placeholder="쿠폰코드" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminNewCouponReward" type="number" value="50000" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <button onclick="createAdminCoupon()" class="py-1.5 rounded-xl bg-amber-400 text-slate-950 font-black text-xs">쿠폰 발행</button>
+          </div>
+          <input id="adminPollQuestion" type="text" placeholder="투표 질문" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+          <div class="grid grid-cols-2 gap-1.5">
+            <input id="adminPollOpt1" type="text" placeholder="항목 1" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+            <input id="adminPollOpt2" type="text" placeholder="항목 2" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button onclick="createAdminPoll()" class="py-1.5 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs">투표 시작</button>
+            <button onclick="closeAdminPoll()" class="py-1.5 rounded-xl bg-slate-700 text-white font-black text-xs">투표 종료</button>
+          </div>
+          <div class="text-xs font-black text-slate-300 pt-2">📨 유저 건의함 내역</div>
+          <div id="adminFeedbackList" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
         </div>
       </div>
     </div>
@@ -692,7 +630,6 @@
       { key: 'storeExpansion', title: '🏬 프리미엄 매장 확장', desc: '초당 자동 매출 +7,000원 & 매장 등급이 상승합니다.', baseCost: 60000, mult: 1.9, maxLv: 10, passivePerLv: 7000 }
     ];
 
-    // 50 SURPRISE EVENTS CATALOG
     const SURPRISE_50_LIST = [
       { id: 'money_rain', title: '💸 1. 하늘에서 돈비', desc: '전원 +30,000원', money: 30000, rain: '💵' },
       { id: 'mega_money_rain', title: '💰 2. 황금 지폐 폭풍', desc: '전원 +100,000원', money: 100000, rain: '💰' },
@@ -737,7 +674,7 @@
       { id: 'pirate_treasure', title: '🏴‍☠️ 41. 해적선의 보물상자', desc: '전원 +150,000원', money: 150000, rain: '👑' },
       { id: 'earthquake_mini', title: '🌋 42. 미세 지진 흔들림', desc: '4초간 흔들림 +30,000원', bodyClass: 'admin-shake', dur: 4000, money: 30000 },
       { id: 'zero_g_party', title: '🪐 43. 토성 무중력 파티', desc: '10초 무중력 +재화 12개', zeroG: 10000, core: 12 },
-      { id: 'vip_convoy', title: ' limo 44. VIP 리무진 행렬', desc: 'VIP 2명 +50,000원', spawnVip: 2, money: 50000 },
+      { id: 'vip_convoy', title: '🚘 44. VIP 리무진 행렬', desc: 'VIP 2명 +50,000원', spawnVip: 2, money: 50000 },
       { id: 'clean_robot', title: '🤖 45. 로봇청소기 출동', desc: '청결 100% +30,000원', clean: true, money: 30000 },
       { id: 'burger_rain', title: '🍔 46. 햄버거 하늘에서 뚝!', desc: '전원 +28,000원', money: 28000, rain: '🍔' },
       { id: 'pizza_party', title: '🍕 47. 전 직원 피자 회식', desc: '전원 +33,000원', money: 33000, rain: '🍕' },
@@ -764,245 +701,109 @@
     };
     let currentCustomer = null, waitingQueue = [], preparedChange = 0, dayTimer = 0, lastTick = Date.now();
 
-    // 60FPS CINEMA ENGINE
     let cinemaState = { mode: 'alien_eve', elapsedSec: 0, shakePower: 0, camZoom: 1.0, targetZoom: 1.0, flashAlpha: 0, stars: [], particles: [], floatingItems: [] };
-
     function spawnCinemaParticles(x, y, count, colors, speedMax = 6, sizeMax = 5) {
       for (let i = 0; i < count; i++) {
         const ang = Math.random() * Math.PI * 2, spd = 1 + Math.random() * speedMax;
         cinemaState.particles.push({ x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 1.5, life: 1.0, decay: 0.018 + Math.random() * 0.025, size: 2 + Math.random() * sizeMax, color: colors[Math.floor(Math.random() * colors.length)] });
       }
     }
-
     function initCinemaCanvas(mode = 'alien_eve') {
       const canvas = document.getElementById('ufoCinemaCanvas'), ctx = canvas.getContext('2d');
-      const resizeCanvas = () => {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      };
+      const resizeCanvas = () => { const dpr = Math.min(window.devicePixelRatio || 1, 2); canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
       resizeCanvas(); window.addEventListener('resize', resizeCanvas);
-      Object.assign(cinemaState, {
-        mode, elapsedSec: 0, shakePower: 0, camZoom: 1.0, targetZoom: 1.0, flashAlpha: 0, particles: [], floatingItems: [],
-        stars: Array.from({ length: 130 }, () => ({ x: Math.random(), y: Math.random() * 0.68, r: Math.random() * 2 + 0.4, twinkle: Math.random() * Math.PI * 2 }))
-      });
-
+      Object.assign(cinemaState, { mode, elapsedSec: 0, shakePower: 0, camZoom: 1.0, targetZoom: 1.0, flashAlpha: 0, particles: [], floatingItems: [], stars: Array.from({ length: 130 }, () => ({ x: Math.random(), y: Math.random() * 0.68, r: Math.random() * 2 + 0.4, twinkle: Math.random() * Math.PI * 2 })) });
       const renderFrame = () => {
         ufoCinemaAnimId = requestAnimationFrame(renderFrame);
         const w = window.innerWidth, h = window.innerHeight, t = performance.now() * 0.001, sec = cinemaState.elapsedSec, cMode = cinemaState.mode;
         cinemaState.camZoom += (cinemaState.targetZoom - cinemaState.camZoom) * 0.05;
-
-        ctx.save();
-        ctx.translate(w * 0.5, h * 0.55); ctx.scale(cinemaState.camZoom, cinemaState.camZoom); ctx.translate(-w * 0.5, -h * 0.55);
-        if (cinemaState.shakePower > 0.2) {
-          ctx.translate((Math.random() - 0.5) * cinemaState.shakePower, (Math.random() - 0.5) * cinemaState.shakePower);
-          cinemaState.shakePower *= 0.92;
-        }
-
+        ctx.save(); ctx.translate(w * 0.5, h * 0.55); ctx.scale(cinemaState.camZoom, cinemaState.camZoom); ctx.translate(-w * 0.5, -h * 0.55);
+        if (cinemaState.shakePower > 0.2) { ctx.translate((Math.random() - 0.5) * cinemaState.shakePower, (Math.random() - 0.5) * cinemaState.shakePower); cinemaState.shakePower *= 0.92; }
         const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.78);
         if (cMode.startsWith('cyber')) { skyGrad.addColorStop(0, '#01060f'); skyGrad.addColorStop(0.55, '#062c30'); skyGrad.addColorStop(1, '#0e4d54'); }
         else if (cMode.startsWith('xmas')) { skyGrad.addColorStop(0, '#070b1e'); skyGrad.addColorStop(0.55, '#1e1b4b'); skyGrad.addColorStop(1, '#312e81'); }
-        else {
-          const isAlert = (cMode === 'alien_eve' && sec >= 28) || cMode === 'alien_raid_start';
-          skyGrad.addColorStop(0, isAlert ? '#0b0217' : '#02050d'); skyGrad.addColorStop(0.55, isAlert ? '#240944' : '#0b152c'); skyGrad.addColorStop(1, isAlert ? '#4c0575' : '#162447');
-        }
+        else { const isAlert = (cMode === 'alien_eve' && sec >= 28) || cMode === 'alien_raid_start'; skyGrad.addColorStop(0, isAlert ? '#0b0217' : '#02050d'); skyGrad.addColorStop(0.55, isAlert ? '#240944' : '#0b152c'); skyGrad.addColorStop(1, isAlert ? '#4c0575' : '#162447'); }
         ctx.fillStyle = skyGrad; ctx.fillRect(-50, -50, w + 100, h + 100);
-
-        if (cMode.startsWith('cyber')) {
-          ctx.fillStyle = 'rgba(34, 211, 238, 0.32)'; ctx.font = 'bold 13px monospace';
-          for (let i = 0; i < 28; i++) ctx.fillText((i + Math.floor(t * 9)) % 2 === 0 ? '0101' : 'ERR!', (w / 28) * i + 6, ((t * 190 + i * 89) % (h * 0.75)));
-        } else {
-          cinemaState.stars.forEach(s => {
-            ctx.fillStyle = `rgba(241, 245, 249, ${0.3 + 0.7 * Math.abs(Math.sin(t * 2.5 + s.twinkle))})`;
-            ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2); ctx.fill();
-          });
-        }
-
-        const groundY = h * 0.73;
-        ctx.fillStyle = cMode.startsWith('xmas') ? '#e2e8f0' : '#0b1120'; ctx.fillRect(-50, groundY, w + 100, h - groundY + 100);
-        ctx.fillStyle = cMode.startsWith('xmas') ? '#cbd5e1' : '#1e293b'; ctx.fillRect(-50, groundY, w + 100, 6);
-
+        if (cMode.startsWith('cyber')) { ctx.fillStyle = 'rgba(34, 211, 238, 0.32)'; ctx.font = 'bold 13px monospace'; for (let i = 0; i < 28; i++) ctx.fillText((i + Math.floor(t * 9)) % 2 === 0 ? '0101' : 'ERR!', (w / 28) * i + 6, ((t * 190 + i * 89) % (h * 0.75))); }
+        else { cinemaState.stars.forEach(s => { ctx.fillStyle = `rgba(241, 245, 249, ${0.3 + 0.7 * Math.abs(Math.sin(t * 2.5 + s.twinkle))})`; ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2); ctx.fill(); }); }
+        const groundY = h * 0.73; ctx.fillStyle = cMode.startsWith('xmas') ? '#e2e8f0' : '#0b1120'; ctx.fillRect(-50, groundY, w + 100, h - groundY + 100);
         const storeW = Math.min(220, w * 0.36), storeH = Math.min(138, h * 0.22), storeX = Math.max(14, w * 0.05), storeY = groundY - storeH;
         const isCorrupted = (cMode === 'alien_eve' && sec >= 28) || (cMode === 'cyber_eve' && sec >= 24);
         drawDetailedStore(ctx, storeX, storeY, storeW, storeH, cMode, isCorrupted);
-
         const heroX = storeX + storeW + Math.min(48, w * 0.08), enemyX = w * 0.72;
-
         if (cMode.startsWith('alien')) {
           let ufoX = enemyX, ufoY = groundY - 105 + Math.sin(t * 3.5) * 7, ufoScale = cMode === 'alien_raid_start' ? 1.75 : 1.15, ufoTilt = Math.sin(t * 2.5) * 0.05;
-          if (cMode === 'alien_eve') {
-            if (sec < 8) {
-              const prog = Math.min(1, sec / 7.5), ease = 1 - Math.pow(1 - prog, 3);
-              ufoX = w * 1.15 + (enemyX - w * 1.15) * ease; ufoY = -80 + (groundY - 105 + 80) * ease; ufoTilt = -0.35 * (1 - ease);
-              if (prog < 0.95) spawnCinemaParticles(ufoX + 30, ufoY - 20, 2, ['#f97316', '#fde047', '#c084fc'], 4, 6);
-            } else if (sec >= 8 && sec < 17) {
-              drawTractorBeam(ctx, ufoX, ufoY + 12, storeX + storeW * 0.7, groundY);
-              if (Math.random() < 0.22) cinemaState.floatingItems.push({ x: storeX + storeW * (0.3 + Math.random() * 0.5), y: groundY - 20, emoji: ['🍙', '🍜', '🍌', '🍱'][Math.floor(Math.random() * 4)], life: 1.0 });
-            }
-          }
-          for (let i = cinemaState.floatingItems.length - 1; i >= 0; i--) {
-            const fi = cinemaState.floatingItems[i]; fi.x += (ufoX - fi.x) * 0.04; fi.y -= 2.4; fi.life -= 0.015;
-            if (fi.life <= 0) { cinemaState.floatingItems.splice(i, 1); continue; }
-            ctx.font = '18px sans-serif'; ctx.fillText(fi.emoji, fi.x, fi.y);
-          }
+          if (cMode === 'alien_eve' && sec < 8) { const prog = Math.min(1, sec / 7.5), ease = 1 - Math.pow(1 - prog, 3); ufoX = w * 1.15 + (enemyX - w * 1.15) * ease; ufoY = -80 + (groundY - 105 + 80) * ease; ufoTilt = -0.35 * (1 - ease); }
           drawHeroCharacter(ctx, heroX, groundY, cMode === 'alien_eve' && sec >= 28, (cMode === 'alien_eve' && sec >= 17 && sec < 28) || cMode === 'alien_raid_win', cMode === 'alien_eve' && sec < 17);
           drawSleekUFO(ctx, ufoX, ufoY, ufoScale, ufoTilt, t);
-
-          if (cMode === 'alien_eve' && sec >= 17 && sec < 28) {
-            const clashRatio = Math.max(0.22, 0.55 - ((sec - 17) / 11) * 0.35), clashX = heroX + (ufoX - heroX) * clashRatio, clashY = (groundY - 48) + ((ufoY + 6) - (groundY - 48)) * clashRatio;
-            drawEnergyBeam(ctx, heroX + 24, groundY - 48, clashX, clashY, 12 + Math.sin(t * 25) * 3, '#10b981', '#fef08a');
-            drawEnergyBeam(ctx, ufoX - 20, ufoY + 6, clashX, clashY, 18 + Math.cos(t * 25) * 4, '#a855f7', '#f0abfc');
-            spawnCinemaParticles(clashX, clashY, 3, ['#fde047', '#e879f9', '#34d399'], 7, 5);
-          }
-          if (cMode === 'alien_raid_win' && sec < 14) {
-            drawEnergyBeam(ctx, heroX + 24, groundY - 48, ufoX, ufoY, 26, '#10b981', '#ffffff');
-            spawnCinemaParticles(ufoX, ufoY, 4, ['#f97316', '#fde047', '#ffffff'], 9, 7);
-          }
+          if ((cMode === 'alien_eve' && sec >= 17 && sec < 28) || (cMode === 'alien_raid_win' && sec < 14)) { drawEnergyBeam(ctx, heroX + 24, groundY - 48, ufoX, ufoY, 18, '#10b981', '#fef08a'); spawnCinemaParticles(ufoX, ufoY, 3, ['#fde047', '#e879f9', '#34d399'], 7, 5); }
         } else if (cMode.startsWith('cyber')) {
           drawHeroCharacter(ctx, heroX, groundY, cMode === 'cyber_eve' && sec >= 24, (cMode === 'cyber_eve' && sec >= 14 && sec < 24) || cMode === 'cyber_raid_win', false);
           drawCyberCoreBoss(ctx, enemyX, groundY - 92 + Math.sin(t * 4.5) * 7, t, cMode === 'cyber_raid_win' && sec >= 12);
-          if (cMode === 'cyber_eve' && sec >= 14 && sec < 24) {
-            const midX = (heroX + enemyX) * 0.5, midY = groundY - 70;
-            drawEnergyBeam(ctx, heroX + 24, groundY - 48, midX, midY, 12, '#38bdf8', '#ffffff');
-            drawEnergyBeam(ctx, enemyX - 30, groundY - 92, midX, midY, 17, '#f43f5e', '#fda4af');
-            spawnCinemaParticles(midX, midY, 3, ['#22d3ee', '#f43f5e'], 7, 4);
-          }
-          if (cMode === 'cyber_raid_win' && sec < 14) {
-            drawEnergyBeam(ctx, heroX + 24, groundY - 48, enemyX, groundY - 92, 24, '#22d3ee', '#ffffff');
-            spawnCinemaParticles(enemyX, groundY - 92, 4, ['#22d3ee', '#fde047', '#ffffff'], 9, 6);
-          }
+          if ((cMode === 'cyber_eve' && sec >= 14 && sec < 24) || (cMode === 'cyber_raid_win' && sec < 14)) { drawEnergyBeam(ctx, heroX + 24, groundY - 48, enemyX, groundY - 92, 18, '#22d3ee', '#ffffff'); spawnCinemaParticles(enemyX, groundY - 92, 3, ['#22d3ee', '#f43f5e'], 7, 4); }
         } else if (cMode.startsWith('xmas')) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-          for (let i = 0; i < 60; i++) { ctx.beginPath(); ctx.arc((i * 97 + t * 40) % w, (i * 53 + t * 115) % (h * 0.74), 2.5, 0, Math.PI * 2); ctx.fill(); }
-          drawHeroCharacter(ctx, heroX, groundY, false, false, sec < 12);
-          drawDetailedSantaSleigh(ctx, enemyX, groundY, cMode, sec, t);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; for (let i = 0; i < 60; i++) { ctx.beginPath(); ctx.arc((i * 97 + t * 40) % w, (i * 53 + t * 115) % (h * 0.74), 2.5, 0, Math.PI * 2); ctx.fill(); }
+          drawHeroCharacter(ctx, heroX, groundY, false, false, sec < 12); drawDetailedSantaSleigh(ctx, enemyX, groundY, cMode, sec, t);
           if (cMode === 'xmas_win' && Math.random() < 0.16) spawnCinemaParticles(w * (0.25 + Math.random() * 0.5), h * (0.14 + Math.random() * 0.25), 28, ['#fde047', '#f43f5e', '#34d399', '#38bdf8'], 7, 5);
         }
-
-        for (let i = cinemaState.particles.length - 1; i >= 0; i--) {
-          const p = cinemaState.particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= p.decay;
-          if (p.life <= 0) { cinemaState.particles.splice(i, 1); continue; }
-          ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.color;
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill();
-        }
+        for (let i = cinemaState.particles.length - 1; i >= 0; i--) { const p = cinemaState.particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= p.decay; if (p.life <= 0) { cinemaState.particles.splice(i, 1); continue; } ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill(); }
         ctx.globalAlpha = 1;
-
-        if (cMode.startsWith('cyber') && Math.random() < 0.25) { ctx.fillStyle = 'rgba(244, 63, 94, 0.18)'; ctx.fillRect(0, Math.random() * h, w, 6 + Math.random() * 14); }
         if (cinemaState.flashAlpha > 0.01) { ctx.fillStyle = `rgba(255, 255, 255, ${cinemaState.flashAlpha})`; ctx.fillRect(-50, -50, w + 100, h + 100); cinemaState.flashAlpha *= 0.86; }
         ctx.restore();
       };
       renderFrame();
     }
-
     function drawDetailedStore(ctx, x, y, w, h, cMode, corrupted) {
       ctx.fillStyle = corrupted ? '#1e1b4b' : '#1e293b'; ctx.beginPath(); ctx.roundRect(x, y, w, h, [10, 10, 0, 0]); ctx.fill();
-      const brandColor = cMode.startsWith('cyber') ? '#06b6d4' : cMode.startsWith('xmas') ? '#ef4444' : corrupted ? '#a855f7' : '#10b981';
-      ctx.fillStyle = '#090d16'; ctx.fillRect(x - 5, y - 8, w + 10, 28);
-      ctx.fillStyle = brandColor; ctx.fillRect(x - 5, y - 8, w + 10, 6);
-      ctx.fillStyle = '#f59e0b'; ctx.fillRect(x - 5, y + 15, w + 10, 5);
-      ctx.fillStyle = '#ffffff'; ctx.font = '900 11px "Noto Sans KR", sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText(cMode.startsWith('cyber') ? 'SYSTEM LOCKED 24' : cMode.startsWith('xmas') ? 'MERRY X-MAS 24' : corrupted ? 'ALIEN BASE 24' : '24H 편의점', x + w * 0.5, y + 11);
-      ctx.fillStyle = corrupted ? '#3b0764' : cMode.startsWith('xmas') ? '#fef3c7' : '#064e3b'; ctx.fillRect(x + 12, y + 26, w - 24, h - 30);
-      ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fillRect(x + 16, y + 48, w - 32, 3); ctx.fillRect(x + 16, y + 74, w - 32, 3);
-      ctx.fillStyle = 'rgba(255,255,255,0.14)'; ctx.beginPath(); ctx.moveTo(x + 18, y + 26); ctx.lineTo(x + 36, y + 26); ctx.lineTo(x + 22, y + h - 4); ctx.lineTo(x + 12, y + h - 4); ctx.closePath(); ctx.fill();
-    }
-    function drawTractorBeam(ctx, x1, y1, x2, y2) {
-      ctx.save(); const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-      grad.addColorStop(0, 'rgba(192, 132, 252, 0.55)'); grad.addColorStop(1, 'rgba(192, 132, 252, 0.05)');
-      ctx.fillStyle = grad; ctx.beginPath(); ctx.moveTo(x1 - 24, y1); ctx.lineTo(x1 + 24, y1); ctx.lineTo(x2 + 65, y2); ctx.lineTo(x2 - 65, y2); ctx.closePath(); ctx.fill(); ctx.restore();
+      ctx.fillStyle = cMode.startsWith('cyber') ? '#06b6d4' : cMode.startsWith('xmas') ? '#ef4444' : corrupted ? '#a855f7' : '#10b981'; ctx.fillRect(x - 5, y - 8, w + 10, 24);
+      ctx.fillStyle = '#ffffff'; ctx.font = '900 11px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('24H 편의점', x + w * 0.5, y + 8);
     }
     function drawSleekUFO(ctx, x, y, scale, tilt, t) {
       ctx.save(); ctx.translate(x, y); ctx.rotate(tilt); ctx.scale(scale, scale);
-      ctx.fillStyle = 'rgba(168, 85, 247, 0.18)'; ctx.beginPath(); ctx.ellipse(0, 2, 92, 28, 0, 0, Math.PI * 2); ctx.fill();
-      const domeGrad = ctx.createLinearGradient(0, -36, 0, 0); domeGrad.addColorStop(0, '#f5d0fe'); domeGrad.addColorStop(1, '#7e22ce');
-      ctx.fillStyle = domeGrad; ctx.beginPath(); ctx.ellipse(0, -8, 36, 25, 0, Math.PI, 0); ctx.fill();
-      ctx.fillStyle = '#cbd5e1'; ctx.beginPath(); ctx.ellipse(0, 2, 80, 18, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#475569'; ctx.beginPath(); ctx.ellipse(0, 6, 62, 10, 0, 0, Math.PI * 2); ctx.fill();
-      for (let i = -3; i <= 3; i++) { ctx.fillStyle = Math.sin(t * 12 + i) > 0 ? '#38bdf8' : '#f472b6'; ctx.beginPath(); ctx.arc(i * 20, 2, 4, 0, Math.PI * 2); ctx.fill(); }
-      ctx.restore();
+      ctx.fillStyle = '#7e22ce'; ctx.beginPath(); ctx.ellipse(0, -8, 36, 25, 0, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = '#cbd5e1'; ctx.beginPath(); ctx.ellipse(0, 2, 80, 18, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     }
     function drawCyberCoreBoss(ctx, x, y, t, shattered = false) {
       if (shattered) return;
-      ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 4; ctx.beginPath();
-      for (let i = 0; i < 6; i++) { const ang = t * 1.8 + (i * Math.PI) / 3; const px = Math.cos(ang) * 62, py = Math.sin(ang) * 62; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-      ctx.closePath(); ctx.stroke();
-      ctx.fillStyle = '#090d16'; ctx.beginPath(); ctx.arc(0, 0, 40, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(0, 0, 17 + Math.sin(t * 10) * 4, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, 52, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(0, 0, 18 + Math.sin(t * 10) * 4, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     }
     function drawDetailedSantaSleigh(ctx, x, y, cMode, sec, t) {
       const litTree = cMode === 'xmas_win';
-      ctx.save(); ctx.translate(x + 28, y);
-      ctx.fillStyle = '#78350f'; ctx.fillRect(-12, -26, 24, 26);
-      ctx.fillStyle = litTree ? '#10b981' : '#065f46';
-      for (let tier = 0; tier < 3; tier++) { ctx.beginPath(); ctx.moveTo(0, -155 + tier * 30); ctx.lineTo(-60 + tier * 11, -90 + tier * 32); ctx.lineTo(60 - tier * 11, -90 + tier * 32); ctx.closePath(); ctx.fill(); }
-      const orbColors = ['#ef4444', '#fbbf24', '#38bdf8', '#f472b6'];
-      for (let i = 0; i < 9; i++) { ctx.fillStyle = litTree ? orbColors[i % 4] : '#64748b'; ctx.beginPath(); ctx.arc(((i % 3) - 1) * 22, -55 - Math.floor(i / 3) * 28, 4.5, 0, Math.PI * 2); ctx.fill(); }
-      ctx.fillStyle = litTree ? '#fde047' : '#94a3b8'; ctx.beginPath(); ctx.arc(0, -162, 11 + (litTree ? Math.sin(t * 9) * 3 : 0), 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-
-      const prog = cMode === 'xmas_eve' ? Math.min(1, sec / 7) : 1;
-      const sx = x - 65 + (1 - prog) * 180, sy = y - (1 - prog) * 95 + Math.sin(t * 5) * 2;
-      ctx.save(); ctx.translate(sx, sy);
-      ctx.fillStyle = '#92400e'; ctx.beginPath(); ctx.roundRect(-64, -34, 26, 15, 6); ctx.fill();
-      ctx.fillRect(-62, -20, 4, 18); ctx.fillRect(-45, -20, 4, 18);
-      ctx.beginPath(); ctx.arc(-66, -40, 9, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#fde68a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-66, -48); ctx.lineTo(-70, -58); ctx.moveTo(-64, -48); ctx.lineTo(-60, -58); ctx.stroke();
-      ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(-75, -40, 4 + Math.sin(t * 10) * 1.2, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(-38, -28); ctx.lineTo(-18, -24); ctx.stroke();
-      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-22, -3); ctx.lineTo(36, -3); ctx.quadraticCurveTo(44, -3, 46, -11); ctx.stroke();
-      ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.roundRect(-18, -28, 52, 21, [4, 4, 12, 12]); ctx.fill();
-      ctx.fillStyle = '#fbbf24'; ctx.fillRect(-18, -28, 52, 4);
-      ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(6, -36, 13, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fde68a'; ctx.beginPath(); ctx.arc(4, -50, 9, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(2, -46, 9, 0.1 * Math.PI, 0.9 * Math.PI); ctx.fill();
-      ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.moveTo(-5, -56); ctx.lineTo(13, -56); ctx.lineTo(16, -68); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(16, -68, 3.5, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#38bdf8'; ctx.fillRect(18, -42, 12, 12);
-      ctx.fillStyle = '#fbbf24'; ctx.fillRect(22, -42, 4, 12);
-      ctx.restore();
+      ctx.save(); ctx.translate(x + 28, y); ctx.fillStyle = litTree ? '#10b981' : '#065f46';
+      ctx.beginPath(); ctx.moveTo(0, -155); ctx.lineTo(-55, -26); ctx.lineTo(55, -26); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = litTree ? '#fde047' : '#94a3b8'; ctx.beginPath(); ctx.arc(0, -162, 11, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     }
     function drawHeroCharacter(ctx, x, y, knocked, firing, surprised = false) {
-      ctx.save(); ctx.translate(x, y);
-      if (knocked) { ctx.translate(0, -10); ctx.rotate(-Math.PI / 2); }
-      ctx.fillStyle = '#1e293b'; ctx.fillRect(-10, -26, 8, 26); ctx.fillRect(2, -26, 8, 26);
+      ctx.save(); ctx.translate(x, y); if (knocked) { ctx.translate(0, -10); ctx.rotate(-Math.PI / 2); }
       ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.roundRect(-14, -58, 28, 34, 6); ctx.fill();
-      ctx.fillStyle = '#fde68a'; ctx.beginPath(); ctx.arc(0, -70, 12, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#059669'; ctx.beginPath(); ctx.arc(0, -73, 12, Math.PI, 0); ctx.fill(); ctx.fillRect(0, -75, 18, 4);
-      ctx.fillStyle = firing ? '#fde047' : '#f59e0b'; ctx.fillRect(11, -50, 17, 7);
-      if (surprised && !knocked) { ctx.fillStyle = '#ef4444'; ctx.font = '900 18px sans-serif'; ctx.fillText('!?', 0, -90); }
-      ctx.restore();
+      ctx.fillStyle = '#fde68a'; ctx.beginPath(); ctx.arc(0, -70, 12, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     }
     function drawEnergyBeam(ctx, x1, y1, x2, y2, thickness, outerColor, coreColor) {
-      ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = outerColor; ctx.lineWidth = thickness * 2.2; ctx.globalAlpha = 0.45;
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-      ctx.strokeStyle = coreColor; ctx.lineWidth = thickness * 0.85; ctx.globalAlpha = 0.96;
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore();
+      ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = outerColor; ctx.lineWidth = thickness * 2; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      ctx.strokeStyle = coreColor; ctx.lineWidth = thickness * 0.8; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore();
     }
     function destroyCinemaCanvas() { if (ufoCinemaAnimId) { cancelAnimationFrame(ufoCinemaAnimId); ufoCinemaAnimId = null; } }
 
-    // 38-SEC STORY SCRIPTS
     const STORY_SCRIPTS = {
       alien_eve: [
-        { startSec: 0, act: 'ACT 1 · 미확인 비행물체 착륙 경보!', speaker: '📡 기상 관측소 긴급속보', ground: '편의점 상공 밤하늘', text: '밤하늘을 가르는 보라빛 섬광과 함께 거대 UFO가 편의점 앞 공터로 급하강합니다!!', shake: 18, zoom: 1.08, flash: 0.7, sound: 'crash' },
-        { startSec: 8, act: 'ACT 2 · 보급품 강제 견인!', speaker: '👽 외계인 함대 사령관', ground: 'UFO 견인 광선 구역', text: '외계인: "지구인... 이 편의점의 모든 간식과 에너지는 이제 우리 함대의 것이다!"', shake: 10, zoom: 1.14, flash: 0, sound: 'alarm' },
-        { startSec: 17, act: 'ACT 3 · 바코드 광선 vs 플라즈마 대결!', speaker: '⚔️ 정면 에너지 광선 대결', ground: '편의점 앞 최후 방어선', text: '사장님이 초고출력 바코드 스캐너 광선으로 맞서지만, 외계 함대의 에너지 출력이 방어선을 밀어냅니다!!', shake: 22, zoom: 1.22, flash: 0.5, sound: 'beam_clash', battle: true, heroHp: 28, alienHp: 65 },
-        { startSec: 28, act: 'ACT 4 · 편의점 점령 완료', speaker: '⚠️ SYSTEM OCCUPIED', ground: '외계 에너지 점령 구역', text: '방어선이 뚫렸습니다! 11/28 본편 이벤트까지 손님을 응대하며 🔋 에너지 코어를 모으세요!', shake: 16, zoom: 1.0, flash: 0.85, sound: 'explosion' }
+        { startSec: 0, act: 'ACT 1 · 미확인 비행물체 착륙 경보!', speaker: '📡 기상 관측소 긴급속보', ground: '편의점 상공 밤하늘', text: '거대 UFO가 편의점 앞 공터로 급하강합니다!!', shake: 18, zoom: 1.08, flash: 0.7, sound: 'crash' },
+        { startSec: 17, act: 'ACT 2 · 바코드 광선 vs 플라즈마 대결!', speaker: '⚔️ 정면 에너지 광선 대결', ground: '편의점 앞 방어선', text: '사장님이 바코드 광선으로 맞서지만 방어선이 밀립니다!', shake: 22, zoom: 1.22, flash: 0.5, sound: 'beam_clash', battle: true, heroHp: 28, alienHp: 65 },
+        { startSec: 28, act: 'ACT 3 · 편의점 점령 완료', speaker: '⚠️ SYSTEM OCCUPIED', ground: '외계 점령 구역', text: '11/28 본편 이벤트까지 🔋 에너지 코어를 모으세요!', shake: 16, zoom: 1.0, flash: 0.85, sound: 'explosion' }
       ],
-      alien_raid_start: [{ startSec: 0, act: 'EVENT START · 초대형 모선 등장!', speaker: '🚨 전 서버 총동원령', ground: '편의점 상공 성층권', text: '초대형 외계인 모선이 모습을 드러냈습니다! 모아둔 에너지 코어로 모선을 물리치세요!!', shake: 18, zoom: 1.15, flash: 0.7, sound: 'crash' }],
-      alien_raid_win: [{ startSec: 0, act: 'VICTORY · 외계인 모선 후퇴!!', speaker: '🏆 지구 방위 대승리!', ground: '해방된 편의점', text: '전 서버 사장님들의 협동 광선으로 외계인 모선이 빛의 입자로 흩어졌습니다! 승리 보상 지급!', shake: 22, zoom: 1.18, flash: 0.9, sound: 'explosion' }],
+      alien_raid_start: [{ startSec: 0, act: 'EVENT START · 초대형 모선 등장!', speaker: '🚨 전 서버 총동원령', ground: '성층권', text: '초대형 외계인 모선이 등장했습니다! 에너지 코어로 물리치세요!', shake: 18, zoom: 1.15, flash: 0.7, sound: 'crash' }],
+      alien_raid_win: [{ startSec: 0, act: 'VICTORY · 외계인 모선 후퇴!!', speaker: '🏆 지구 방위 대승리!', ground: '해방된 편의점', text: '외계인 모선이 후퇴했습니다! 승리 보상 지급!', shake: 22, zoom: 1.18, flash: 0.9, sound: 'explosion' }],
       cyber_eve: [
-        { startSec: 0, act: 'ACT 1 · POS 네트워크 이상 신호!', speaker: '⚠️ 보안 관제 센터 경보', ground: '편의점 결제 단말기', text: '삐빅—!! 단말기 화면에 붉은 디지털 신호가 쏟아지며 매장 시스템이 얼어붙습니다!', shake: 14, zoom: 1.1, flash: 0.6, sound: 'glitch' },
-        { startSec: 14, act: 'ACT 2 · 보안 방어선 대결!', speaker: '🤖 AI 메인프레임 코어', ground: '디지털 방화벽 구역', text: 'AI 시스템: "모든 결제와 물류 데이터는 통제되었다." 백신 광선으로 맞서지만 방화벽이 무너집니다!', shake: 18, zoom: 1.2, flash: 0.4, sound: 'beam_clash', battle: true, heroHp: 30, alienHp: 70 },
-        { startSec: 24, act: 'ACT 3 · 시스템 잠금 완료', speaker: '💻 SYSTEM LOCKED', ground: '잠금된 POS 네트워크', text: '결제망이 잠겼습니다! 12/12 결전의 날까지 💾 데이터 칩을 모아 복구를 준비하세요!', shake: 14, zoom: 1.0, flash: 0.7, sound: 'glitch' }
+        { startSec: 0, act: 'ACT 1 · POS 네트워크 이상 신호!', speaker: '⚠️ 보안 관제 경보', ground: '결제 단말기', text: '단말기 화면에 붉은 디지털 신호가 쏟아집니다!', shake: 14, zoom: 1.1, flash: 0.6, sound: 'glitch' },
+        { startSec: 14, act: 'ACT 2 · 보안 방어선 대결!', speaker: '🤖 AI 메인프레임', ground: '디지털 방화벽', text: '방화벽이 무너집니다! 💾 데이터 칩을 모으세요!', shake: 18, zoom: 1.2, flash: 0.4, sound: 'beam_clash', battle: true, heroHp: 30, alienHp: 70 }
       ],
-      cyber_raid_start: [{ startSec: 0, act: 'CYBER EVENT · AI 메인프레임 결전!', speaker: '🔐 보안 암호 해독 작전', ground: '메인프레임 코어', text: 'AI 코어가 방화벽 암호를 가동했습니다! 4자리 암호를 해제하고 시스템을 정상화하세요!', shake: 16, zoom: 1.15, flash: 0.6, sound: 'glitch' }],
-      cyber_raid_win: [{ startSec: 0, act: 'SYSTEM RESTORED · 네트워크 완전 복구!', speaker: '💻 화이트해커 대승리!', ground: '정상화된 편의점', text: '오류 코드가 완전히 사라지고 편의점 서버가 복구되었습니다! [💻화이트해커] 칭호 획득!', shake: 18, zoom: 1.15, flash: 0.85, sound: 'explosion' }],
+      cyber_raid_start: [{ startSec: 0, act: 'CYBER EVENT · AI 메인프레임 결전!', speaker: '🔐 보안 암호 해독', ground: '메인프레임', text: '4자리 암호를 해제하고 시스템을 정상화하세요!', shake: 16, zoom: 1.15, flash: 0.6, sound: 'glitch' }],
+      cyber_raid_win: [{ startSec: 0, act: 'SYSTEM RESTORED · 네트워크 복구!', speaker: '💻 화이트해커 대승리!', ground: '정상화된 편의점', text: '편의점 서버가 복구되었습니다! [💻화이트해커] 칭호 획득!', shake: 18, zoom: 1.15, flash: 0.85, sound: 'explosion' }],
       xmas_eve: [
-        { startSec: 0, act: 'ACT 1 · 눈보라 속 산타 썰매 비상 착륙!', speaker: '❄️ 기상청 대설 특보', ground: '함박눈 내리는 편의점 앞', text: '거센 눈보라를 뚫고 빨간코 루돌프와 산타 썰매가 편의점 앞 눈밭에 착륙했습니다!', shake: 14, zoom: 1.12, flash: 0.4, sound: 'crash' },
-        { startSec: 13, act: 'ACT 2 · 산타 할아버지의 긴급 부탁', speaker: '🎅 산타클로스', ground: '편의점 정문 앞', text: '산타: "허허, 눈보라에 선물 상자들이 흩어졌구나! 크리스마스까지 잃어버린 선물을 모아주겠니?"', shake: 0, zoom: 1.16, flash: 0, sound: 'bells' },
-        { startSec: 25, act: 'ACT 3 · 화이트 크리스마스 전야제 개막!', speaker: '🎄 축제 준비 시작', ground: '눈 내리는 매장', text: '매장에 함박눈이 내립니다! 손님을 응대하고 🎁 선물 상자를 모아 12/25 트리 점등을 준비하세요!', shake: 0, zoom: 1.0, flash: 0.5, sound: 'bells' }
+        { startSec: 0, act: 'ACT 1 · 산타 썰매 비상 착륙!', speaker: '❄️ 기상청 대설 특보', ground: '함박눈 내리는 편의점', text: '산타 썰매가 편의점 앞 눈밭에 착륙했습니다!', shake: 14, zoom: 1.12, flash: 0.4, sound: 'crash' },
+        { startSec: 20, act: 'ACT 2 · 화이트 크리스마스 개막!', speaker: '🎄 축제 준비 시작', ground: '눈 내리는 매장', text: '🎁 선물 상자를 모아 12/25 트리 점등을 준비하세요!', shake: 0, zoom: 1.0, flash: 0.5, sound: 'bells' }
       ],
-      xmas_win: [{ startSec: 0, act: 'MERRY CHRISTMAS · 초대형 트리 점등!!', speaker: '🎅 산타클로스 & 루돌프', ground: '불꽃놀이 크리스마스 광장', text: '전 서버 사장님들의 마음으로 초대형 트리가 황금빛으로 빛납니다! 메리 크리스마스!!', shake: 8, zoom: 1.12, flash: 0.8, sound: 'bells' }]
+      xmas_win: [{ startSec: 0, act: 'MERRY CHRISTMAS · 초대형 트리 점등!!', speaker: '🎅 산타 & 루돌프', ground: '크리스마스 광장', text: '초대형 트리가 황금빛으로 빛납니다! 메리 크리스마스!!', shake: 8, zoom: 1.12, flash: 0.8, sound: 'bells' }]
     };
 
     function playCutsceneSequence(mode, onFinished) {
@@ -1011,17 +812,14 @@
       overlay.classList.remove('hidden'); document.getElementById('ufoMainStage').classList.remove('hidden'); document.getElementById('ufoCountdownFinaleStage').classList.add('hidden');
       initCinemaCanvas(mode);
       setTimeout(() => { topBar.classList.remove('-translate-y-full'); bottomBar.classList.remove('translate-y-full'); }, 40);
-
       const isEve = mode.endsWith('_eve'), totalSec = isEve ? 38 : mode.endsWith('_start') ? 12 : 16, beats = STORY_SCRIPTS[mode] || STORY_SCRIPTS.alien_eve, totalLabel = `00:${String(totalSec).padStart(2, '0')}`;
       let elapsedSec = 0, lastBeatIndex = -1;
-
       const renderBeatAtSecond = sec => {
         cinemaState.elapsedSec = sec;
         document.getElementById('ufoElapsedTimer').textContent = `00:${String(sec).padStart(2, '0')} / ${totalLabel}`;
         const pct = Math.min(100, Math.round((sec / totalSec) * 100));
         document.getElementById('ufoTimelineBar').style.width = `${pct}%`; document.getElementById('ufoSceneProgressText').textContent = `${pct}%`;
-        let beatIdx = 0;
-        for (let i = 0; i < beats.length; i++) if (sec >= beats[i].startSec) beatIdx = i;
+        let beatIdx = 0; for (let i = 0; i < beats.length; i++) if (sec >= beats[i].startSec) beatIdx = i;
         if (beatIdx !== lastBeatIndex) {
           lastBeatIndex = beatIdx; const b = beats[beatIdx];
           document.getElementById('ufoActBadge').textContent = b.act; document.getElementById('ufoSpeakerName').textContent = b.speaker;
@@ -1029,9 +827,7 @@
           const battleHud = document.getElementById('ufoBattleHud');
           if (b.battle) { battleHud.classList.remove('hidden'); document.getElementById('heroHpBar').style.width = `${b.heroHp}%`; document.getElementById('heroHpText').textContent = `${b.heroHp}%`; document.getElementById('alienHpBar').style.width = `${b.alienHp}%`; document.getElementById('alienHpText').textContent = `${b.alienHp}%`; }
           else battleHud.classList.add('hidden');
-          if (b.shake > 0) cinemaState.shakePower = b.shake;
-          if (b.zoom) cinemaState.targetZoom = b.zoom;
-          if (b.flash) cinemaState.flashAlpha = b.flash;
+          if (b.shake > 0) cinemaState.shakePower = b.shake; if (b.zoom) cinemaState.targetZoom = b.zoom; if (b.flash) cinemaState.flashAlpha = b.flash;
           if (b.sound === 'alarm') playUfoAlarm(); else if (b.sound) playCinemaImpactSound(b.sound);
         }
       };
@@ -1042,14 +838,9 @@
         else { clearInterval(ufoCutsceneInterval); if (isEve) showThreeSecondCountdownFinale(mode.split('_')[0], onFinished); else closeCinemaOverlay(onFinished); }
       }, 1000);
     }
-
     function showThreeSecondCountdownFinale(themeKey, onFinished) {
       document.getElementById('ufoMainStage').classList.add('hidden'); document.getElementById('ufoCountdownFinaleStage').classList.remove('hidden');
-      const meta = {
-        alien: { tag: '👽 ALIEN EVENT · 11/28', head: '대규모 이벤트가 다가옵니다..', desc: '2026년 11월 28일 (토) 오전 11:00 (KST)', target: THEME_TARGETS.alien },
-        cyber: { tag: '💻 CYBER DEFENSE · 12/12', head: '시스템 결전의 날이 다가옵니다..', desc: '2026년 12월 12일 (토) 오전 11:00 (KST)', target: THEME_TARGETS.cyber },
-        xmas: { tag: '🎄 CHRISTMAS FESTIVAL · 12/25', head: '크리스마스 대축제가 다가옵니다!', desc: '2026년 12월 25일 (금) 오전 11:00 (KST)', target: THEME_TARGETS.xmas }
-      }[themeKey] || { tag: 'MAIN EVENT', head: '이벤트가 다가옵니다..', desc: '', target: THEME_TARGETS.alien };
+      const meta = { alien: { tag: '👽 ALIEN · 11/28', head: '대규모 이벤트가 다가옵니다..', desc: '2026년 11월 28일 오전 11:00', target: THEME_TARGETS.alien }, cyber: { tag: '💻 CYBER · 12/12', head: '시스템 결전의 날이 다가옵니다..', desc: '2026년 12월 12일 오전 11:00', target: THEME_TARGETS.cyber }, xmas: { tag: '🎄 X-MAS · 12/25', head: '크리스마스 대축제가 다가옵니다!', desc: '2026년 12월 25일 오전 11:00', target: THEME_TARGETS.xmas } }[themeKey] || { tag: 'EVENT', head: '이벤트가 다가옵니다..', desc: '', target: THEME_TARGETS.alien };
       document.getElementById('finaleEventTag').textContent = meta.tag; document.getElementById('finaleHeadline').textContent = meta.head; document.getElementById('finaleTargetDesc').textContent = meta.desc;
       playGiftFanfare();
       const updateCountdownClock = () => {
@@ -1062,36 +853,26 @@
       updateCountdownClock(); ufoCountdownInterval = setInterval(updateCountdownClock, 1000);
       setTimeout(() => { clearInterval(ufoCountdownInterval); closeCinemaOverlay(onFinished); }, 3500);
     }
-
     function closeCinemaOverlay(onFinished) {
       document.getElementById('ufoTopLetterbox').classList.add('-translate-y-full'); document.getElementById('ufoBottomLetterbox').classList.add('translate-y-full');
       setTimeout(() => { destroyCinemaCanvas(); document.getElementById('ufoCutsceneOverlay').classList.add('hidden'); if (typeof onFinished === 'function') onFinished(); }, 400);
     }
 
-    // THEME & AUTH & GAME LOGIC
     function applyThemeVisuals(theme) {
       activeThemeMode = theme || 'normal';
       const banner = document.getElementById('alienOccupationBanner'), snow = document.getElementById('christmasSnowContainer'), tokenLabel = document.getElementById('statTokenLabel');
       banner.classList.add('hidden'); snow.classList.add('hidden'); snow.innerHTML = '';
       if (activeThemeMode === 'alien') {
-        banner.classList.remove('hidden'); banner.className = 'bg-gradient-to-r from-purple-950 via-fuchsia-950 to-purple-950 border border-purple-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md';
-        document.getElementById('occupationBannerIcon').textContent = '👽'; document.getElementById('occupationBannerTitle').textContent = currentBannerText || '대규모 이벤트가 다가옵니다..'; tokenLabel.textContent = '🔋 코어';
+        banner.classList.remove('hidden'); document.getElementById('occupationBannerIcon').textContent = '👽'; document.getElementById('occupationBannerTitle').textContent = currentBannerText || '대규모 이벤트가 다가옵니다..'; tokenLabel.textContent = '🔋 코어';
       } else if (activeThemeMode === 'cyber') {
-        banner.classList.remove('hidden'); banner.className = 'bg-gradient-to-r from-cyan-950 via-blue-950 to-cyan-950 border border-cyan-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md';
-        document.getElementById('occupationBannerIcon').textContent = '💻'; document.getElementById('occupationBannerTitle').textContent = currentBannerText || '시스템 결전의 날이 다가옵니다..'; tokenLabel.textContent = '💾 칩';
+        banner.classList.remove('hidden'); document.getElementById('occupationBannerIcon').textContent = '💻'; document.getElementById('occupationBannerTitle').textContent = currentBannerText || '시스템 결전의 날이 다가옵니다..'; tokenLabel.textContent = '💾 칩';
       } else if (activeThemeMode === 'xmas') {
-        banner.classList.remove('hidden'); banner.className = 'bg-gradient-to-r from-red-950 via-emerald-950 to-red-950 border border-amber-400 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] shadow-md';
-        document.getElementById('occupationBannerIcon').textContent = '🎅'; document.getElementById('occupationBannerTitle').textContent = currentBannerText || '크리스마스 대축제가 다가옵니다!'; tokenLabel.textContent = '🎁 선물';
+        banner.classList.remove('hidden'); document.getElementById('occupationBannerIcon').textContent = '🎅'; document.getElementById('occupationBannerTitle').textContent = currentBannerText || '크리스마스 대축제가 다가옵니다!'; tokenLabel.textContent = '🎁 선물';
         snow.classList.remove('hidden');
-        for (let i = 0; i < 28; i++) {
-          const flake = document.createElement('div'); flake.className = 'snow-flake'; flake.textContent = i % 2 === 0 ? '❄️' : '❅';
-          flake.style.left = `${Math.random() * 100}vw`; flake.style.fontSize = `${10 + Math.random() * 12}px`; flake.style.animationDuration = `${4 + Math.random() * 4}s`; flake.style.animationDelay = `${Math.random() * 5}s`;
-          snow.appendChild(flake);
-        }
+        for (let i = 0; i < 28; i++) { const flake = document.createElement('div'); flake.className = 'snow-flake'; flake.textContent = i % 2 === 0 ? '❄️' : '❅'; flake.style.left = `${Math.random() * 100}vw`; flake.style.animationDuration = `${4 + Math.random() * 4}s`; flake.style.animationDelay = `${Math.random() * 5}s`; snow.appendChild(flake); }
       } else tokenLabel.textContent = '🔋 코어';
       refillWaitingQueue(); spawnNextCustomer(); updateAllUI();
     }
-
     function updateThemeDdayText() {
       if (activeThemeMode === 'normal') return;
       const diff = Math.max(0, (THEME_TARGETS[activeThemeMode] || THEME_TARGETS.alien) - Date.now());
@@ -1105,14 +886,11 @@
         try {
           const parsed = savedBackup ? JSON.parse(savedBackup) : null;
           detectedRecoveryData = { nickname: savedNick || parsed?.nickname, state: parsed };
-          if (detectedRecoveryData.nickname) {
-            document.getElementById('recoveryBanner').classList.remove('hidden');
-            document.getElementById('recoverySummaryText').textContent = `사장님 [${detectedRecoveryData.nickname}] · 보유 자금 ${parsed?.money ? Number(parsed.money).toLocaleString() + '원' : '클라우드 기록'}`;
-          }
+          if (detectedRecoveryData.nickname) { document.getElementById('recoveryBanner').classList.remove('hidden'); document.getElementById('recoverySummaryText').textContent = `사장님 [${detectedRecoveryData.nickname}] · 보유 자금 ${parsed?.money ? Number(parsed.money).toLocaleString() + '원' : '클라우드 기록'}`; }
         } catch (e) {}
       }
     }
-    function applyDetectedRecovery() { if (detectedRecoveryData?.nickname) { document.getElementById('loginNickname').value = detectedRecoveryData.nickname; showToast('✨ 닉네임이 입력되었습니다! 기존 PIN 4자리를 입력해 접속하세요.'); } }
+    function applyDetectedRecovery() { if (detectedRecoveryData?.nickname) { document.getElementById('loginNickname').value = detectedRecoveryData.nickname; showToast('✨ 닉네임이 입력되었습니다! 기존 PIN 4자리를 입력하세요.'); } }
     function sanitizeKey(str) { return str.replace(/[.#$\[\]\/]/g, '_').trim(); }
 
     function handleAccountLogin() {
@@ -1135,15 +913,13 @@
             coreWeapons: Object.assign({ hyperLaser: 0, autoTurret: 0 }, data.coreWeapons || {}),
             upgrades: Object.assign({ partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 }, data.upgrades || {})
           });
-          userRef.update({ updatedAt: Date.now() });
-          finishLoginSetup();
+          userRef.update({ updatedAt: Date.now() }); finishLoginSetup();
         } else {
           currentUser = { key: userKey, nickname: nickInput, pin: pinInput };
           userRef.set({ nickname: nickInput, pin: pinInput, ...gameState, updatedAt: Date.now() }).then(() => finishLoginSetup());
         }
       });
     }
-
     function finishLoginSetup() {
       localStorage.setItem('conv_tycoon_nick', currentUser.nickname);
       localStorage.setItem('conv_tycoon_backup', JSON.stringify({ nickname: currentUser.nickname, ...gameState }));
@@ -1153,7 +929,6 @@
       showToast(`🎉 [${currentUser.nickname}] 사장님, 매장 오픈을 환영합니다!`);
       setInterval(gameLoopTick, 250); setInterval(saveToCloud, 15000);
     }
-
     function saveToCloud() {
       if (!currentUser || isRemoteMoneySyncing) return;
       localStorage.setItem('conv_tycoon_backup', JSON.stringify({ nickname: currentUser.nickname, ...gameState }));
@@ -1162,7 +937,6 @@
     function manualCloudSave() { saveToCloud(); playCoinTap(); showToast('☁️ 매장 데이터가 서버에 안전하게 저장되었습니다!'); }
 
     function setupRealtimeListeners() {
-      // 실시간 동접자(Presence) 등록 및 감시
       const myPresenceRef = db.ref(`presence/${currentUser.key}`);
       db.ref('.info/connected').on('value', snap => {
         if (snap.val() === true) {
@@ -1186,10 +960,8 @@
         if (val.banned) { document.getElementById('banReasonDisplay').textContent = val.banReason || '관리자에 의해 이용이 정지되었습니다.'; document.getElementById('banLockModal').classList.remove('hidden'); }
         if (val.adminSyncFlag && val.adminSyncFlag !== window._lastSyncFlag) {
           window._lastSyncFlag = val.adminSyncFlag; isRemoteMoneySyncing = true;
-          gameState.money = Number(val.money ?? gameState.money);
-          gameState.energyCores = Number(val.energyCores ?? gameState.energyCores);
-          updateAllUI();
-          showToast('💰 관리자에 의해 보유 자금/재화가 갱신되었습니다!');
+          gameState.money = Number(val.money ?? gameState.money); gameState.energyCores = Number(val.energyCores ?? gameState.energyCores);
+          updateAllUI(); showToast('💰 관리자에 의해 보유 자금/재화가 갱신되었습니다!');
           setTimeout(() => { isRemoteMoneySyncing = false; }, 500);
         }
       });
@@ -1221,10 +993,7 @@
         } else if (isInitialThemeLoad) { isInitialThemeLoad = false; applyThemeVisuals(val.activeTheme || 'normal'); }
         if (val.resetId && val.resetId !== lastSeasonResetId) {
           lastSeasonResetId = val.resetId;
-          if (!isInitialSeasonLoad) {
-            Object.assign(gameState, { money: 15000, day: 1, branchCount: 1, energyCores: 0, upgrades: { partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 } });
-            saveToCloud(); renderUpgradeList(); updateAllUI(); showToast(`👑 시즌 ${currentSeasonNumber}이 새롭게 개막했습니다!`);
-          }
+          if (!isInitialSeasonLoad) { Object.assign(gameState, { money: 15000, day: 1, branchCount: 1, energyCores: 0, upgrades: { partTimer: 0, posScanner: 0, coffeeMachine: 0, storeExpansion: 0 } }); saveToCloud(); renderUpgradeList(); updateAllUI(); showToast(`👑 시즌 ${currentSeasonNumber}이 새롭게 개막했습니다!`); }
         }
         isInitialSeasonLoad = false;
       });
@@ -1236,23 +1005,15 @@
             lastRaidWinId = raid.winId;
             if (!isInitialRaidLoad) {
               const rType = raid.type || 'alien';
-              playCutsceneSequence(`${rType}_raid_win`, () => {
-                gameState.money += 250000;
-                if (rType === 'cyber' && !gameState.medals.includes('💻화이트해커')) gameState.medals.push('💻화이트해커');
-                if (rType === 'alien' && !gameState.medals.includes('👽우주수호자')) gameState.medals.push('👽우주수호자');
-                saveToCloud(); updateAllUI(); showToast('🏆 이벤트 승리 보상 +250,000원 & 특별 칭호 지급!');
-              });
+              playCutsceneSequence(`${rType}_raid_win`, () => { gameState.money += 250000; if (rType === 'cyber' && !gameState.medals.includes('💻화이트해커')) gameState.medals.push('💻화이트해커'); if (rType === 'alien' && !gameState.medals.includes('👽우주수호자')) gameState.medals.push('👽우주수호자'); saveToCloud(); updateAllUI(); showToast('🏆 이벤트 승리 보상 +250,000원 & 특별 칭호 지급!'); });
             }
           }
           activeRaidState = null; isInitialRaidLoad = false; return;
         }
         activeRaidState = raid; hud.classList.remove('hidden');
         const isCyber = raid.type === 'cyber';
-        document.getElementById('raidBossIcon').textContent = isCyber ? '🤖' : '🛸';
-        document.getElementById('raidBossTitle').textContent = isCyber ? 'AI 메인프레임 결전!' : '외계인 모선 총공세 이벤트!';
-        document.getElementById('bossHpName').textContent = isCyber ? '메인프레임 코어 무결성' : '모선 에너지 코어 HP';
-        document.getElementById('laserBtnLabel').textContent = isCyber ? '백신 광선' : '광선 가동';
-        document.getElementById('coreBtnLabel').textContent = isCyber ? '💾 칩 오버로드' : '🔋 코어 방출';
+        document.getElementById('raidBossIcon').textContent = isCyber ? '🤖' : '🛸'; document.getElementById('raidBossTitle').textContent = isCyber ? 'AI 메인프레임 결전!' : '외계인 모선 총공세 이벤트!';
+        document.getElementById('bossHpName').textContent = isCyber ? '메인프레임 코어 무결성' : '모선 에너지 코어 HP'; document.getElementById('laserBtnLabel').textContent = isCyber ? '백신 광선' : '광선 가동'; document.getElementById('coreBtnLabel').textContent = isCyber ? '💾 칩 오버로드' : '🔋 코어 방출';
         const hp = Math.max(0, Number(raid.hp || 0)), maxHp = Math.max(1, Number(raid.maxHp || 100000));
         document.getElementById('bossHpLabel').textContent = `${hp.toLocaleString()} / ${maxHp.toLocaleString()}`;
         document.getElementById('bossHpFill').style.width = `${Math.min(100, (hp / maxHp) * 100)}%`;
@@ -1324,10 +1085,7 @@
       currentCustomer = waitingQueue.shift(); refillWaitingQueue(); preparedChange = 0;
       document.getElementById('posCustomerTitle').textContent = `${currentCustomer.profile.emoji} ${currentCustomer.profile.name}`;
       ['posSpecialIncidentArea', 'posStep1Area', 'posStep2CardArea', 'posStep2CashArea'].forEach(id => document.getElementById(id).classList.add('hidden'));
-      if (currentCustomer.isIncident) {
-        document.getElementById('posStepBadge').textContent = '⚠️ 돌발 상황 발생'; document.getElementById('posSpecialIncidentArea').classList.remove('hidden');
-        document.getElementById('scanProgressText').textContent = '신분증 확인 필요'; document.getElementById('posScannedTotal').textContent = '0원'; return;
-      }
+      if (currentCustomer.isIncident) { document.getElementById('posStepBadge').textContent = '⚠️ 돌발 상황 발생'; document.getElementById('posSpecialIncidentArea').classList.remove('hidden'); document.getElementById('scanProgressText').textContent = '신분증 확인 필요'; document.getElementById('posScannedTotal').textContent = '0원'; return; }
       document.getElementById('posStepBadge').textContent = 'STEP 1 · 바코드 스캔'; document.getElementById('posStep1Area').classList.remove('hidden'); renderBasketItems();
     }
     function renderBasketItems() {
@@ -1345,12 +1103,8 @@
       renderBasketItems();
       if (currentCustomer.basket.every(i => i.scanned)) {
         document.getElementById('posStep1Area').classList.add('hidden');
-        if (currentCustomer.payMethod === 'card') {
-          document.getElementById('posStepBadge').textContent = 'STEP 2 · 카드 승인'; document.getElementById('posStep2CardArea').classList.remove('hidden'); document.getElementById('cardPayAmountText').textContent = `${currentCustomer.total.toLocaleString()}원`;
-        } else {
-          document.getElementById('posStepBadge').textContent = 'STEP 2 · 현금 거스름돈'; document.getElementById('posStep2CashArea').classList.remove('hidden');
-          document.getElementById('cashGivenText').textContent = `${currentCustomer.cashGiven.toLocaleString()}원`; document.getElementById('cashTotalText').textContent = `${currentCustomer.total.toLocaleString()}원`; document.getElementById('cashPreparedText').textContent = '0원';
-        }
+        if (currentCustomer.payMethod === 'card') { document.getElementById('posStepBadge').textContent = 'STEP 2 · 카드 승인'; document.getElementById('posStep2CardArea').classList.remove('hidden'); document.getElementById('cardPayAmountText').textContent = `${currentCustomer.total.toLocaleString()}원`; }
+        else { document.getElementById('posStepBadge').textContent = 'STEP 2 · 현금 거스름돈'; document.getElementById('posStep2CashArea').classList.remove('hidden'); document.getElementById('cashGivenText').textContent = `${currentCustomer.cashGiven.toLocaleString()}원`; document.getElementById('cashTotalText').textContent = `${currentCustomer.total.toLocaleString()}원`; document.getElementById('cashPreparedText').textContent = '0원'; }
       }
     }
     function addChangeCash(amount) { preparedChange += amount; playCoinTap(); document.getElementById('cashPreparedText').textContent = `${preparedChange.toLocaleString()}원`; }
@@ -1362,33 +1116,22 @@
       finalizeCustomerSale(1.2, ev);
     }
     function resolveSpecialIncident(refused, ev) {
-      if (refused) {
-        const reward = Math.floor(8000 * getCurrentMultiplier()); gameState.money += reward; gameState.combo += 1; playRegisterComplete();
-        if (ev) spawnFloatingText(ev.clientX, ev.clientY, `모범 업소 포상금 +${reward.toLocaleString()}원!`, '#fbbf24');
-        showToast(`🛡️ 모범 업소 포상금 +${reward.toLocaleString()}원!`);
-      } else { gameState.money = Math.max(0, gameState.money - 5000); gameState.combo = 0; showToast('🚨 단속 적발! 과태료 -5,000원이 부과되었습니다.', 'rose'); }
+      if (refused) { const reward = Math.floor(8000 * getCurrentMultiplier()); gameState.money += reward; gameState.combo += 1; playRegisterComplete(); if (ev) spawnFloatingText(ev.clientX, ev.clientY, `모범 업소 포상금 +${reward.toLocaleString()}원!`, '#fbbf24'); showToast(`🛡️ 모범 업소 포상금 +${reward.toLocaleString()}원!`); }
+      else { gameState.money = Math.max(0, gameState.money - 5000); gameState.combo = 0; showToast('🚨 단속 적발! 과태료 -5,000원이 부과되었습니다.', 'rose'); }
       spawnNextCustomer(); updateAllUI();
     }
     function finalizeCustomerSale(bonusFactor = 1.0, ev = null) {
       const earned = Math.floor(currentCustomer.total * getCurrentMultiplier() * bonusFactor * (currentCustomer.isVip ? 10 : 1));
       gameState.money += earned; gameState.combo += 1; gameState.totalServed += 1; gameState.cleanliness = Math.max(20, gameState.cleanliness - 2);
       let coreMsg = '';
-      if (activeThemeMode !== 'normal') {
-        const gainedCore = currentCustomer.isVip ? 5 : 1; gameState.energyCores += gainedCore;
-        coreMsg = ` · ${activeThemeMode === 'cyber' ? '💾 칩' : activeThemeMode === 'xmas' ? '🎁 선물' : '🔋 코어'} +${gainedCore}`;
-      }
+      if (activeThemeMode !== 'normal') { const gainedCore = currentCustomer.isVip ? 5 : 1; gameState.energyCores += gainedCore; coreMsg = ` · ${activeThemeMode === 'cyber' ? '💾 칩' : activeThemeMode === 'xmas' ? '🎁 선물' : '🔋 코어'} +${gainedCore}`; }
       playRegisterComplete(); if (ev) spawnFloatingText(ev.clientX, ev.clientY, `+${earned.toLocaleString()}원${coreMsg}`, '#fbbf24');
       spawnNextCustomer(); updateAllUI();
     }
     function cleanStoreFloor(ev) { gameState.cleanliness = 100; const tip = Math.floor(1500 * getCurrentMultiplier()); gameState.money += tip; playGiftFanfare(); if (ev) spawnFloatingText(ev.clientX, ev.clientY, `반짝반짝! +${tip.toLocaleString()}원`, '#38bdf8'); updateAllUI(); }
 
-    function getCurrentMultiplier() {
-      return Number(((1 + (gameState.branchCount - 1) * 0.5) * (1 + (gameState.upgrades.posScanner || 0) * 0.15) * (gameState.cleanliness >= 80 ? 1.1 : gameState.cleanliness < 40 ? 0.8 : 1.0) * (Date.now() < serverFeverUntil ? serverFeverMultiplier : 1.0)).toFixed(2));
-    }
-    function getPassiveIncomePerSec() {
-      let base = 0; UPGRADE_DEFS.forEach(u => { base += (gameState.upgrades[u.key] || 0) * u.passivePerLv; });
-      return Math.floor(base * getCurrentMultiplier());
-    }
+    function getCurrentMultiplier() { return Number(((1 + (gameState.branchCount - 1) * 0.5) * (1 + (gameState.upgrades.posScanner || 0) * 0.15) * (gameState.cleanliness >= 80 ? 1.1 : gameState.cleanliness < 40 ? 0.8 : 1.0) * (Date.now() < serverFeverUntil ? serverFeverMultiplier : 1.0)).toFixed(2)); }
+    function getPassiveIncomePerSec() { let base = 0; UPGRADE_DEFS.forEach(u => { base += (gameState.upgrades[u.key] || 0) * u.passivePerLv; }); return Math.floor(base * getCurrentMultiplier()); }
     function renderUpgradeList() {
       document.getElementById('upgradeListContainer').innerHTML = UPGRADE_DEFS.map(u => {
         const lv = gameState.upgrades[u.key] || 0, cost = Math.floor(u.baseCost * Math.pow(u.mult, lv)), isMax = lv >= u.maxLv;
@@ -1420,15 +1163,8 @@
       playGiftFanfare(); renderUpgradeList(); updateAllUI(); saveToCloud(); showToast(`🎊 축하합니다! ${gameState.branchCount}호점이 개업했습니다!`);
     }
 
-    function triggerCyberFirewall() {
-      cyberFirewallCode = String(Math.floor(1000 + Math.random() * 9000)); cyberFirewallLocked = true;
-      document.getElementById('cyberCodeDisplay').textContent = cyberFirewallCode; document.getElementById('cyberCodeInput').value = ''; document.getElementById('cyberFirewallBox').classList.remove('hidden');
-    }
-    function submitCyberFirewallCode() {
-      if (document.getElementById('cyberCodeInput').value.trim() === cyberFirewallCode) {
-        cyberFirewallLocked = false; document.getElementById('cyberFirewallBox').classList.add('hidden'); playGiftFanfare(); showToast('🔓 AI 방화벽 해독 완료! 3배 위력이 적용됩니다!');
-      } else showToast('❌ 보안 암호가 틀렸습니다!', 'rose');
-    }
+    function triggerCyberFirewall() { cyberFirewallCode = String(Math.floor(1000 + Math.random() * 9000)); cyberFirewallLocked = true; document.getElementById('cyberCodeDisplay').textContent = cyberFirewallCode; document.getElementById('cyberCodeInput').value = ''; document.getElementById('cyberFirewallBox').classList.remove('hidden'); }
+    function submitCyberFirewallCode() { if (document.getElementById('cyberCodeInput').value.trim() === cyberFirewallCode) { cyberFirewallLocked = false; document.getElementById('cyberFirewallBox').classList.add('hidden'); playGiftFanfare(); showToast('🔓 AI 방화벽 해독 완료! 3배 위력이 적용됩니다!'); } else showToast('❌ 보안 암호가 틀렸습니다!', 'rose'); }
     function attackMothership(mode, ev) {
       if (!activeRaidState || !activeRaidState.active) return;
       const laserLv = gameState.coreWeapons.hyperLaser || 0; let dmg = 150 + laserLv * 100;
@@ -1527,15 +1263,23 @@
     function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
     function verifyAdminPass() {
       if (document.getElementById('adminPassInput').value.trim() === ADMIN_SECRET) {
-        document.getElementById('adminAuthGate').classList.add('hidden'); document.getElementById('adminDashboard').classList.remove('hidden');
-        renderSurprise50Buttons(); loadAdminUserList(); loadAdminFeedbacks();
+        document.getElementById('adminAuthGate').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        renderSurprise50Buttons();
+        loadAdminUserList();
+        loadAdminFeedbacks();
         db.ref('meta/totalVisits').once('value', s => { document.getElementById('adminTotalVisits').textContent = `${Number(s.val() || 0).toLocaleString()}회`; });
       } else document.getElementById('adminAuthError').classList.remove('hidden');
     }
     function renderSurprise50Buttons() {
-      const grid = document.getElementById('adminSurprise50Grid');
-      if (!grid) return;
-      grid.innerHTML = SURPRISE_50_LIST.map(ev => `<button onclick="triggerAdminSurprise('${ev.id}')" class="p-2 rounded-xl bg-slate-900/90 hover:bg-purple-900/50 border border-purple-400/40 text-left active:scale-95 transition"><div class="text-[11px] font-black text-amber-300 truncate">${ev.title}</div><div class="text-[9px] text-slate-300 truncate">${ev.desc}</div></button>`).join('');
+      const sel = document.getElementById('adminSurpriseSelect');
+      if (sel) {
+        sel.innerHTML = SURPRISE_50_LIST.map(ev => `<option value="${ev.id}">${ev.title} (${ev.desc})</option>`).join('');
+      }
+    }
+    function triggerRandomSurprise() {
+      const rand = SURPRISE_50_LIST[Math.floor(Math.random() * SURPRISE_50_LIST.length)];
+      triggerAdminSurprise(rand.id);
     }
     function saveSeasonConfig() {
       db.ref('global/season').update({ number: Number(document.getElementById('adminSeasonNumInput').value || 1), bannerText: document.getElementById('adminBannerMsgInput').value.trim() || '대규모 이벤트가 다가옵니다..' });
@@ -1564,6 +1308,10 @@
       });
     }
     function triggerAdminSurprise(type) {
+      if (!type) {
+        const sel = document.getElementById('adminSurpriseSelect');
+        type = sel ? sel.value : 'money_rain';
+      }
       const msgInput = document.getElementById('adminMegaphoneInput');
       db.ref('global/surprise').set({ id: `surp_${Date.now()}`, type, text: msgInput ? msgInput.value.trim() : '', timestamp: Date.now() });
       showToast(`🎪 깜짝 이벤트 [${type}] 발송 완료!`);
@@ -1585,52 +1333,23 @@
       if (cfg.rushSec) autoRushUntil = Date.now() + cfg.rushSec * 1000;
       if (cfg.zeroG) { zeroGravityUntil = Date.now() + cfg.zeroG; renderBasketItems(); }
       if (cfg.lottoChance) {
-        if (Math.random() < cfg.lottoChance) {
-          gameState.money += cfg.lottoPrize;
-          showToast(`🎰 대박!! 당첨되어 +${cfg.lottoPrize.toLocaleString()}원을 획득했습니다!`);
-        } else {
-          showToast('🎰 추첨이 진행되었습니다! 아쉽지만 다음 기회에!');
-        }
+        if (Math.random() < cfg.lottoChance) { gameState.money += cfg.lottoPrize; showToast(`🎰 대박!! 당첨되어 +${cfg.lottoPrize.toLocaleString()}원을 획득했습니다!`); }
+        else showToast('🎰 추첨이 진행되었습니다! 아쉽지만 다음 기회에!');
         updateAllUI(); return;
       }
-      if (cfg.spawnVip) {
-        for (let i = 0; i < cfg.spawnVip; i++) waitingQueue.unshift(createCustomerObject(true, false));
-        renderWaitingLine();
-      }
-      if (cfg.spawnLarge) {
-        for (let i = 0; i < cfg.spawnLarge; i++) waitingQueue.unshift(createCustomerObject(false, true));
-        renderWaitingLine();
-      }
-      if (cfg.bodyClass) {
-        const classes = cfg.bodyClass.split(' ');
-        document.body.classList.add(...classes);
-        setTimeout(() => document.body.classList.remove(...classes), cfg.dur || 5000);
-      }
-      if (cfg.blackout) {
-        const bo = document.getElementById('blackoutOverlay');
-        bo.classList.remove('hidden');
-        setTimeout(() => bo.classList.add('hidden'), cfg.blackout);
-      }
+      if (cfg.spawnVip) { for (let i = 0; i < cfg.spawnVip; i++) waitingQueue.unshift(createCustomerObject(true, false)); renderWaitingLine(); }
+      if (cfg.spawnLarge) { for (let i = 0; i < cfg.spawnLarge; i++) waitingQueue.unshift(createCustomerObject(false, true)); renderWaitingLine(); }
+      if (cfg.bodyClass) { const classes = cfg.bodyClass.split(' '); document.body.classList.add(...classes); setTimeout(() => document.body.classList.remove(...classes), cfg.dur || 5000); }
+      if (cfg.blackout) { const bo = document.getElementById('blackoutOverlay'); bo.classList.remove('hidden'); setTimeout(() => bo.classList.add('hidden'), cfg.blackout); }
       if (cfg.slime) {
-        const slime = document.getElementById('slimeOverlay');
-        slime.classList.remove('hidden', 'pointer-events-none');
+        const slime = document.getElementById('slimeOverlay'); slime.classList.remove('hidden', 'pointer-events-none');
         slime.innerHTML = Array.from({ length: 12 }, () => `<div onclick="this.remove()" style="position:fixed;left:${10 + Math.random() * 75}vw;top:${15 + Math.random() * 65}vh;font-size:54px;cursor:pointer;">${cfg.slime}</div>`).join('');
         setTimeout(() => { slime.innerHTML = ''; slime.classList.add('hidden', 'pointer-events-none'); }, 8000);
       }
       if (cfg.rain) {
-        for (let i = 0; i < 24; i++) {
-          const el = document.createElement('div');
-          el.className = 'money-rain-item';
-          el.textContent = cfg.rain;
-          el.style.left = `${Math.random() * 95}vw`;
-          el.style.animationDelay = `${Math.random() * 1.2}s`;
-          document.body.appendChild(el);
-          setTimeout(() => el.remove(), 3500);
-        }
+        for (let i = 0; i < 24; i++) { const el = document.createElement('div'); el.className = 'money-rain-item'; el.textContent = cfg.rain; el.style.left = `${Math.random() * 95}vw`; el.style.animationDelay = `${Math.random() * 1.2}s`; document.body.appendChild(el); setTimeout(() => el.remove(), 3500); }
       }
-      playGiftFanfare();
-      showToast(`🎪 ${cfg.title} — ${cfg.desc}`);
-      updateAllUI();
+      playGiftFanfare(); showToast(`🎪 ${cfg.title} — ${cfg.desc}`); updateAllUI();
     }
 
     function postGlobalNotice() {
@@ -1640,7 +1359,6 @@
       db.ref('global/notice').set(payload); db.ref('global/noticeHistory').push(payload);
       showToast('📢 전체 긴급 공지가 발송되었습니다!');
     }
-    function clearGlobalNotice() { db.ref('global/notice').remove(); }
     function triggerServerFever(minutes, mult) { db.ref('global/fever').set({ until: Date.now() + minutes * 60000, multiplier: mult }); showToast(`🔥 ${minutes}분간 전체 서버 ${mult}배 피버 발동!`); }
     function triggerCustomFever() { triggerServerFever(Number(document.getElementById('adminFeverMinInput').value || 5), Number(document.getElementById('adminFeverMultInput').value || 2)); }
     function stopServerFever() { db.ref('global/fever').remove(); showToast('피버 타임이 종료되었습니다.'); }
@@ -1651,14 +1369,26 @@
         users.sort((a, b) => (onlineUserKeys.has(b.key) ? 1 : 0) - (onlineUserKeys.has(a.key) ? 1 : 0) || (b.updatedAt || 0) - (a.updatedAt || 0));
         document.getElementById('adminTotalUsers').textContent = `${users.length}명`;
         document.getElementById('adminUserSelect').innerHTML = '<option value="">-- 가입 유저 선택 --</option>' + users.map(u => `<option value="${escapeHtml(u.nickname)}">${onlineUserKeys.has(u.key) ? '🟢 ' : '⚪ '}${escapeHtml(u.nickname)} (${Number(u.money || 0).toLocaleString()}원)</option>`).join('');
-        document.getElementById('adminUserStatusList').innerHTML = users.map(u => {
-          const isOnline = onlineUserKeys.has(u.key);
-          return `<div class="flex items-center justify-between px-2 py-1.5 rounded bg-slate-900 border ${isOnline ? 'border-emerald-500/60' : 'border-slate-700'}"><div class="flex items-center gap-1.5 min-w-0"><span class="text-[10px]">${isOnline ? '🟢' : '⚪'}</span><span class="${u.banned ? 'text-rose-400 line-through' : 'text-slate-200'} font-bold truncate">${escapeHtml(u.nickname)}</span></div><span class="text-slate-400 shrink-0">${u.banned ? '🚫 차단됨' : `${Number(u.money || 0).toLocaleString()}원`}</span></div>`;
-        }).join('');
+        document.getElementById('adminUserStatusList').innerHTML = users.length === 0
+          ? '<div class="text-slate-400 text-xs py-2">가입된 사장님이 없습니다.</div>'
+          : users.map(u => {
+              const isOnline = onlineUserKeys.has(u.key);
+              const lastDate = u.updatedAt ? new Date(u.updatedAt).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+              return `<div class="flex items-center justify-between px-2.5 py-2 rounded-xl bg-slate-900 border ${isOnline ? 'border-emerald-500/60' : 'border-slate-700'}">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span>${isOnline ? '🟢' : '⚪'}</span>
+                    <span class="${u.banned ? 'text-rose-400 line-through' : 'text-white'} font-black truncate">${escapeHtml(u.nickname)}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-[10px] font-bold">PIN: ${escapeHtml(String(u.pin || '----'))}</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">최근 접속: ${lastDate} · ${u.branchCount || 1}호점</div>
+                </div>
+                <div class="font-black shrink-0 ${u.banned ? 'text-rose-400' : 'text-emerald-300'}">${u.banned ? '🚫 차단됨' : `${Number(u.money || 0).toLocaleString()}원`}</div>
+              </div>`;
+            }).join('');
       });
     }
     function syncSelectedUserToInput() { const v = document.getElementById('adminUserSelect').value; if (v) document.getElementById('adminTargetNickname').value = v; }
-    function setAdminAmountPreset(amt) { document.getElementById('adminMoneyAmount').value = amt; }
     function adminModifyUserMoney(mode) {
       const target = document.getElementById('adminTargetNickname').value.trim(), amount = Number(document.getElementById('adminMoneyAmount').value || 0);
       if (!target) return;
@@ -1719,4 +1449,3 @@
   </script>
 </body>
 </html>
-
